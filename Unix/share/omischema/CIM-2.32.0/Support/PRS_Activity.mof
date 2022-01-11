@@ -42,7 +42,7 @@ class PRS_Activity : PRS_ExchangeElement {
 
       [Description ( 
           "The date of the Activity. This property is set by the "
-          "PRS_SISService StartSISTranasaction method." )]
+          "PRS_SISService StartSISTransaction method." )]
    datetime LocalDate;
 
       [Description ( "Description of the activity performed." )]

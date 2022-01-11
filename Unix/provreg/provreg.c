@@ -192,7 +192,7 @@ ProvRegNamespaceNode* _FindOrCreateNamespace(
 /* ********************************************************* */
 /* ***                tree operations                    *** */
 /* ********************************************************* */
-ProvRegClassInheritanceNode* _GetNextTreeNodeLimittedBy(
+ProvRegClassInheritanceNode* _GetNextTreeNodeLimitedBy(
     ProvRegClassInheritanceNode* item,
     ProvRegClassInheritanceNode* subtreeRoot)
 {
@@ -220,7 +220,7 @@ ProvRegClassInheritanceNode* _GetNextTreeNodeLimittedBy(
 ProvRegClassInheritanceNode* _GetNextTreeNode(
     ProvRegClassInheritanceNode* item)
 {
-    return _GetNextTreeNodeLimittedBy(item,0);
+    return _GetNextTreeNodeLimitedBy(item,0);
 }
 
 ProvRegClassInheritanceNode* _FindClassNodeInTreeByChar(
@@ -694,7 +694,7 @@ static int _AddEntryForExtraClass(
     return 0;
 }
 
-/* Initialize ProvReg strucutre from given directory */
+/* Initialize ProvReg structure from given directory */
 _Use_decl_annotations_
 MI_Result ProvReg_Init(ProvReg* self, const char* directory)
 {
@@ -875,7 +875,7 @@ failed:
     return r;
 }
 
-/* Initialize ProvReg strucutre from omiregister directory */
+/* Initialize ProvReg structure from omiregister directory */
 _Use_decl_annotations_
 MI_Result ProvReg_Init2(ProvReg* self)
 {
@@ -1012,7 +1012,7 @@ MI_Result ProvReg_NextClass(
 
     if (pos->deep)
     {
-        pos->current = _GetNextTreeNodeLimittedBy(pos->current,pos->start);
+        pos->current = _GetNextTreeNodeLimitedBy(pos->current,pos->start);
     }
     else
     {

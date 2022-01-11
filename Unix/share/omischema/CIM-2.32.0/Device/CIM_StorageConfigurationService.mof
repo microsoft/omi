@@ -209,7 +209,7 @@ class CIM_StorageConfigurationService : CIM_Service {
       [Description ( 
           "Start a job to create a new storage object which is a "
           "replica of the specified source storage object. "
-          "(SourceElement). Note that using the input paramter, "
+          "(SourceElement). Note that using the input parameter, "
           "CopyType, this function can be used to instantiate the "
           "replica, and to create an ongoing association between "
           "the source and replica. If 0 is returned, the function "

@@ -176,11 +176,11 @@ INLINE XML_Char* _ToEntityRef(_Inout_ XML* self, _In_z_ XML_Char* p, _Out_ XML_C
     /* Note: we collected the following statistics on the frequency of
      * each entity reference in a large body of XML documents:
      *     
-     *     &quot; - 74,480 occurences
-     *     &apos; - 13,877 occurences
-     *     &lt;   -  9,919 occurences
-     *     &gt;   -  9,853 occurences
-     *     &amp;  -    111 occurences
+     *     &quot; - 74,480 occurrences
+     *     &apos; - 13,877 occurrences
+     *     &lt;   -  9,919 occurrences
+     *     &gt;   -  9,853 occurrences
+     *     &amp;  -    111 occurrences
      *
      * The cases below are organized in order of statistical frequency.
      */
@@ -263,8 +263,8 @@ INLINE XML_Char* _ToRef(_Inout_ XML* self, _In_z_ XML_Char* p, _Out_ XML_Char* c
         return _ToEntityRef(self, p, ch);
 }
 
-/* Matches all but '\0', '\'', '"', and '&'. All matching charcters
- * yeild 2, except for '\n', which yields 1 
+/* Matches all but '\0', '\'', '"', and '&'. All matching characters
+ * yield 2, except for '\n', which yields 1 
  */
 static const unsigned char _ReduceAttrValueMatchChars[256] =
 {
@@ -463,7 +463,7 @@ INLINE unsigned int _HashCode(_In_reads_z_(n) const XML_Char* s, size_t n)
      * (e.g., URIs) the first character is not unique. Instead the hash 
      * comprises three components:
      *     (1) The length
-     *     (3) The last chacter
+     *     (3) The last character
      */
     return n ? (int)(n ^ s[n-1]) : 0;
 }
@@ -716,7 +716,7 @@ static void _ParseAttr(
         /* Check for attribute array overflow */
         if (elem->attrsSize == XML_MAX_ATTRIBUTES)
         {
-            elem->data.data[elem->data.size] = 0;   //May not have been null termated yet
+            elem->data.data[elem->data.size] = 0;   //May not have been null terminated yet
             XML_Raise(self, XML_ERROR_TOO_MANY_ATTRIBUTES, tcs(elem->data.data), (int)XML_MAX_ATTRIBUTES);
             return;
         }
@@ -871,7 +871,7 @@ static void _ParseStartTag(
             }
         }
 
-        /* If input exhuasted */
+        /* If input exhausted */
         if (*p == '\0')
         {
             XML_Raise(self, XML_ERROR_ELEMENT_NAME_PREMATURE_END);
@@ -1064,7 +1064,7 @@ static void _ParseEndTag(
         }
     }
 
-    /* If input exhuasted */
+    /* If input exhausted */
     if (*p == '\0')
     {
         XML_Raise(self, XML_ERROR_ELEMENT_NAME_PREMATURE_END_ELEM_END);

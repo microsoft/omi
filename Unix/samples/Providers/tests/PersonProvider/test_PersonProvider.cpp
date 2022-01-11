@@ -580,7 +580,7 @@ static void EnumeratePerson(
 {
     MI_Result r;
 
-    // Call the provider's enumeate method.
+    // Call the provider's enumerate method.
     mh.callEnumerate();
 
     // Check the result.

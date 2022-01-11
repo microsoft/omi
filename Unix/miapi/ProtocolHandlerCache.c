@@ -207,7 +207,7 @@ MI_Result ProtocolHandlerCache_CreateAllProtocolEntries(_Inout_ ProtocolHandlerC
 
     if (ret == MI_RESULT_OK)
     {
-        /* Handler staticly compiled in ones now */
+        /* Handler statically compiled in ones now */
         for (staticHandlerLoop = 0; staticHandlerLoop != sizeof(g_staticallyLoadedProtocolHandlers)/sizeof(g_staticallyLoadedProtocolHandlers[0]); staticHandlerLoop++)
         {
             ProtocolHandlerCacheItem *item;
@@ -346,7 +346,7 @@ MI_EXTERN_C MI_Result ProtocolHandlerCache_DeInitialize(_Inout_ ProtocolHandlerC
     return MI_RESULT_OK;
 }
 
-/* LOCK MUST ALREADY BE AQUIRED */
+/* LOCK MUST ALREADY BE ACQUIRED */
 _Success_(return == MI_RESULT_OK)
 MI_Result ProtocolHandlerCache_FindProtocolHandler(_Inout_ ProtocolHandlerCache *cache, _In_z_ const MI_Char *name, _Outptr_ ProtocolHandlerCacheItem **cacheItem)
 {

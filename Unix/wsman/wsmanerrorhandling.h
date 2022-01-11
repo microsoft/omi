@@ -48,7 +48,7 @@
 #define SOAP_FAULT_SUBCODE_ERROR_WSMAN_DELIVERY_REFUSED WSMAN_NS_PREFIX MI_T("DeliveryRefused")
 #define SOAP_FAULT_SUBCODE_ERROR_WSMAN_DESTINATION_UNREACHABLE  WSA_NS_PREFIX MI_T("DestinationUnreachable")
 #define SOAP_FAULT_SUBCODE_ERROR_WSMAN_ENCODING_LIMIT WSMAN_NS_PREFIX MI_T("EncodingLimit")
-#define SOAP_FAULT_SUBCODE_ERROR_WSMAN_ENDPOINT_UNAVAILABLE WSA_NS_PREFIX MI_T("EndpointUnavilable")
+#define SOAP_FAULT_SUBCODE_ERROR_WSMAN_ENDPOINT_UNAVAILABLE WSA_NS_PREFIX MI_T("EndpointUnavailable")
 #define SOAP_FAULT_SUBCODE_ERROR_WSMAN_EVENTDELIVERTOUNUSABLE WSMAN_NS_PREFIX MI_T("EventDeliverToUnusable")
 #define SOAP_FAULT_SUBCODE_ERROR_WSMAN_EVENTING_SOURCE_UNABLE_TO_PROCESS WSE_NS_PREFIX MI_T("EventSourceUnableToProcess")
 #define SOAP_FAULT_SUBCODE_ERROR_WSMAN_ENUMERATE_FILTER_DIALECT_REQUESTED_UNAVAILABLE WSEN_NS_PREFIX MI_T("FilterDialectRequestedUnavailable")
@@ -81,7 +81,7 @@
 #define SOAP_FAULT_SUBCODE_ERROR_WSMB_POLYMORPHISM_MODE_UNSUPPORTED WSMB_NS_PREFIX MI_T("PolymorphismModeNotSupported")
 
 
-//WSMAN DETAIL STRINGS -- In order of apearence in WS-Man spec
+//WSMAN DETAIL STRINGS -- In order of appearance in WS-Man spec
 #define DMTF_FAULT_DETAIL_NS MI_T("http://schemas.dmtf.org/wbem/wsman/1/wsman/")
 
 #define SOAP_FAULT_WSMAN_DETAIL_ACTION_MISMATCH DMTF_FAULT_DETAIL_NS MI_T("faultDetail/ActionMismatch")
@@ -203,7 +203,7 @@ typedef enum _Error_Types
     ERROR_WSMAN_INVALID_XML_NAMESPACE,
     ERROR_WSMAN_INVALID_XML_FRAGMENT,
     ERROR_WSMAN_INVALID_REPRESENTATION,
-    ERROR_WSMAN_INSUFFCIENT_SELECTORS,
+    ERROR_WSMAN_INSUFFICIENT_SELECTORS,
     ERROR_WSMAN_INVALID_URI_WMI_SINGLETON,
     ERROR_WSMAN_UNEXPECTED_SELECTORS,
     ERROR_WSMAN_SELECTOR_TYPEMISMATCH,
@@ -291,7 +291,7 @@ typedef struct _Probable_Cause_Data
     Error_Types type;
     MI_Uint16      probable_cause_id; // From CIM_Error mof
     const MI_Char *description;
-    void *alloc_p;                    // If the Probaable_Cause_Data was PAL_Malloc'ed, we can free it using this address. If the address is NULL, 
+    void *alloc_p;                    // If the Probable_Cause_Data was PAL_Malloc'ed, we can free it using this address. If the address is NULL, 
                                       // this is a pointer to static data 
                                       // If it is PAL_Malloc'ed, the description is expected to be alloced along with the description and vice versa
 } Probable_Cause_Data;

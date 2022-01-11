@@ -72,7 +72,7 @@ typedef struct _MSFT_Neighbor /* extends CIM_AutonomousSystem */
     /* MSFT_Neighbor properties */
     MI_ConstStringField RouteMap;
     MI_ConstStringField Password;
-    MI_ConstUint32Field KeyEncriptionMethod;
+    MI_ConstUint32Field KeyEncryptionMethod;
 }
 MSFT_Neighbor;
 
@@ -1092,19 +1092,19 @@ MI_INLINE MI_Result MI_CALL MSFT_Neighbor_Clear_Password(
         35);
 }
 
-MI_INLINE MI_Result MI_CALL MSFT_Neighbor_Set_KeyEncriptionMethod(
+MI_INLINE MI_Result MI_CALL MSFT_Neighbor_Set_KeyEncryptionMethod(
     _Inout_ MSFT_Neighbor* self,
     _In_ MI_Uint32 x)
 {
-    ((MI_Uint32Field*)&self->KeyEncriptionMethod)->value = x;
-    ((MI_Uint32Field*)&self->KeyEncriptionMethod)->exists = 1;
+    ((MI_Uint32Field*)&self->KeyEncryptionMethod)->value = x;
+    ((MI_Uint32Field*)&self->KeyEncryptionMethod)->exists = 1;
     return MI_RESULT_OK;
 }
 
-MI_INLINE MI_Result MI_CALL MSFT_Neighbor_Clear_KeyEncriptionMethod(
+MI_INLINE MI_Result MI_CALL MSFT_Neighbor_Clear_KeyEncryptionMethod(
     _Inout_ MSFT_Neighbor* self)
 {
-    memset((void*)&self->KeyEncriptionMethod, 0, sizeof(self->KeyEncriptionMethod));
+    memset((void*)&self->KeyEncryptionMethod, 0, sizeof(self->KeyEncryptionMethod));
     return MI_RESULT_OK;
 }
 

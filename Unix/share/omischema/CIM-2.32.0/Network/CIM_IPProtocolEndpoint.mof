@@ -84,7 +84,7 @@ class CIM_IPProtocolEndpoint : CIM_ProtocolEndpoint {
           "A value of 7 \"DHCPv6\" shall indicate the values were "
           "assigned using DHCPv6. See RFC 3315. \n"
           "A value of 8 \"IPv6 AutoConfig\" shall indicate the "
-          "values were assinged using the IPv6 AutoConfig Protocol. "
+          "values were assigned using the IPv6 AutoConfig Protocol. "
           "See RFC 4862. \n"
           "A value of 9 \"Stateless\" shall indicate Stateless "
           "values were assigned. \n"
@@ -99,7 +99,7 @@ class CIM_IPProtocolEndpoint : CIM_ProtocolEndpoint {
    uint16 AddressOrigin = 0;
 
       [Description ( 
-          "IPv6AddressType indentified the type of address found in "
+          "IPv6AddressType identified the type of address found in "
           "the IPv6Address property. The values of this property "
           "shall be interpreted according to RFC4291, Section 2.4" ), 
        ValueMap { "2", "3", "4", "5", "6", "7", "8", "..", 

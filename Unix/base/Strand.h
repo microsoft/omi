@@ -304,7 +304,7 @@ struct _StrandMany
 {
     SListHead               pending;        // pending operations on main strand
     HashMap                 many;           // collection with interactions on the MANY direction (a StrandEntry)
-    HashMapIterator         iter;           // to interato thru "many"
+    HashMapIterator         iter;           // to iterate thru "many"
     size_t                  numEntries;     // number of entries on "many"
     FindEntryProc           findEntryProc;
     Strand                  strand;         // includes interaction for the Parent
@@ -435,7 +435,7 @@ MI_INLINE void StrandEntry_DeleteNoAdded( _In_ StrandEntry* self )
 }
 
 // Called inside a strand method (or when creating strand with STRAND_FLAG_ENTERSTRAND)
-// to explictly leave the strand (prematurely on the case of the strand method)
+// to explicitly leave the strand (prematurely on the case of the strand method)
 // Note that additional strand methods can be called if they are already
 // scheduled when Strand_Leave is called
 void Strand_Leave( _In_ Strand* self );
@@ -1321,7 +1321,7 @@ void Strand_OpenPrepare(
     _Strand_OpenPrepareImp( self, &self->info, interactionParams, callbackData, msg, leaveStrand );
 }
 
-// If after call Strand_OpenPrepare the opend didnt happen
+// If after call Strand_OpenPrepare the open didn't happen
 // Used on Strand/StrandMany/StrandEntry (but not StrandBoth, see below)
 MI_INLINE
 void Strand_OpenCancel(
@@ -1372,7 +1372,7 @@ void StrandBoth_OpenPrepare(
     _Strand_OpenPrepareImp( &self->base, &self->infoRight, interactionParams, callbackData, msg, leaveStrand );
 }
 
-// If after call Strand_OpenPrepare the opend didnt happen
+// If after call Strand_OpenPrepare the open didn't happen
 // Used on Strand/StrandMany/StrandEntry (but not StrandBoth, see below)
 MI_INLINE
 void StrandBoth_OpenCancel(

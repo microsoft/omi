@@ -27,7 +27,7 @@ export CONFIG_TARGET
 ##==============================================================================
 ##
 ## WORLD -- the 'WORLD" variable indicates that we are building for test
-## (./cofigure-world).
+## (./configure-world).
 ##
 ##==============================================================================
 

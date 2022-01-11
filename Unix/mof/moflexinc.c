@@ -1218,7 +1218,7 @@ case 41:
 YY_RULE_SETUP
 #line 345 "mof.l"
 {
-    /* C-sytle comments */
+    /* C-style comments */
     int c;
     int prev;
 
@@ -2565,7 +2565,7 @@ int openIncludeFile(const char* path_)
     if ((path = findIncludeFile(path_)) == NULL)
     {
         yyerrorf(ID_FAILED_TO_FIND_INCLUDE_FILE, 
-            "failed to find inlude file: \"%s\"", path_);
+            "failed to find include file: \"%s\"", path_);
         return -1;
     }
 

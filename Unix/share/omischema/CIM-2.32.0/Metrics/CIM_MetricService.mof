@@ -44,7 +44,7 @@ class CIM_MetricService : CIM_Service {
           "method the ManagedElements parameter shall contain a "
           "reference to each CIM_ManagedElement instance to which "
           "the CIM_BaseMetricDefinition instance referenced by the "
-          "Definition parameteris associated through "
+          "Definition parameter is associated through "
           "CIM_MetricDefForME and the MetricCollectionEnabled "
           "parameter shall contain a value corresponding to the "
           "value of the MetricCollectionEnabled property of the "
@@ -83,7 +83,7 @@ class CIM_MetricService : CIM_Service {
       CIM_ManagedElement REF Subject, 
          [IN, Description ( 
              "The Definition parameter identifies an instance of "
-             "CIM_BaseMetricDefintion. The method returns "
+             "CIM_BaseMetricDefinition. The method returns "
              "references to instances of CIM_ManagedElement for "
              "which metrics defined by the instance of "
              "CIM_BaseMetricDefinition are available to be "

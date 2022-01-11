@@ -2,7 +2,7 @@
 ##
 # Copyright (c) Microsoft Corporation.  All rights reserved.
 #
-# Contains settings for the OMI WS-Management Deamon.
+# Contains settings for the OMI WS-Management Daemon.
 #
 #
 
@@ -16,7 +16,7 @@
 # Description:       Microsoft Open Management Infrastructure (OMI) Server
 ### END INIT INFO
 
-#TEMPLATE_CODEVOV_ENV#
+#TEMPLATE_CODECOV_ENV#
 
 OMI_HOME=/opt/omi
 OMI_NAME="Microsoft OMI Server"

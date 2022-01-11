@@ -37,7 +37,7 @@ bool writeFileContent( const std::string& file, const std::vector< unsigned char
 // start_dir - can be null (use curent directory); should be provided if test is playing with current directory
 // sub_directory - related to unittet directory - for example "tools/mof"
 // file - file name
-// reutrns file if found or ASSERTs otherwise
+// returns file if found or ASSERTs otherwise
 std::string findSampleFile(const char* start_dir, const char* sub_directory, const char* file);
 
 
@@ -70,7 +70,7 @@ void removeIfExist( const char* file );
 void sleep_sec(MI_Uint64 sec);
 void sleep_ms(MI_Uint64 ms_sec);
 
-// time funcitonality
+// time functionality
 typedef unsigned long long uint64;
 uint64 time_now();
 

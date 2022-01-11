@@ -360,7 +360,7 @@ long Application_Shutdown(_Inout_ ApplicationObject *applicationObject)
         }
     }
 
-    /*Another thread cleared ActiveBit. That is rather worrisom*/
+    /*Another thread cleared ActiveBit. That is rather worrisome*/
     return 0;
 }
 
@@ -706,7 +706,7 @@ MI_EXTERN_C MI_Result Application_SetTestTransport(
  *               handler is NULL it will pick the default for local/remote
  *               destination.
  * protocolHandler - If specified is the protocol handler string.
- * protocolHnadlerApplication - MI_Application for the protocll handler
+ * protocolHandlerApplication - MI_Application for the protocol handler
  *               exposing the function table to the handler.
  *
  * Return code: MI_Result code

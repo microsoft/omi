@@ -11,7 +11,7 @@
        "logical blocks and has identifying data written on/to it. It "
        "may include a signature written by the OS or by an "
        "application. This class is a common superclass for Disk and "
-       "TapePartions. Partitions are directly realized by Physical "
+       "TapePartitions. Partitions are directly realized by Physical "
        "Media (indicated by the RealizesExtent association) or built "
        "on StorageVolumes (indicated by the BasedOn association)." )]
 class CIM_MediaPartition : CIM_StorageExtent {

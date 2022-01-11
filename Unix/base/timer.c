@@ -136,7 +136,7 @@ void Timer_Fire(
              * of fireTimeoutAt will have already occurred, but the Selector
              * will have not gotten a chance to detect it yet. That is treated
              * as the default scenario.  This signals that the timeout is treated
-             * as a manuallly triggered timeout. */
+             * as a manually triggered timeout. */
             timer->reason = reason;
         }
         timer->handler.fireTimeoutAt = currentTimeUsec;

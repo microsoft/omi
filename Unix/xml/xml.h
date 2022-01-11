@@ -260,7 +260,7 @@ int XML_ParseCharFault(const XML *self,
 #define XML_ERROR_OPEN_ANGLE_BRACKET_EXPECTED ZT("Failed to parse XML. An open angle bracket '<' was expected and not found.")
 #define XML_ERROR_COMMENT_CDATA_DOCTYPE_EXPECTED ZT("Failed to parse XML. A comment, CDATA or DOCTYPE element was expected and not found.")
 #define XML_ERROR_ELEMENT_EXPECTED ZT("Failed to parse XML. An XML element was expected and not found.")
-#define XML_ERROR_UNEXPECTED_STATE ZT("Failed to parse XML. The XML parser hit an interal problem that stopped it from progressing.")
+#define XML_ERROR_UNEXPECTED_STATE ZT("Failed to parse XML. The XML parser hit an internal problem that stopped it from progressing.")
 #define XML_ERROR_SPECIFIC_ELEMENT_EXPECTED ZT("Failed to parse XML. The element name %T was expected but %T was found instead.")
 #define XML_ERROR_SPECIFIC_END_ELEMENT_EXPECTED ZT("Failed to parse XML. The element name %T end tag was expected but %T was found instead.")
 #define XML_ERROR_CHARACTER_DATA_EXPECTED ZT("Failed to parse XML. Character data was expected but not found.")

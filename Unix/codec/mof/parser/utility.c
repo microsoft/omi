@@ -277,7 +277,7 @@ MI_Boolean mof_neof(MOF_Buffer * b)
 ** Utilities of check current char
 **
 =============================================================================*/
-MI_Boolean mof_isdoulbequotes(MOF_Encoding e, void * data)
+MI_Boolean mof_isdoublequotes(MOF_Encoding e, void * data)
 {
     return mof_getchar(e, data) == '"';
 }
@@ -654,8 +654,8 @@ MI_Result mof_setupbuffer(void * data, size_t nBytes, Batch *batch, MOF_Buffer *
 #endif
     if(b->e.u && (ptrdiff_t)(p) % (sizeof(wchar_t)) != 0)
     {
-        /* Buffer is not alighed with sizeof(wchar_t) */
-        /* Need to copy input buffer to alighed memory */   
+        /* Buffer is not aligned with sizeof(wchar_t) */
+        /* Need to copy input buffer to aligned memory */   
         if (batch)
         {
             p = (unsigned char*)Batch_Get(batch, nBytes);
@@ -1070,7 +1070,7 @@ void mof_fillbuf(
     MI_Uint32 bbytes = (b->e.u) ? bs * sizeof(wchar_t) : bs * sizeof(char);
     char *newCur = (char*)b->cur -bbytes;
     MOF_Buffer temp;
-    MI_Boolean flaged = MI_FALSE;
+    MI_Boolean flagged = MI_FALSE;
     memcpy(&temp, b, sizeof(MOF_Buffer));
     temp.cur = newCur;
     _Analysis_assume_(size > 2);
@@ -1083,7 +1083,7 @@ void mof_fillbuf(
         if (i == bs)
         {
             buf[i++] = '^';
-            flaged = MI_TRUE;
+            flagged = MI_TRUE;
         }
         if (i < tmax)
         {
@@ -1091,7 +1091,7 @@ void mof_fillbuf(
         }
         mof_nextchar(&temp);
     }
-    if (!flaged)
+    if (!flagged)
     {
         buf[i++] = '^';
     }

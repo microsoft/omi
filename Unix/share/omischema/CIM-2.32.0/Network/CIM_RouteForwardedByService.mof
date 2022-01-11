@@ -8,7 +8,7 @@
     Version ( "2.7.0" ), 
     UMLPackagePath ( "CIM::Network::Routes" ), 
     Description ( 
-       "This assocation makes explicit the next hops that are "
+       "This association makes explicit the next hops that are "
        "forwarded by a specific ForwardingService, to reach the "
        "destination. Every ForwardingService can have its own unique "
        "set of routing destinations and next hops. The association is "

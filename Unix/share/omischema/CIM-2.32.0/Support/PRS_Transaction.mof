@@ -39,7 +39,7 @@ class PRS_Transaction : PRS_ExchangeElement {
       [Description ( 
           "The status of the transaction after it has reached the "
           "\'Closed\' state. A CompletionStatus of zero (0) means "
-          "the tranasaction completed successfully. A non-zero "
+          "the transaction completed successfully. A non-zero "
           "CompletionStatus indicates the transaction did not "
           "complete successfully. Non-zero values are "
           "implementation-specific. While the transaction is \'Open\' "

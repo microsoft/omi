@@ -61,7 +61,7 @@ static void _Client_PostControl( _In_ Strand* self, _In_ Message* msg)
 
     if( eventMsg->success )
     {
-        // Create enuemrate request:
+        // Create enumerate request:
         
         EnumerateInstancesReq* req ;
         {

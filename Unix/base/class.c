@@ -894,7 +894,7 @@ MI_Result MI_CALL QualifierSet_GetQualifier(
     return MI_RESULT_NOT_FOUND;
 }
 
-/*Qualifier can be propogated only if 
+/*Qualifier can be propagated only if 
     1) It has ToSubClass qualifier
     2) It it not restricted. WMIV1 has no mechanism to tell if a qualifier is restricted, hence
         we are building the list of qualifiers we know are restricted. Note in future DMTF might introduce 
@@ -909,7 +909,7 @@ MI_Char *restrictedQualifier[] = {
                                     ZT("Version"),
                                     ZT("ClassVersion")
                                  };
-MI_Boolean CanQualifierBePropogated( _In_ MI_Qualifier *qualifier)
+MI_Boolean CanQualifierBePropagated( _In_ MI_Qualifier *qualifier)
 {
     if(qualifier->flavor & MI_FLAG_TOSUBCLASS )
     {
@@ -933,9 +933,9 @@ MI_Result ClassConstructor_New(
     _In_opt_z_ const MI_Char *namespaceName, /* Not needed if parentClass is passed in */
     _In_opt_z_ const MI_Char *serverName,    /* Not needed if parentClass is passed in */
     _In_z_ const MI_Char *className, 
-    MI_Uint32 numberClassQualifiers,         /* number of extra class qualifiers you want to create.  Allowes us to pre-create array of correct size */
-    MI_Uint32 numberProperties,              /* number of extra properties you want to create.  Allowes us to pre-create array of correct size */
-    MI_Uint32 numberMethods,                 /* number of extra methods you want to create. Allowes us to pre-create array of correct size */
+    MI_Uint32 numberClassQualifiers,         /* number of extra class qualifiers you want to create.  Allows us to pre-create array of correct size */
+    MI_Uint32 numberProperties,              /* number of extra properties you want to create.  Allows us to pre-create array of correct size */
+    MI_Uint32 numberMethods,                 /* number of extra methods you want to create. Allows us to pre-create array of correct size */
     _Out_ MI_Class **newClass              /* Object that is ready to receive new qualifiers/properties/methods */
     )
 {
@@ -1033,14 +1033,14 @@ MI_Result ClassConstructor_New(
         for (i = 0; i != parentClass->classDecl->numQualifiers; i++)
         {
             //Only qualifiers that are flavor ToSubClass are propagated (however they can be overridden!)
-            if( CanQualifierBePropogated(parentClass->classDecl->qualifiers[i]))
+            if( CanQualifierBePropagated(parentClass->classDecl->qualifiers[i]))
             {
                 numberClassQualifiers++;
             }
         }
         
-        //Abstract can't be inherited. There are bunch of other qualifiers that cna't be intherited
-        // But luckliy we define only abstract as part of the flags
+        //Abstract can't be inherited. There are bunch of other qualifiers that can't be inherited
+        // But luckily we define only abstract as part of the flags
         classDecl->flags |= (parentClass->classDecl->flags & (~MI_FLAG_ABSTRACT));
     }
     else
@@ -1085,7 +1085,7 @@ MI_Result ClassConstructor_New(
             int i;
             for (i = 0; i != parentClass->classDecl->numQualifiers; i++)
             {
-                if( CanQualifierBePropogated(parentClass->classDecl->qualifiers[i]))
+                if( CanQualifierBePropagated(parentClass->classDecl->qualifiers[i]))
                 {
                     classDecl->qualifiers[classDecl->numQualifiers] = parentClass->classDecl->qualifiers[i];
                     classDecl->numQualifiers++;
@@ -1127,7 +1127,7 @@ MI_Result ClassConstructor_New(
                         classDecl->properties[iCount]->numQualifiers = 0;
                         for( jCount = 0 ; jCount <  parentClass->classDecl->properties[iCount]->numQualifiers; jCount++)
                         {
-                            if( CanQualifierBePropogated(parentClass->classDecl->properties[iCount]->qualifiers[jCount]))
+                            if( CanQualifierBePropagated(parentClass->classDecl->properties[iCount]->qualifiers[jCount]))
                             {
                                 classDecl->properties[iCount]->qualifiers[classDecl->properties[iCount]->numQualifiers] = 
                                                         parentClass->classDecl->properties[iCount]->qualifiers[jCount];
@@ -1174,7 +1174,7 @@ MI_Result ClassConstructor_New(
                         classDecl->methods[iCount]->numQualifiers = 0;
                         for( jCount = 0 ; jCount <  parentClass->classDecl->methods[iCount]->numQualifiers; jCount++)
                         {
-                            if( CanQualifierBePropogated(parentClass->classDecl->methods[iCount]->qualifiers[jCount]))
+                            if( CanQualifierBePropagated(parentClass->classDecl->methods[iCount]->qualifiers[jCount]))
                             {
                                 classDecl->methods[iCount]->qualifiers[classDecl->methods[iCount]->numQualifiers] = 
                                                         parentClass->classDecl->methods[iCount]->qualifiers[jCount];
@@ -2033,7 +2033,7 @@ static MI_Result _AddClassQualifier(
         //Get location of entry
         qualifierLocation = &mi_class->classDecl->qualifiers[qualifierIndex];
     
-        //Qualifier pointer array values are initialialized to -1.  If not overriden and the next slot is not -1 then we have gone off the end of the array
+        //Qualifier pointer array values are initialialized to -1.  If not overridden and the next slot is not -1 then we have gone off the end of the array
         if ((qualifierIndex == mi_class->classDecl->numQualifiers) && ((*qualifierLocation) != (void*)-1))
         {
             return MI_RESULT_INVALID_PARAMETER;
@@ -2293,7 +2293,7 @@ static MI_Result _AddElement(
         if( propertyIndex < mi_class->classDecl->numProperties )
         {
             totalParentPropertyQualifiers = mi_class->classDecl->properties[propertyIndex]->numQualifiers;
-            // TODO: there might be other flags that we need to propogate.
+            // TODO: there might be other flags that we need to propagate.
             if(mi_class->classDecl->properties[propertyIndex]->flags & MI_FLAG_KEY)
             {
                 propertyDecl.flags |= MI_FLAG_KEY;
@@ -2304,7 +2304,7 @@ static MI_Result _AddElement(
             }
         }
 
-        //NOTE: THE ABOVE CODE MUST BE EXECUTED BEFORE CHANGIND PROPERTYLOCATION
+        //NOTE: THE ABOVE CODE MUST BE EXECUTED BEFORE CHANGING PROPERTYLOCATION
         //Pretty sure we have not gone off end of array so clone the property into our batch
         (*propertyLocation) = Class_Clone_Property(batch, &propertyDecl);
         if ((*propertyLocation) == NULL)
@@ -2328,7 +2328,7 @@ static MI_Result _AddElement(
                 int i;
                 for (i = 0; i != parentPropertyLocation->numQualifiers; i++)
                 {
-                    if (CanQualifierBePropogated(parentPropertyLocation->qualifiers[i]))
+                    if (CanQualifierBePropagated(parentPropertyLocation->qualifiers[i]))
                     {
                         (*propertyLocation)->qualifiers[(*propertyLocation)->numQualifiers] = parentPropertyLocation->qualifiers[i];
                         (*propertyLocation)->numQualifiers++;
@@ -2337,7 +2337,7 @@ static MI_Result _AddElement(
             }
         }
 
-        //Successfully added property so update proeprty count if necessary
+        //Successfully added property so update property count if necessary
         *elementId = propertyIndex;
         if (propertyIndex == mi_class->classDecl->numProperties)
         {
@@ -2777,7 +2777,7 @@ MI_Result Class_AddMethod(
                 MI_Uint32 i;
                 for( i = 0; i < parentMethodLocation->numQualifiers; i++)
                 {
-                    if( CanQualifierBePropogated(parentMethodLocation->qualifiers[i] ))
+                    if( CanQualifierBePropagated(parentMethodLocation->qualifiers[i] ))
                     {
                         (*methodLocation)->qualifiers[(*methodLocation)->numQualifiers] = parentMethodLocation->qualifiers[i];
                         (*methodLocation)->numQualifiers++;
@@ -2966,7 +2966,7 @@ MI_Result Class_AddMethodQualifierArrayItem(
     return MI_RESULT_OK;
 }
 
-/* Add a method proeprty to a refcounted class.  The method property array was precreated by passing numberParameters to Class_AddMethod.
+/* Add a method property to a refcounted class.  The method property array was precreated by passing numberParameters to Class_AddMethod.
     Add the property in the next slot by querying how many qualifiers are currently there.  Don't add more properties than 
     you said you wanted as the array is fixed
 */
@@ -3009,7 +3009,7 @@ MI_Result Class_AddMethodParameter(
         parameterDecl.className = (MI_Char*)refClassname;
         parameterDecl.subscript = arrayMaxSize;
         //parameterDecl.offset
-        // TODO: Disabling the propogation for now. WINRM and WMIDCOM behavior is different
+        // TODO: Disabling the propagation for now. WINRM and WMIDCOM behavior is different
         
         //Now check if we already inheriting the parameter from the parent
         for (actualParameterIndex = 0; actualParameterIndex < (*methodLocation)->numParameters; actualParameterIndex++)
@@ -3056,7 +3056,7 @@ MI_Result Class_AddMethodParameter(
                 int i;
                 for(i =0 ;i != previousParameterLocation->numQualifiers; i++)
                 {
-                    if(CanQualifierBePropogated(previousParameterLocation->qualifiers[i]) )
+                    if(CanQualifierBePropagated(previousParameterLocation->qualifiers[i]) )
                     {
                         (*parameterLocation)->qualifiers[(*parameterLocation)->numQualifiers] = previousParameterLocation->qualifiers[i];
                         (*parameterLocation)->numQualifiers++;
@@ -3071,7 +3071,7 @@ MI_Result Class_AddMethodParameter(
             (*methodLocation)->returnType = type;
         }
 
-        //Successfully added method parameter so update proeprty count
+        //Successfully added method parameter so update property count
         *parameterId = actualParameterIndex;
         if(actualParameterIndex >= (*methodLocation)->numParameters)
         {
@@ -3165,7 +3165,7 @@ static MI_Result _AddMethodParameterQualifier(
         {
             qualifier.value = &value;
         }
-        // TODO: Disabling the propogation for now. WINRM and WMIDCOM behavior is different
+        // TODO: Disabling the propagation for now. WINRM and WMIDCOM behavior is different
         
         //Now check if we already inheriting the qualifier from the parent
         for (actualQualifierIndex = 0; actualQualifierIndex < (*parameterLocation)->numQualifiers; actualQualifierIndex++)

@@ -17,7 +17,7 @@ class MSFT_AuthenticationAuthorizationAccounting
    string Server;
 
     [Description ( 
-          "An enumeration indicating the the login defaul group "
+          "An enumeration indicating the the login default group "
          ), 
        ValueMap {  "1", "2", "3"}, 
        Values { "Other", "tacacs+", "radius"} 
@@ -25,8 +25,8 @@ class MSFT_AuthenticationAuthorizationAccounting
    uint16 LoginDefaultGroup;
 
    [Description ( 
-          "A string that describes a login defaul group when a well "
-          "defined value is not available login defaul group has the "
+          "A string that describes a login default group when a well "
+          "defined value is not available login default group has the "
           "value \"Other\"." ), 
        ModelCorrespondence { 
           "MSFT_AuthenticationAuthorizationAccounting.LoginDefaultGroup" }]

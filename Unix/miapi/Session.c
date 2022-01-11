@@ -801,7 +801,7 @@ MI_Result Session_AccessCheck(_In_ MI_Session *session, _In_opt_z_ const MI_Char
 
     trace_MIEnter(__FUNCTION__, session);
 
-    /* NOTE: Access check may be called from Operat_Cancel or Operation_Close after the
+    /* NOTE: Access check may be called from Operation_Cancel or Operation_Close after the
      * session has been closed.  Therefore do thunk and ignore Active bit on handle.
      */
     ThunkHandle_FromGeneric_ForCompletionCallback((GenericHandle*)session, &sessionThunk);

@@ -16,7 +16,7 @@ PAL_BEGIN_EXTERNC
 
 /* Defining FASTER macro disables malloc injection
    to reduce overhead for manual performance benchmarking.
-   It is not defined durring normal builds.
+   It is not defined during normal builds.
 */
 #if !defined(FASTER) && !defined(USE_ALLOCATOR)
 

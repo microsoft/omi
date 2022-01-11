@@ -16,7 +16,7 @@ class MSFT_LinkAggregationAssociation
 	CIM_EthernetPort REF LinkAggregation;
 	
 		[Key, 
-		Description ( "A member Ehternet Switch port")]
+		Description ( "A member Ethernet Switch port")]
 
 	CIM_EthernetPort REF EthernetPorts;
 	

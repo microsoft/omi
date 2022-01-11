@@ -5,7 +5,7 @@
        "NextHopRoute represents one of a series of \'hops\' to reach a "
        "network destination. A route is administratively defined, or "
        "calculated/learned by a particular routing process. A "
-       "ConcreteDependency associaton may be instantiated between a "
+       "ConcreteDependency association may be instantiated between a "
        "route and its routing service to indicate this. (In this "
        "scenario, the route is dependent on the service.)" )]
 class CIM_NextHopRoute : CIM_ManagedElement {

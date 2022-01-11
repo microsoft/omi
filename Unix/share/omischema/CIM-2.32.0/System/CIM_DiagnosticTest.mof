@@ -192,7 +192,7 @@ class CIM_DiagnosticTest : CIM_DiagnosticService {
           "specified using the Setting input parameter. If a "
           "reference is not passed into the method, then a default "
           "DiagnosticSetting may be used. This default Setting is "
-          "associated with the DiagnoticTest using the "
+          "associated with the DiagnosticTest using the "
           "DefaultSetting relationship of the Core Model. \n"
           "When RunTest starts execution, the settings, which are "
           "time sensitive, should be evaluated and captured. This "
@@ -228,7 +228,7 @@ class CIM_DiagnosticTest : CIM_DiagnosticService {
              "input parameter. If a reference is not passed into "
              "the method, then a default DiagnosticSetting may "
              "be used. This default Setting is associated with "
-             "the DiagnoticTest using the DefaultSetting "
+             "the DiagnosticTest using the DefaultSetting "
              "relationship of the Core Model." )]
       CIM_DiagnosticSetting REF Setting, 
          [IN ( false ), OUT, Description ( 
@@ -241,7 +241,7 @@ class CIM_DiagnosticTest : CIM_DiagnosticService {
        Description ( 
           "This method is deprecated in favor of using the "
           "corresponding functionality contained in the Log class, "
-          "this is consistant with the deprecation of the Result "
+          "this is consistent with the deprecation of the Result "
           "class in favor of Log. \n"
           "Execution of this method will delete all instances of "
           "the DiagnosticResultForMSE object, for this "

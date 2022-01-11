@@ -50,7 +50,7 @@ static MI_Result _CreateThread(
 
 /* closes thread handle and frees related system resources;
     optionally, may wait for thread to complete */
-static MI_Result _CloseThreadHanlde(
+static MI_Result _CloseThreadHandle(
     ThreadID  self,
     MI_Boolean wait )
 {
@@ -183,8 +183,8 @@ static void* MI_CALL _Enumerate( void* param)
     _CreateThread( _EnumerateEven, ctx, &(t[0]));
     _CreateThread( _EnumerateOdd, ctx, &(t[1]));
 
-    _CloseThreadHanlde( t[0], MI_TRUE );
-    _CloseThreadHanlde( t[1], MI_TRUE );
+    _CloseThreadHandle( t[0], MI_TRUE );
+    _CloseThreadHandle( t[1], MI_TRUE );
 
     ctx->Post(MI_RESULT_OK);
 
@@ -208,7 +208,7 @@ void X_SmallNumber_Class_Provider::EnumerateInstances(
         ThreadID t;
         if ( MI_RESULT_OK == _CreateThread( _Enumerate, new Context(context), &t) )
         {
-            _CloseThreadHanlde( t, MI_FALSE );
+            _CloseThreadHandle( t, MI_FALSE );
         }
         else
         {
@@ -282,7 +282,7 @@ void X_SmallNumber_Class_Provider::DeleteInstance(
     const String& nameSpace,
     const X_SmallNumber_Class& instance_ref)
 {
-    /* For unit-test suppport - allow to delete instance with number < 10 */
+    /* For unit-test support - allow to delete instance with number < 10 */
     if ( instance_ref.Number_value() >= 10 ) 
     {
         context.Post(MI_RESULT_NOT_FOUND);

@@ -196,12 +196,12 @@ void WSBuf_GenerateMessageID(
     _Pre_writable_size_(WS_MSG_ID_SIZE) ZChar msgID[WS_MSG_ID_SIZE]);
 
 /* Maps CIMM error to the most relevant WS fault;
-   Retuns description of CIM error (can be used as fault description) */
+   Returns description of CIM error (can be used as fault description) */
 WSBUF_FAULT_CODE    WSBuf_CIMErrorToWSFault(
     MI_Uint32       cimErrorCode,
     const ZChar** description );
 
-/* Helper function to create a fault repsonse */
+/* Helper function to create a fault response */
 Page* WSBuf_CreateFaultResponsePage(
     WSBUF_FAULT_CODE faultCode,
     const ZChar* notUnderstoodTag,
@@ -212,7 +212,7 @@ Page* WSBuf_CreateReleaseResponsePage(
     const ZChar* requestMessageID);
 
 /* Creates soap header with provided action. 
-    Funciotn leaves header open so extra header fields can be added */
+    Function leaves header open so extra header fields can be added */
 MI_Result WSBuf_CreateSoapResponseHeader(
     WSBuf   *buf,
     const ZChar*  action,

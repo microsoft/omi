@@ -288,7 +288,7 @@ static MI_Result _Sock_ReadAux(
 
         if ( res > 0 )
         {
-            /* we are done with accpet */
+            /* we are done with accept */
             handler->acceptDone = MI_TRUE;
             return _Sock_ReadAux(handler,buf,buf_size,sizeRead);
         }
@@ -492,7 +492,7 @@ static Http_CallbackResult _ReadHeader(
     MI_Boolean fullHeaderReceived = MI_FALSE;
 
     /* are we done with header? */
-    if (handler->recvingState == RECV_STATE_CONTENT)
+    if (handler->receivingState == RECV_STATE_CONTENT)
         return PRT_CONTINUE;
 
     buf = handler->recvBuffer + handler->receivedSize;
@@ -597,7 +597,7 @@ static Http_CallbackResult _ReadHeader(
     }
 
     memcpy( handler->recvPage + 1, data, handler->receivedSize );
-    handler->recvingState = RECV_STATE_CONTENT;
+    handler->receivingState = RECV_STATE_CONTENT;
 
     return PRT_CONTINUE;
 }
@@ -610,7 +610,7 @@ static Http_CallbackResult _ReadData(
     MI_Result r;
 
     /* are we in the right state? */
-    if (handler->recvingState != RECV_STATE_CONTENT)
+    if (handler->receivingState != RECV_STATE_CONTENT)
         return PRT_RETURN_FALSE;
 
     buf = ((char*)(handler->recvPage + 1)) + handler->receivedSize;
@@ -687,7 +687,7 @@ Done:
     handler->recvPage = 0;
     handler->receivedSize = 0;
     memset(&handler->recvHeaders, 0, sizeof(handler->recvHeaders));
-    handler->recvingState = RECV_STATE_HEADER;
+    handler->receivingState = RECV_STATE_HEADER;
     return PRT_CONTINUE;
 }
 
@@ -1176,7 +1176,7 @@ static MI_Boolean _RequestCallback(
         }
     }
 
-    /* Close conenction by timeout */
+    /* Close connection by timeout */
     if (mask & SELECTOR_TIMEOUT)
     {
         trace_ConnectionClosed_Timeout();
@@ -1376,7 +1376,7 @@ void _HttpSocket_Aux_NewRequest( _In_ Strand* self_)
        From there normal Strand logic applies: once the upper layer
        also closes the interaction the object is deleted.
 
-    Unique features and special Behavour:
+    Unique features and special Behaviour:
     - When a complete message has been read instead of scheduling a post
        the auxiliary function HTTPSOCKET_STRANDAUX_NEWREQUEST is
        scheduled instead. That function takes care of posting using
@@ -1453,7 +1453,7 @@ static MI_Boolean _ListenerCallback(
             return MI_TRUE;
         }
 
-        /* Primary refount -- secondary one is for posting to protocol thread safely */
+        /* Primary refcount -- secondary one is for posting to protocol thread safely */
         h->refcount = 1;
         h->http = self;
         h->pAuthContext  = NULL;
@@ -1572,12 +1572,12 @@ static MI_Result _New_Http(
     }
 
     if (selector)
-    {   /* attach the exisiting selector */
+    {   /* attach the existing selector */
         self->selector = selector;
         self->internalSelectorUsed = MI_FALSE;
     }
     else
-    {   /* creaet a new selector */
+    {   /* create a new selector */
         /* Initialize the network */
         Sock_Start();
 
@@ -1886,7 +1886,7 @@ MI_Result Http_Delete(
     if (self->internalSelectorUsed)
     {
         /* Release selector;
-        Note: selector-destory closes all sockets in a list including connector and listener */
+        Note: selector-destroy closes all sockets in a list including connector and listener */
         Selector_Destroy(self->selector);
 
         /* Shutdown the network */

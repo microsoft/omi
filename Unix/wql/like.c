@@ -220,7 +220,7 @@ MI_Boolean WQL_MatchLike(
                 {
                     matchedPos = c + 1;
                     /* current wild char still match, but it should be */
-                    /* the same as its preivous pattern char, I.E., */
+                    /* the same as its previous pattern char, I.E., */
                     /* matched one char */
                     currentRow[c] = MATCHED_WITH_ONE_CHAR;
                 }
@@ -228,7 +228,7 @@ MI_Boolean WQL_MatchLike(
                 {
                     /* if previous one is a wildcard match, */
                     /* then this wildcard has the same matching result */
-                    /* with preivous char */
+                    /* with previous char */
                     matchedPos = c;
                 }
                 for (; matchedPos <= stringLength; matchedPos++)
@@ -262,7 +262,7 @@ MI_Boolean WQL_MatchLike(
                 currentString = orgString + c;
                 if (match == MATCHED_WITH_WILDCARD_CHAR)
                 {
-                    /* match the current char if preivous is a wildchar match */
+                    /* match the current char if previous is a wildchar match */
                     /* otherwise match the next char */
                     currentString --;
                 }
@@ -318,7 +318,7 @@ MI_Boolean WQL_MatchLike(
                 currentString = orgString + c;
                 if (match == MATCHED_WITH_WILDCARD_CHAR)
                 {
-                    /* match the current char if preivous is a wildchar match, */
+                    /* match the current char if previous is a wildchar match, */
                     /* otherwise match the next char */
                     currentString --;
                 }

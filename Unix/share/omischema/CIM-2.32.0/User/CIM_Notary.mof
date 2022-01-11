@@ -21,7 +21,7 @@ class CIM_Notary : CIM_CredentialManagementService {
        ValueMap { "0", "1", "2", "3", "4", "5", "6", "7", "8" }, 
        Values { "N/A", "Other", "Facial", "Retina", "Mark", 
           "Finger", "Voice", "DNA-RNA", "EEG" }]
-   uint16 Comparitors;
+   uint16 Comparators;
 
       [Description ( 
           "The SealProtocol is how the decision of the Notary is "

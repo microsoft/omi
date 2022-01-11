@@ -165,7 +165,7 @@ NitsTestWithSetup(TestProvRegInvalidConfigFile, TestProvregSetup)
     MI_Result r;
 
     /* Load the registrations */
-    r = ProvReg_Init(&reg, "non-exisiting-file");
+    r = ProvReg_Init(&reg, "nonexistent-file");
 
     UT_ASSERT (MI_RESULT_OPEN_FAILED == r);
 }
@@ -524,9 +524,9 @@ NitsTestWithSetup(TestAssociationsInvalidClass, TestProvregSetup)
     ProvRegAssocPosition pos;
 
     UT_ASSERT (MI_RESULT_INVALID_NAMESPACE == ProvReg_BeginAssocClasses( &reg, ZT("notExistingNamespace"), ZT("X"), 0, 0, &pos ));
-    UT_ASSERT (MI_RESULT_INVALID_CLASS == ProvReg_BeginAssocClasses( &reg, ZT("ns"), ZT("noExisitingClass"), 0, 0, &pos ));
-    UT_ASSERT (MI_RESULT_INVALID_CLASS == ProvReg_BeginAssocClasses( &reg, ZT("ns"), ZT("AA"), ZT("noExisitingClass"), 0, &pos ));
-    UT_ASSERT (MI_RESULT_INVALID_CLASS == ProvReg_BeginAssocClasses( &reg, ZT("ns"), ZT("AA"), 0, ZT("noExisitingClass"), &pos ));
+    UT_ASSERT (MI_RESULT_INVALID_CLASS == ProvReg_BeginAssocClasses( &reg, ZT("ns"), ZT("nonexistentClass"), 0, 0, &pos ));
+    UT_ASSERT (MI_RESULT_INVALID_CLASS == ProvReg_BeginAssocClasses( &reg, ZT("ns"), ZT("AA"), ZT("nonexistentClass"), 0, &pos ));
+    UT_ASSERT (MI_RESULT_INVALID_CLASS == ProvReg_BeginAssocClasses( &reg, ZT("ns"), ZT("AA"), 0, ZT("nonexistentClass"), &pos ));
 
     ProvReg_Destroy(&reg);
 }
@@ -662,7 +662,7 @@ NitsEndTest
 #if defined(CONFIG_POSIX)
 NitsTestWithSetup(TestProvReg2, TestProvregSetup)
 {
-    // Disable Nits Fault injection here, beacuse in RegFile_New function (Called internally in ProvReg_Init2) will 
+    // Disable Nits Fault injection here, because in RegFile_New function (Called internally in ProvReg_Init2) will 
     // return NULL in both cases Failure OR failed to allocate. And Nits doesn't like that.
     NitsDisableFaultSim;
 

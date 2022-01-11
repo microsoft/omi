@@ -639,7 +639,7 @@ qualifier
         if (InitializerToValue(&$2, qd->type, &value) != 0)
         {
             yyerrorf(ID_INVALID_QUALIFIER_INITIALIZER, 
-                "invalid initializer for qualifer: \"%s\"", $1);
+                "invalid initializer for qualifier: \"%s\"", $1);
             YYABORT;
         }
         
@@ -694,7 +694,7 @@ qualifier
         if (InitializerToValue(&$2, qd->type, &value) != 0)
         {
             yyerrorf(ID_INVALID_QUALIFIER_INITIALIZER, 
-                "invalid initializer for qualifer: \"%s\"", $1);
+                "invalid initializer for qualifier: \"%s\"", $1);
             YYABORT;
         }
         
@@ -1899,7 +1899,7 @@ scope
 flavorExpr
     : ',' TOK_FLAVOR '(' flavorList ')'
     {
-        /* Reject incompatiable ToSubclass and Restricted flavors */
+        /* Reject incompatible ToSubclass and Restricted flavors */
         if ($4 & MI_FLAG_TOSUBCLASS && $4 & MI_FLAG_RESTRICTED)
         {
             yyerrorf(ID_INCOMPATIBLE_FLAVORS, "incompatible flavors: %s/%s", 
@@ -1907,7 +1907,7 @@ flavorExpr
             YYABORT;
         }
 
-        /* Reject incompatiable EnableOverride and DisableOverride flavors */
+        /* Reject incompatible EnableOverride and DisableOverride flavors */
         if ($4 & MI_FLAG_ENABLEOVERRIDE && $4 & MI_FLAG_DISABLEOVERRIDE)
         {
             yyerrorf(ID_INCOMPATIBLE_FLAVORS, "incompatible flavors: %s/%s", 

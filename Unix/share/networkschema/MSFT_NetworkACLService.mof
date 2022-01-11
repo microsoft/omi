@@ -7,7 +7,7 @@ class MSFT_NetworkACLService : CIM_NetworkPolicyService
 {
 
        [Description ( 
-          "Creates ande Names a new ACL" ),
+          "Creates and Names a new ACL" ),
        ValueMap { "0",  "4096", "4097..32767", "32768..65535" }, 
        Values { "Completed with No Error", "Job Started", 
 	             "Method Reserved", "Vendor Specific" }]

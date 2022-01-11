@@ -15,7 +15,7 @@
        "router\'s OSPFAreaConfiguration, using this relationship. The "
        "association between the range and area configuration contains "
        "a property (EnableAdvertise) defining the handling - to allow "
-       "or disallow advertismenets in the range." )]
+       "or disallow advertisements in the range." )]
 class CIM_RangesOfConfiguration : CIM_Dependency {
 
       [Override ( "Antecedent" ), 

@@ -112,7 +112,7 @@ typedef struct _SelectorRep
     
     /* flag that allows empty selector running 
         when empty selector runs, it only can be interrupted by
-        internal funcitons, since it has no sockets to monitor
+        internal functions, since it has no sockets to monitor
         */
     MI_Boolean allowEmptySelector;
 
@@ -340,7 +340,7 @@ void _Selector_WakeupFromWait(
 
 /* 
     * This function guaranties that callback is called in 'Run'/'IO' thread context,
-    * so locking is required for accessing sokcet objects, updating buffers etc
+    * so locking is required for accessing socket objects, updating buffers etc
 */
 MI_Result Selector_CallInIOThread(
     Selector* self,

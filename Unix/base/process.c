@@ -76,7 +76,7 @@ int Process_StopChild(Process* self_)
 try_again:
     if (waitpid(self->pid, &status, 0) == -1)
     {
-        // EINTR is common in waitpid() and doesn't necessarily indicate faulure.
+        // EINTR is common in waitpid() and doesn't necessarily indicate failure.
         //       Give the system 10 times to see if the pid cleanly exits.
         if (10 < numWaits && errno == EINTR)
         {

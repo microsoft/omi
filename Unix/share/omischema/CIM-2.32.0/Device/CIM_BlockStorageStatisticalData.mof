@@ -160,7 +160,7 @@ class CIM_BlockStorageStatisticalData : CIM_StatisticalData {
    uint64 MaintOp;
 
       [Description ( 
-          "The cumulative elapsed disk mainenance time. "
+          "The cumulative elapsed disk maintenance time. "
           "Maintainance response time is added to this counter at "
           "the completion of each measured maintenance operation "
           "using ClockTickInterval units." ), 

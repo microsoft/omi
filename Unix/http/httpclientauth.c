@@ -2214,7 +2214,7 @@ HttpClient_NextAuthRequest(_In_ struct _HttpClient_SR_SocketData * self, _In_ co
 
   
         trace_HTTP_AuthComplete();
-        self->encrypting   = (self->negoFlags & (GSS_C_INTEG_FLAG | GSS_C_CONF_FLAG)) == (GSS_C_CONF_FLAG | GSS_C_INTEG_FLAG);       // All data transfered will be encrypted.
+        self->encrypting   = (self->negoFlags & (GSS_C_INTEG_FLAG | GSS_C_CONF_FLAG)) == (GSS_C_CONF_FLAG | GSS_C_INTEG_FLAG);       // All data transferred will be encrypted.
         self->readyToSend  = TRUE;
         self->authorizing  = FALSE;
         self->isAuthorized = TRUE;
@@ -2551,7 +2551,7 @@ static char *_BuildInitialGssAuthHeader(_In_ HttpClient_SR_SocketData * self, MI
 
     // Figure out the target name
 
-    {   // Start with the fdqn
+    {   // Start with the fqdn
         gss_buffer_desc buff = { 0 };
 
         struct addrinfo hints, *info;
@@ -2586,7 +2586,7 @@ static char *_BuildInitialGssAuthHeader(_In_ HttpClient_SR_SocketData * self, MI
 
         ((MI_Char *) buff.value)[buff.length] = 0; 
 
-        // 2DO: If we dont have an fdqn we will use the addr
+        // 2DO: If we dont have an fqdn we will use the addr
 
         freeaddrinfo(info);
 
@@ -2651,7 +2651,7 @@ static char *_BuildInitialGssAuthHeader(_In_ HttpClient_SR_SocketData * self, MI
             ((self->negoFlags  & (GSS_C_INTEG_FLAG | GSS_C_CONF_FLAG)) == (GSS_C_INTEG_FLAG | GSS_C_CONF_FLAG)) &&
             (!(self->negoFlags & GSS_C_PROT_READY_FLAG))) 
         {    
-            // We may be in complete, but we are not ready to encrypt so we short cirtuit isAuthorised
+            // We may be in complete, but we are not ready to encrypt so we short circuit isAuthorised
             self->authContext = context_hdl;
             self->targetName = target_name;
             self->authorizing = TRUE;
@@ -2659,7 +2659,7 @@ static char *_BuildInitialGssAuthHeader(_In_ HttpClient_SR_SocketData * self, MI
         }
         else 
         {        
-            self->encrypting   = (self->negoFlags & (GSS_C_INTEG_FLAG | GSS_C_CONF_FLAG)) == (GSS_C_CONF_FLAG | GSS_C_INTEG_FLAG);       // All data transfered will be encrypted.
+            self->encrypting   = (self->negoFlags & (GSS_C_INTEG_FLAG | GSS_C_CONF_FLAG)) == (GSS_C_CONF_FLAG | GSS_C_INTEG_FLAG);       // All data transferred will be encrypted.
             self->readyToSend  = TRUE;
             self->authorizing  = FALSE;
             self->isAuthorized = TRUE;
@@ -2867,7 +2867,7 @@ Http_CallbackResult HttpClient_IsAuthorized(_In_ struct _HttpClient_SR_SocketDat
             switch (pheaders->httpError)
             {
             case HTTP_ERROR_CODE_OK:
-                self->encrypting   = (self->negoFlags & (GSS_C_INTEG_FLAG | GSS_C_CONF_FLAG)) == (GSS_C_CONF_FLAG | GSS_C_INTEG_FLAG);       // All data transfered will be encrypted.
+                self->encrypting   = (self->negoFlags & (GSS_C_INTEG_FLAG | GSS_C_CONF_FLAG)) == (GSS_C_CONF_FLAG | GSS_C_INTEG_FLAG);       // All data transferred will be encrypted.
                 self->readyToSend  = TRUE;
                 self->authorizing = FALSE;
                 self->isAuthorized = TRUE;
@@ -2921,7 +2921,7 @@ Http_CallbackResult HttpClient_IsAuthorized(_In_ struct _HttpClient_SR_SocketDat
 
                     self->base.mask &= ~SELECTOR_READ;
                     self->base.mask |= SELECTOR_WRITE;
-                    self->recvingState = RECV_STATE_HEADER;
+                    self->receivingState = RECV_STATE_HEADER;
                 }     
                 return r;
 
@@ -2949,7 +2949,7 @@ Http_CallbackResult HttpClient_IsAuthorized(_In_ struct _HttpClient_SR_SocketDat
                      // Force it into read state so we can get the next header
                      self->base.mask &= ~SELECTOR_WRITE;
                      self->base.mask |= SELECTOR_READ;
-                     self->recvingState = RECV_STATE_HEADER;
+                     self->receivingState = RECV_STATE_HEADER;
      
                      PAL_Free(reply);
                      reply = NULL;
@@ -2971,7 +2971,7 @@ Http_CallbackResult HttpClient_IsAuthorized(_In_ struct _HttpClient_SR_SocketDat
 
                          self->base.mask &= ~SELECTOR_READ;
                          self->base.mask |= SELECTOR_WRITE;
-                         self->recvingState = RECV_STATE_HEADER;
+                         self->receivingState = RECV_STATE_HEADER;
                      }     
 
                  }

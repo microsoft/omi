@@ -6,7 +6,7 @@
 // ==================================================================
    [Abstract, Version ( "2.6.0" ), 
     UMLPackagePath ( "CIM::User::SecurityServices" ), 
-    Description ( "A service providing security functionaity." )]
+    Description ( "A service providing security functionality." )]
 class CIM_SecurityService : CIM_Service {
 
 

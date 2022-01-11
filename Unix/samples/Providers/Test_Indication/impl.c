@@ -446,8 +446,8 @@ _Use_decl_annotations_
         case PostBehavior_Subcontext:
             startfireindication = MI_FALSE;
             break;
-        case PostBehavior_Enablecontext_PostOnCalllthread:
-        case PostBehavior_Subcontext_PostOnCalllthread:
+        case PostBehavior_Enablecontext_PostOnCallThread:
+        case PostBehavior_Subcontext_PostOnCallThread:
             goto DONE;
         default:
             break;
@@ -625,8 +625,8 @@ _Use_decl_annotations_
                 LOGMSG(("Signal semaphore to fire indication"));
             }
             break;
-        case PostBehavior_Enablecontext_PostOnCalllthread:
-        case PostBehavior_Subcontext_PostOnCalllthread:
+        case PostBehavior_Enablecontext_PostOnCallThread:
+        case PostBehavior_Subcontext_PostOnCallThread:
             break;
         default:
             break;

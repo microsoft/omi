@@ -458,7 +458,7 @@ void _ProtocolSocket_Aux_ConnectEvent( _In_ Strand* self_)
        the auxiliary function PROTOCOLSOCKET_STRANDAUX_CONNECTEVENT
        which in turn disables that flag allowing the object to be deleted.
 
-    Unique features and special Behavour:
+    Unique features and special Behaviour:
     - When a complete message has been read instead of scheduling a post
        the auxiliary function PROTOCOLSOCKET_STRANDAUX_POSTMSG is
        scheduled instead. That function takes care of opening the interaction
@@ -734,7 +734,7 @@ static MI_Boolean _SendAuthResponse(
 
     Return:
     "TRUE" if connection should stay open; "FALSE" if auth failed
-        and conneciton should be closed immediately
+        and connection should be closed immediately
 */
 static MI_Boolean _ProcessAuthMessageWaitingConnectRequestFileData(
     ProtocolSocket* handler,
@@ -885,7 +885,7 @@ static MI_Boolean _ProcessAuthMessageWaitingConnectRequest(
         if (!_SendAuthResponse(handler, MI_RESULT_IN_PROGRESS, handler->authData->path, binMsg->forwardSock, INVALID_ID, INVALID_ID))
             return MI_FALSE;
 
-        /* Auth posponed */
+        /* Auth postponed */
         handler->clientAuthState = PRT_AUTH_WAIT_CONNECTION_REQUEST_WITH_FILE_DATA;
         *keepConnection = MI_TRUE;
 
@@ -907,7 +907,7 @@ static MI_Boolean _ProcessAuthMessageWaitingConnectRequest(
 
     Return:
     "TRUE" if connection should stay open; "FALSE" if auth failed
-        and conneciton should be closed immediately
+        and connection should be closed immediately
 */
 static MI_Boolean _ProcessAuthMessage(
     ProtocolSocket* handler,
@@ -961,7 +961,7 @@ static MI_Boolean _ProcessAuthMessage(
         if (binMsg->result == MI_RESULT_OK)
         {
             handler->clientAuthState = PRT_AUTH_OK;
-            trace_ClientCredentialsVerfied2();
+            trace_ClientCredentialsVerified2();
 
             if( Atomic_Swap(&handler->connectEventSent, 1) == 0 )
             {
@@ -1258,7 +1258,7 @@ static MI_Boolean _ProcessCreateAgentMsg(
                 return MI_FALSE;
             }
 
-            /* Create/open file with permisisons 644 */
+            /* Create/open file with permissions 644 */
             logfd = open(path, O_WRONLY|O_CREAT|O_APPEND, S_IWUSR | S_IRUSR | S_IRGRP | S_IROTH);
             if (logfd == INVALID_SOCK)
             {
@@ -1880,7 +1880,7 @@ static MI_Result _CreateConnector(
     Parameters:
         handler - pointer to received data
     Returns:
-        it returns result if 'callback' with the followinf meaning:
+        it returns result if 'callback' with the following meaning:
         MI_TRUE - to continue normal operations
         MI_FALSE - to close connection
 */
@@ -2084,7 +2084,7 @@ static Protocol_CallbackResult _ProcessReceivedMessage(
                             newHandler->clientAuthState = PRT_AUTH_OK;
                             newHandler->authInfo.uid = binMsg->uid;
                             newHandler->authInfo.gid = binMsg->gid;
-                            trace_ClientCredentialsVerfied(newHandler);
+                            trace_ClientCredentialsVerified(newHandler);
                         }
 
                         ProtocolSocketAndBase *socketAndBase = _ProtocolSocketTrackerGetElement(handler->base.sock);
@@ -2140,7 +2140,7 @@ static Protocol_CallbackResult _ProcessReceivedMessage(
         {
             //disable receiving anything else until this message is ack'ed
             handler->base.mask &= ~SELECTOR_READ;
-            // We cannot use Strand_SchedulePost becase we have to do
+            // We cannot use Strand_SchedulePost because we have to do
             // special treatment here (leave the strand in post)
             // We can use otherMsg to store this though
             Message_AddRef( msg );  // since the actual message use can be delayed
@@ -2580,7 +2580,7 @@ static MI_Result _ProtocolBase_Init(
         return MI_RESULT_INVALID_PARAMETER;
 
     if (selector)
-    {   /* attach the exisiting selector */
+    {   /* attach the existing selector */
         self->selector = selector;
         self->internal_selector_used = MI_FALSE;
     }
@@ -2848,7 +2848,7 @@ MI_Result ProtocolSocketAndBase_New_Connector(
         {
             // this will call _RequestCallback which will schedule a CloseOther,
             // but that is not going delete the object (since it is not even truly opened),
-            // so do it explicitely
+            // so do it explicitly
             Sock_Close(connector);
             ProtocolSocketAndBase_Delete(self);
             return MI_RESULT_FAILED;
@@ -2883,7 +2883,7 @@ MI_Result ProtocolSocketAndBase_New_Connector(
     callbackData -
 
     Returns:
-    'OK' if succefful, error otherwise
+    'OK' if successful, error otherwise
 */
 MI_Result _ProtocolSocketAndBase_New_From_Socket(
     _Out_       ProtocolSocketAndBase** selfOut,
@@ -2978,7 +2978,7 @@ MI_Result _ProtocolBase_Finish(
     if (self->internal_selector_used)
     {
         /* Release selector;
-        Note: selector-destory closes all sockects in a list including connector and listener */
+        Note: selector-destroy closes all sockets in a list including connector and listener */
         Selector_Destroy(self->selector);
 
         /* Shutdown the network */

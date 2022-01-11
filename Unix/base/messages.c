@@ -394,7 +394,7 @@ void __Message_AddRef(
 
 /*
     Decrements message's ref-counter and destroys
-    mesage if last reference was released
+    message if last reference was released
     Parameters:
     self - message to decref/release
 */

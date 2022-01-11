@@ -123,7 +123,7 @@ void CreateInstances(MI_Context* context, unsigned int number)
         TestClass_ForEmbedded_Destruct(&embeddedInstance);        
 
         MI_Instance* dynamicInstance;
-        MI_Context_NewDynamicInstance(context, MI_T("DyanamicClass"), 0, &dynamicInstance);
+        MI_Context_NewDynamicInstance(context, MI_T("DynamicClass"), 0, &dynamicInstance);
 
         MI_Value val;
         val.uint32 = 100;
@@ -547,7 +547,7 @@ void MI_CALL TestClass_AllDMTFTypes_Invoke_GetUint8Value(
             TestClass_AllDMTFTypes_GetUint8Value_Destruct(&temp);
 
             if(result != MI_RESULT_OK)
-                POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
+                POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not post instance"));
 
             break;
         }
@@ -585,7 +585,7 @@ void MI_CALL TestClass_AllDMTFTypes_Invoke_SetUint8Value(
                 TestClass_AllDMTFTypes_SetUint8Value_Destruct(&temp);
 
                 if(result != MI_RESULT_OK)
-                    POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
+                    POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not post instance"));
 
                 break;
             }
@@ -624,7 +624,7 @@ void MI_CALL TestClass_AllDMTFTypes_Invoke_GetSint8Value(
             TestClass_AllDMTFTypes_GetSint8Value_Destruct(&temp);
 
             if(result != MI_RESULT_OK)
-                POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
+                POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not post instance"));
 
             break;
         }
@@ -662,7 +662,7 @@ void MI_CALL TestClass_AllDMTFTypes_Invoke_SetSint8Value(
                 TestClass_AllDMTFTypes_SetSint8Value_Destruct(&temp);
 
                 if(result != MI_RESULT_OK)
-                    POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
+                    POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not post instance"));
 
                 break;
             }
@@ -701,7 +701,7 @@ void MI_CALL TestClass_AllDMTFTypes_Invoke_GetUint16Value(
             TestClass_AllDMTFTypes_GetUint16Value_Destruct(&temp);
 
             if(result != MI_RESULT_OK)
-                POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
+                POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not post instance"));
 
             break;
         }
@@ -739,7 +739,7 @@ void MI_CALL TestClass_AllDMTFTypes_Invoke_SetUint16Value(
                 TestClass_AllDMTFTypes_SetUint16Value_Destruct(&temp);
 
                 if(result != MI_RESULT_OK)
-                    POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
+                    POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not post instance"));
 
                 break;
             }
@@ -778,7 +778,7 @@ void MI_CALL TestClass_AllDMTFTypes_Invoke_GetSint16Value(
             TestClass_AllDMTFTypes_GetSint16Value_Destruct(&temp);
 
             if(result != MI_RESULT_OK)
-                POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
+                POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not post instance"));
 
             break;
         }
@@ -814,7 +814,7 @@ void MI_CALL TestClass_AllDMTFTypes_Invoke_SetSint16Value(
                 result = TestClass_AllDMTFTypes_SetSint16Value_Post(&temp, context);
 
                 if(result != MI_RESULT_OK)
-                    POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
+                    POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not post instance"));
 
                 break;
             }
@@ -853,7 +853,7 @@ void MI_CALL TestClass_AllDMTFTypes_Invoke_GetUint32Value(
             TestClass_AllDMTFTypes_GetUint32Value_Destruct(&temp);
 
             if(result != MI_RESULT_OK)
-                POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
+                POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not post instance"));
 
             break;
         }
@@ -891,7 +891,7 @@ void MI_CALL TestClass_AllDMTFTypes_Invoke_SetUint32Value(
                 TestClass_AllDMTFTypes_SetUint32Value_Destruct(&temp);
 
                 if(result != MI_RESULT_OK)
-                    POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
+                    POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not post instance"));
 
                 break;
             }
@@ -930,7 +930,7 @@ void MI_CALL TestClass_AllDMTFTypes_Invoke_GetSint32Value(
             TestClass_AllDMTFTypes_GetSint32Value_Destruct(&temp);
 
             if(result != MI_RESULT_OK)
-                POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
+                POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not post instance"));
 
             break;
         }
@@ -990,7 +990,7 @@ void MI_CALL TestClass_AllDMTFTypes_Invoke_SetSint32Value(
                 result = TestClass_AllDMTFTypes_SetSint32Value_Post(&temp, context);
 
                 if(result != MI_RESULT_OK)
-                    POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
+                    POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not post instance"));
 
                 TestClass_AllDMTFTypes_SetSint32Value_Destruct(&temp);
 
@@ -1031,7 +1031,7 @@ void MI_CALL TestClass_AllDMTFTypes_Invoke_GetUint64Value(
             TestClass_AllDMTFTypes_GetUint64Value_Destruct(&temp);
 
             if(result != MI_RESULT_OK)
-                POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
+                POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not post instance"));
 
             break;
         }
@@ -1069,7 +1069,7 @@ void MI_CALL TestClass_AllDMTFTypes_Invoke_SetUint64Value(
                 TestClass_AllDMTFTypes_SetUint64Value_Destruct(&temp);
 
                 if(result != MI_RESULT_OK)
-                    POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
+                    POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not post instance"));
 
                 break;
             }
@@ -1108,7 +1108,7 @@ void MI_CALL TestClass_AllDMTFTypes_Invoke_GetSint64Value(
             TestClass_AllDMTFTypes_GetSint64Value_Destruct(&temp);
 
             if(result != MI_RESULT_OK)
-                POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
+                POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not post instance"));
 
             break;
         }
@@ -1146,7 +1146,7 @@ void MI_CALL TestClass_AllDMTFTypes_Invoke_SetSint64Value(
                 TestClass_AllDMTFTypes_SetSint64Value_Destruct(&temp);
 
                 if(result != MI_RESULT_OK)
-                    POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
+                    POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not post instance"));
 
                 break;
             }
@@ -1185,28 +1185,28 @@ void MI_CALL TestClass_AllDMTFTypes_Invoke_GetStringCustomOption(
     result = TestClass_AllDMTFTypes_GetStringCustomOption_Construct(&methodResult, context);
     if(result != MI_RESULT_OK)
     {
-        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot construct instance"));
+        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not construct instance"));
     }
 
     result = TestClass_AllDMTFTypes_GetStringCustomOption_Set_MIReturn(&methodResult, 0);
     if(result != MI_RESULT_OK)
     {
         TestClass_AllDMTFTypes_GetStringCustomOption_Destruct(&methodResult);
-        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot set return value"));
+        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not set return value"));
     }
 
     result = TestClass_AllDMTFTypes_GetStringCustomOption_Set_optionValue(&methodResult, customOptionValue.string);
     if(result != MI_RESULT_OK)
     {
         TestClass_AllDMTFTypes_GetStringCustomOption_Destruct(&methodResult);
-        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot set option value"));
+        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not set option value"));
     }
 
     result = MI_PostInstance(context, &(methodResult.__instance));
     if(result != MI_RESULT_OK)
     {
         TestClass_AllDMTFTypes_GetStringCustomOption_Destruct(&methodResult);
-        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
+        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not post instance"));
     }
 
     MI_PostResult(context, MI_RESULT_OK);
@@ -1242,7 +1242,7 @@ void MI_CALL TestClass_AllDMTFTypes_Invoke_GetEmbeddedObjectValue(
             TestClass_AllDMTFTypes_GetEmbeddedObjectValue_Destruct(&temp);
 
             if(result != MI_RESULT_OK)
-                POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
+                POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not post instance"));
 
             break;
         }
@@ -1278,7 +1278,7 @@ void MI_CALL TestClass_AllDMTFTypes_Invoke_SetEmbeddedObjectValue(
             TestClass_AllDMTFTypes_SetEmbeddedObjectValue_Destruct(&temp);
 
             if(result != MI_RESULT_OK)
-                POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
+                POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not post instance"));
 
             break;
         }
@@ -1316,7 +1316,7 @@ void MI_CALL TestClass_AllDMTFTypes_Invoke_GetEmbeddedInstanceValue(
             TestClass_AllDMTFTypes_GetEmbeddedInstanceValue_Destruct(&temp);
 
             if(result != MI_RESULT_OK)
-                POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
+                POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not post instance"));
 
             break;
         }
@@ -1352,7 +1352,7 @@ void MI_CALL TestClass_AllDMTFTypes_Invoke_SetEmbeddedInstanceValue(
             TestClass_AllDMTFTypes_SetEmbeddedInstanceValue_Destruct(&temp);
 
             if(result != MI_RESULT_OK)
-                POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
+                POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not post instance"));
 
             break;
         }
@@ -1390,7 +1390,7 @@ void MI_CALL TestClass_AllDMTFTypes_Invoke_GetReferenceValue(
             TestClass_AllDMTFTypes_GetReferenceValue_Destruct(&temp);
 
             if(result != MI_RESULT_OK)
-                POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
+                POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not post instance"));
 
             break;
         }
@@ -1426,7 +1426,7 @@ void MI_CALL TestClass_AllDMTFTypes_Invoke_SetReferenceValue(
             TestClass_AllDMTFTypes_SetReferenceValue_Destruct(&temp);
 
             if(result != MI_RESULT_OK)
-                POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
+                POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not post instance"));
 
             break;
         }
@@ -1464,7 +1464,7 @@ void MI_CALL TestClass_AllDMTFTypes_Invoke_GetOctetUint8Value(
             TestClass_AllDMTFTypes_GetOctetUint8Value_Destruct(&temp);
 
             if(result != MI_RESULT_OK)
-                POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
+                POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not post instance"));
 
             break;
         }
@@ -1500,7 +1500,7 @@ void MI_CALL TestClass_AllDMTFTypes_Invoke_SetOctetUint8Value(
             TestClass_AllDMTFTypes_SetOctetUint8Value_Destruct(&temp);
 
             if(result != MI_RESULT_OK)
-                POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
+                POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not post instance"));
 
             break;
         }

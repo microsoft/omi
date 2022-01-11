@@ -929,7 +929,7 @@ static int _PromoteValue(
                 }
                 default:
                 {
-                    /* For empty array, just create another emptry array and return */
+                    /* For empty array, just create another empty array and return */
                     if (p->size == 0)
                     {
                         MI_Uint64A* q;
@@ -1028,14 +1028,14 @@ static int _PromoteValue(
             case MI_INSTANCEA:
             case MI_REFERENCEA:
                 {
-                    const MI_InstanceA * insta = *(const MI_InstanceA**)value;
+                    const MI_InstanceA * instance = *(const MI_InstanceA**)value;
                     MI_Char *destclassname = destpropertydecl->className;
                     if (destclassname)
                     {
                         *embeddedpropertyError = MI_TRUE;
-                        for (i = 0; i < insta->size; i++)
+                        for (i = 0; i < instance->size; i++)
                         {
-                            if (_IsInstanceOfClass(state, insta->data[i], destclassname) != 0)
+                            if (_IsInstanceOfClass(state, instance->data[i], destclassname) != 0)
                                 return -1;
                         }
                     }
@@ -3036,9 +3036,9 @@ static int _FindEmbeddedQualifier(
 **     Next non-restricted inherited qualifiers are appended to this list.
 **     Finally derived qualifiers are applied to the list. Qualifiers not
 **     already in the list are appended. Qualifiers already in the list are
-**     overriden.
+**     overridden.
 **
-**     Propation is performed using the MI_Qualifier.flavor whose bits may be
+**     Propagation is performed using the MI_Qualifier.flavor whose bits may be
 **     masked by these macros.
 **
 **         MI_FLAG_ENABLEOVERRIDE
@@ -3217,7 +3217,7 @@ static int _FinalizeClassProperties(
 
         if (pos == MOF_NOT_FOUND)
         {
-            /* set default flavor to qualifers */
+            /* set default flavor to qualifiers */
             for (j = 0; j < pd->numQualifiers; j++)
             {
                 pd->qualifiers[j]->flavor = SetDefaultFlavors(pd->qualifiers[j]->flavor);
@@ -3475,7 +3475,7 @@ static int _FinalizeClassMethods(
 
         if (pos == MOF_NOT_FOUND)
         {
-            /* set default flavor to qualifers */
+            /* set default flavor to qualifiers */
             for (k = 0; k < md->numQualifiers; k++)
             {
                 md->qualifiers[k]->flavor = SetDefaultFlavors(md->qualifiers[k]->flavor);
@@ -3534,7 +3534,7 @@ static int _FinalizeClassMethods(
                     pdecl->code = Hash(pdecl->name);
                 }
 
-                /* set default flavor to qualifers */
+                /* set default flavor to qualifiers */
                 for (k = 0; k < pdecl->numQualifiers; k++)
                 {
                     pdecl->qualifiers[k]->flavor = SetDefaultFlavors(pdecl->qualifiers[k]->flavor);
@@ -5074,7 +5074,7 @@ int closeIncludeFile(void *mofstate)
     MOF_State * state = (MOF_State *)mofstate;
     if (state->bufTop == 0) return 0;
     r = MOF_State_PopBuffer(mofstate);
-    /* return 1 means the poped buffer is valid */
+    /* return 1 means the popped buffer is valid */
     if (r == 0) return 1;
     return r;
 }

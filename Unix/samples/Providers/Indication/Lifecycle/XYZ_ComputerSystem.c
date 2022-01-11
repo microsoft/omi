@@ -35,7 +35,7 @@ struct _LifecycleIndicationItem
         methodcall;
         struct _Modify
         {
-            MI_Instance* orginalInstance;
+            MI_Instance* originalInstance;
         }
         modify;
     }
@@ -153,7 +153,7 @@ MI_INLINE LifecycleIndicationItem* LifecycleIndicationItem_New(
     switch(lifecycleIndicationType)
     {
     case MI_LIFECYCLE_INDICATION_MODIFY:
-        temp->u.modify.orginalInstance = clonedOriginalInstance;
+        temp->u.modify.originalInstance = clonedOriginalInstance;
         break;
     case MI_LIFECYCLE_INDICATION_METHODCALL:
         temp->u.methodcall.methodName = clonedMethodName;
@@ -180,8 +180,8 @@ MI_INLINE void LifecycleIndicationItem_Free(
         switch(item->type)
         {
         case MI_LIFECYCLE_INDICATION_MODIFY:
-            if (item->u.modify.orginalInstance)
-                MI_Instance_Delete(item->u.modify.orginalInstance);
+            if (item->u.modify.originalInstance)
+                MI_Instance_Delete(item->u.modify.originalInstance);
             break;
         case MI_LIFECYCLE_INDICATION_METHODCALL:
             if (item->u.methodcall.parameter)
@@ -216,7 +216,7 @@ typedef struct _LifecycleIndicationItemList
 LifecycleIndicationItemList;
 
 /*
- * Initlize list
+ * Initialize list
  */
 MI_INLINE void LifecycleIndicationItemList_Init(
     _Out_ LifecycleIndicationItemList* self)
@@ -365,7 +365,7 @@ MI_Uint32 THREAD_API lifecycleindicationproc(void* param)
                     MI_LifecycleIndicationContext_PostRead(self->context, item->instance);
                     break;
                 case MI_LIFECYCLE_INDICATION_MODIFY:
-                    MI_LifecycleIndicationContext_PostModify(self->context, item->u.modify.orginalInstance, item->instance);
+                    MI_LifecycleIndicationContext_PostModify(self->context, item->u.modify.originalInstance, item->instance);
                     break;
                 case MI_LIFECYCLE_INDICATION_METHODCALL:
                     if (item->u.methodcall.precall)
@@ -388,7 +388,7 @@ MI_Uint32 THREAD_API lifecycleindicationproc(void* param)
             item = LifecycleIndicationItemList_Remove(list);
         }
 
-        /* wait for semophore, either provider is being unloaded or new lifecycle item scheduled */
+        /* wait for semaphore, either provider is being unloaded or new lifecycle item scheduled */
         Sem_Wait(&self->list.sem);
     }
 
@@ -480,7 +480,7 @@ void MI_CALL XYZ_ComputerSystem_Load(
         (*self)->context, MI_LIFECYCLE_INDICATION_ALL);
     CHECKR_POST_RETURN_VOID(context, r);
 
-    /* intialize global data */
+    /* initialize global data */
     r = _Initialize(context, *self);
     if (r != MI_RESULT_OK)
     {

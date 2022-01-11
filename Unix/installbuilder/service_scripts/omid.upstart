@@ -1,7 +1,7 @@
 ##
 ## Copyright (c) Microsoft Corporation.  All rights reserved.
 ##
-## Contains settings for the OMI WS-Management Deamon.
+## Contains settings for the OMI WS-Management Daemon.
 ##
 ##
 #
@@ -22,7 +22,7 @@ start on (starting network-interface INTERFACE=lo
       or starting networking)
 
 stop  on (stopping network-interface INTERFACE=lo
-      or stoppng networking)
+      or stopping networking)
 
 console output
 

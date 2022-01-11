@@ -156,7 +156,7 @@ class CIM_StorageCapabilities : CIM_Capabilities {
           "by default in a replica for caching changes. For a "
           "complete copy this would be 100%, but it can be lower in "
           "some implementations. This parameter sets the default "
-          "value, while DeletaReservationMax and DeltReservationMin "
+          "value, while DeltaReservationMax and DeltaReservationMin "
           "set the upper and lower bounds." ), 
        Units ( "Percentage" ), 
        MinValue ( 0 ), 
@@ -293,7 +293,7 @@ class CIM_StorageCapabilities : CIM_Capabilities {
           "can be used to the supported parity layouts." ), 
        ValueMap { "0", "1", "2" }, 
        Values { "Method completed OK", "Method not supported", 
-          "Choice not aavailable for this capability" }]
+          "Choice not available for this capability" }]
    uint32 GetSupportedParityLayouts(
          [IN ( false ), OUT, Description ( 
              "List of supported Parity for a Volume/Pool "

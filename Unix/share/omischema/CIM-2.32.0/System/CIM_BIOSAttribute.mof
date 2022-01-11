@@ -88,11 +88,11 @@ class CIM_BIOSAttribute : CIM_ManagedElement {
       [Description ( 
           "This property specifies if the underlying system BIOS or "
           "BIOSService will not allow the Attribute to be modified "
-          "through calls tothe methods "
+          "through calls to the methods "
           "CIM_BIOSService.SetBIOSAttribute or "
           "CIM_BIOSService.SetBIOSDefaults. This does not mean the "
           "Attribute can not be modified through other means. Only "
-          "that the CIM interfaceis not capable of making a change" )]
+          "that the CIM interface is not capable of making a change" )]
    boolean IsReadOnly;
 
 

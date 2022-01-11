@@ -70,7 +70,7 @@ class CIM_AccessControlInformation : CIM_LogicalElement {
           "corresponding permission applies. For example, it can be "
           "used to specify a generic access such as \'Read-only\', "
           "\'Read/Write\', etc. for file or record access control "
-          "or it can be used to specifiy an entry point name for "
+          "or it can be used to specify an entry point name for "
           "service access control." ), 
        ArrayType ( "Indexed" ), 
        ModelCorrespondence { 

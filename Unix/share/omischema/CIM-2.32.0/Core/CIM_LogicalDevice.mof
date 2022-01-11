@@ -51,7 +51,7 @@ class CIM_LogicalDevice : CIM_EnabledLogicalElement {
           "The use of this property has been deprecated. Instead, "
           "the existence of an associated "
           "PowerManagementCapabilities class (associated using the "
-          "ElementCapabilities relationhip) indicates that power "
+          "ElementCapabilities relationship) indicates that power "
           "management is supported." )]
    boolean PowerManagementSupported;
 
@@ -60,7 +60,7 @@ class CIM_LogicalDevice : CIM_EnabledLogicalElement {
        Description ( 
           "An enumerated array describing the power management "
           "capabilities of the Device. The use of this property has "
-          "been deprecated. Instead, the PowerCapabilites property "
+          "been deprecated. Instead, the PowerCapabilities property "
           "in an associated PowerManagementCapabilities class "
           "should be used." ), 
        ValueMap { "0", "1", "2", "3", "4", "5", "6", "7" }, 
@@ -205,7 +205,7 @@ class CIM_LogicalDevice : CIM_EnabledLogicalElement {
           "property can be used to provide further information. For "
           "example, a Device\'s primary Availability may be \"Off "
           "line\" (value=8), but it may also be in a low power "
-          "state (AdditonalAvailability value=14), or the Device "
+          "state (AdditionalAvailability value=14), or the Device "
           "could be running Diagnostics (AdditionalAvailability "
           "value=5, \"In Test\")." ), 
        ValueMap { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", 

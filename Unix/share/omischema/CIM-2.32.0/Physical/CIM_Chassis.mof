@@ -100,7 +100,7 @@ class CIM_Chassis : CIM_PhysicalFrame {
           "Expansion Chassis", "SubChassis", 
           // 20               
           "Bus Expansion Chassis", 
-          "Peripheral Chassis", "Storage Chassis", "SMBIOS Reseved", 
+          "Peripheral Chassis", "Storage Chassis", "SMBIOS Reserved", 
           "Sealed-Case PC", "SMBIOS Reserved", "CompactPCI", 
           "AdvancedTCA", "Blade Enclosure", "DMTF Reserved", 
           "Vendor Reserved" }, 

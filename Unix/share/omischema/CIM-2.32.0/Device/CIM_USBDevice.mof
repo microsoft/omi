@@ -1,7 +1,7 @@
 // Copyright (c) 2009 DMTF.  All rights reserved.
    [Version ( "2.22.0" ), 
     UMLPackagePath ( "CIM::Device::USB" ), 
-    Description ( "The management characterisitics of a USB Device." )]
+    Description ( "The management characteristics of a USB Device." )]
 class CIM_USBDevice : CIM_LogicalDevice {
 
       [Description ( 
@@ -66,7 +66,7 @@ class CIM_USBDevice : CIM_LogicalDevice {
    uint16 DeviceReleaseNumber;
 
       [Description ( 
-          "From the USB specification Device Descriptior, "
+          "From the USB specification Device Descriptor, "
           "Manufacturer string." ), 
        MappingStrings { 
           "Universal Serial Bus Specification.USB-IF|Standard Device Descriptor|iManufacturer" }]
@@ -117,7 +117,7 @@ class CIM_USBDevice : CIM_LogicalDevice {
           "applications supporting USB Redirections. When the "
           "Redirection Service redirects a USBDevice command to a "
           "remote device, and the remote device does not respond "
-          "before CommandTimout times out, the Redirection Service "
+          "before CommandTimeout times out, the Redirection Service "
           "will emulate a media eject event and re-try the command "
           "and/or try to re-establish the connection to the remote "
           "device. The timeout is expressed using the interval "

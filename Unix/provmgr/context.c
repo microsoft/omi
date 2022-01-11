@@ -292,7 +292,7 @@ static MI_Result _ProcessResult(
             if (cimError)
             {
                 InstanceToBatch(cimError, NULL, NULL, resp->base.batch, &resp->packedInstancePtr, &resp->packedInstanceSize);
-                /* If the serialization fails we should just send the original error back. Seems bad to overrite it with this error */
+                /* If the serialization fails we should just send the original error back. Seems bad to overwrite it with this error */
 
                 resp->cimErrorClassName = Batch_Tcsdup(resp->base.batch, cimError->classDecl->name);
             }
@@ -501,7 +501,7 @@ static MI_Result MI_CALL _PostResult(
     Context* self = (Context*)self_;
 
     /* Suppress MI_RESULT_NOT_SUPPORTED errors for operations which involve
-     * multiple provdiders. For example, suppose the operation is handled by
+     * multiple providers. For example, suppose the operation is handled by
      * providers A, B, and C. If providers A and B post MI_RESULT_OK but
      * provider C posts MI_RESULT_NOT_SUPPORTED, we must translate this error
      * to a MI_RESULT_OK to prevent the client from receiving it. The client
@@ -804,7 +804,7 @@ MI_Result _SubscrContext_PostIndication(
      * a known filter. */
     if (MI_RESULT_OK == result && isMatch)
     {
-        SubMgrSubscription_AcuquirePostLock(subscription);
+        SubMgrSubscription_AcquirePostLock(subscription);
         if ( MI_FALSE == SubMgrSubscription_CancelStarted(subscription) )
             result = _PostIndicationToCallback((Context*)context, indication, bookmark);
         else
@@ -864,7 +864,7 @@ MI_Result _SubscrContext_ProcessResult(
         trace_SubscrContext_ProcessResult_InvalidState(UintThreadID(), subCtx, subscription, subscription->state);
     }
 
-    SubMgrSubscription_AcuquirePostLock(subscription);
+    SubMgrSubscription_AcquirePostLock(subscription);
     r = SubscrContext_SendFinalResultMsg( subCtx, result, errorMessage, cimError );
     SubMgrSubscription_ReleasePostLock(subscription);
 
@@ -1733,7 +1733,7 @@ static void _Context_Ack( _In_ Strand* self_)
 
     // al management done by strand implementation except broadcasting cond var
 
-    // wake up Context_PostMessageLeft if appropiate
+    // wake up Context_PostMessageLeft if appropriate
     // (no point on waking up Context_PostMessageLeft if CONTEXT_STRANDAUX_TRYPOSTLEFT is scheduled to run after us)
     if( CONTEXT_POSTLEFT_POSTING == Atomic_CompareAndSwap( &self->tryingToPostLeft, (ptrdiff_t)CONTEXT_POSTLEFT_POSTING, (ptrdiff_t)(CONTEXT_POSTLEFT_POSTING|CONTEXT_POSTLEFT_SCHEDULED)) )
     {
@@ -1775,7 +1775,7 @@ static void _Context_Aux_TryPostLeft( _In_ Strand* self_ )
 
     if( !self->strand.info.thisAckPending )
     {
-        if (!self->strand.info.thisClosedOther)  // TODO: Is this correct, or is it indiciative of a different problem?
+        if (!self->strand.info.thisClosedOther)  // TODO: Is this correct, or is it indicative of a different problem?
         {
             /* Only post the message if this Context has not "closed"
              * the connection.  Another thread may have done so on the

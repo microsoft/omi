@@ -84,7 +84,7 @@ static int _authCallback(
     const char* password = (const char*)applicationData;
     int i;
 
-    /* If zero (or megative) messages, return now */
+    /* If zero (or negative) messages, return now */
 
     if (numMessages <= 0)
     {
@@ -218,7 +218,7 @@ static int _CreateChildProcess(
         }
     }
 
-    /* perform operation in quesiton */
+    /* perform operation in question */
     {
         int r = PamCheckUser(user, password);
 
@@ -240,9 +240,9 @@ MI_INLINE int _TestEINTR()
 }
 
 /* 
-    Reads data from file, retry if was interuptted
+    Reads data from file, retry if was interrupted
     Returns:
-    'size of the data' readed from the file if success
+    'size of the data' read from the file if success
     '-1' otherwise
 */
 int ReadFile(int fd, void* data, size_t size)
@@ -322,7 +322,7 @@ int ValidateUser(const char* user)
 }
 
 /*
-    Disables authentication calls so 'AuthUser' always retunrs 'ok';
+    Disables authentication calls so 'AuthUser' always returns 'ok';
     used for unit-test only
 */
 void    IgnoreAuthCalls(int flag)

@@ -47,7 +47,7 @@ class CIM_DiagnosticTestForMSE : CIM_ProvidesServiceToElement {
       [Deprecated { "CIM_ServiceAffectsElement.ElementEffects" }, 
        Description ( 
           "This property is being deprecated since the same "
-          "characterisitic can be published in the "
+          "characteristic can be published in the "
           "CIM_ServiceAffectsElement.ElementEffects array as Value "
           "= 2, \"Exclusive Use\". \n"
           "If the DiagnosticTest referenced in this object can be "

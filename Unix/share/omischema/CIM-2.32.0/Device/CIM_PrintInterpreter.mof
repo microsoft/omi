@@ -161,7 +161,7 @@ class CIM_PrintInterpreter : CIM_PrinterElement {
           "detailed availability information for this "
           "PrintInterpreter is unknown. 3 (AvailableIdle) means "
           "this PrintInterpreter is available and idle, i.e., not "
-          "currently in use. 4 (AvailableStandy) means this "
+          "currently in use. 4 (AvailableStandby) means this "
           "PrintInterpreter is available but on standby, e.g., in a "
           "power saving mode. 5 (AvailableActive) means this "
           "PrintInterpreter is available and active, i.e., "

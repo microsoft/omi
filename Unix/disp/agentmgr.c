@@ -72,7 +72,7 @@ typedef struct _RequestItem
 
     Message* request;           // Request received from the left
     MI_Uint64 originalOperationId;
-    MI_Uint64 key;  // OperationId of the outogoing request; for now RequestItem address (as it was before)
+    MI_Uint64 key;  // OperationId of the outgoing request; for now RequestItem address (as it was before)
 }
 RequestItem;
 
@@ -208,7 +208,7 @@ void _AgentElem_Post( _In_ Strand* self_, _In_ Message* msg)
 
     // For now ack immediately
     //TODO eventually multiplexer should take care of flow control here
-    // For now, we are short circuiting ACK from RequstItem
+    // For now, we are short circuiting ACK from RequestItem
 }
 
 void _AgentElem_PostControl( _In_ Strand* self_, _In_ Message* msg)
@@ -232,7 +232,7 @@ void _AgentElem_Close( _In_ Strand* self_)
 
     trace_AgentClosedConnection((int)self->uid);
     // lost connection to the agent ( within 'CloseAgentItem' call):
-    //    - send error repsonses to all outstanding requests
+    //    - send error responses to all outstanding requests
     //    - remove agent form the list
 
     _AgentElem_InitiateClose( self, MI_TRUE );
@@ -278,7 +278,7 @@ static void _AgentElem_CloseAgentItem(Strand* self_);
     - Post checks if the message is a idle notification, and if it is and there is
        only one remaining operation (the idle notification one itself) then initiates
        a close. Otherwise it just post the message to the pertinent operation that is
-       find using the buildin hash map searching by the operationId field
+       find using the builtin hash map searching by the operationId field
        in the message.
     - Ack does nothing currently as there is not an explicit in-the-wire flow control
        protocol implemented yet.
@@ -290,10 +290,10 @@ static void _AgentElem_CloseAgentItem(Strand* self_);
        once the interaction is closed on both sides and there are no
        entries the object is auto-deleted.
 
-    Unique features and special Behavour:
+    Unique features and special Behaviour:
     - _AgentElem_CloseAgentItem is called at any time is there is an unrecoverable
       error or the connection has been lost and it will iterate thru the existing
-      operations/requests sending an appropiate error message to each one.
+      operations/requests sending an appropriate error message to each one.
      - _AgentElem_EntryAck is schedule by each entry (RequestItem) when it
       receives and Ack so that Ack can be simply passed thru to the connection
       (since we dont have yet a more sophisticated on-the-wire flow control
@@ -501,7 +501,7 @@ void _RequestItem_PrepareToFinishOnError( _In_ Strand* self_)
     Behavior:
     - Post calls _PrepareMessageForAgent to adapt the message to be send on the
        wire the uses StrandEntry_PostParentPassthru to post to the parent
-       using the default many-to-one post implementation that enques the message
+       using the default many-to-one post implementation that enqueues the message
        on the AgentElem
     - Ack checks on the state of finishOnErrorState. On the normal case the ack is
        just passed thru to the parent by using AGENTELEM_STRANDAUX_ENTRYACK
@@ -520,7 +520,7 @@ void _RequestItem_PrepareToFinishOnError( _In_ Strand* self_)
        Note that the interaction is closed once the final message is received as
        noted in _RequestItem_ParentPost below
 
-    Unique features and special Behavour:
+    Unique features and special Behaviour:
     - _RequestItem_PrepareToFinishOnError is scheduled when the parent
        _AgentElem_CloseAgentItem execute, that is, when for some reason
        the connection to the agent needs to be closed. In that case it checks
@@ -590,7 +590,7 @@ void _IdleRequestItem_ReadyToFinish( _In_ Strand* self_)
 }
 
 /*
-    Object that implements the especific request needed to receive the Idle notification
+    Object that implements the specific request needed to receive the Idle notification
     from the agent. It is attached as one Entries on the one-to-many interface with the
     agent connection (AgentElem).
 
@@ -907,7 +907,7 @@ static void _AgentElem_CloseAgentItem( Strand* self_ )
 
     StrandMany_BeginIteration( &agent->strand );
 
-    /* send error repsonses to all outstanding requests */
+    /* send error responses to all outstanding requests */
     while( NULL != (requestItem = (RequestItem*)StrandMany_Iterate( &agent->strand )) )
     {
         if(  requestItem->isIdleRequest )
@@ -1036,7 +1036,7 @@ static AgentElem* _CreateAgent(
                 goto failed;
             }
 
-            /* Create/open fiel with permisisons 644 */
+            /* Create/open fiel with permissions 644 */
             logfd = open(path, O_WRONLY|O_CREAT|O_APPEND, S_IWUSR | S_IRUSR | S_IRGRP | S_IROTH);
             if (logfd == -1)
             {

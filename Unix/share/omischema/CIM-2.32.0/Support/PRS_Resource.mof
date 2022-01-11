@@ -10,7 +10,7 @@
        "Each PRS_Resolution may have an associated cost of "
        "implementation. This cost may have several components such as "
        "time, material costs, labor cost, etc. To capture these costs, "
-       "a PRS_Resouce is associated with a PRS_Resolution. For Service "
+       "a PRS_Resource is associated with a PRS_Resolution. For Service "
        "Incidents, one or more PRS_Resource objects may be associated "
        "with an Activity." )]
 class PRS_Resource : PRS_ExchangeElement {

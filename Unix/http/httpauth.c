@@ -837,7 +837,7 @@ static MI_Boolean _WriteAuthResponse(Http_SR_SocketData * handler, const char *p
             switch (SSL_get_error(handler->ssl, sent))
             {
 
-                // These do not happen. We havfe already drained the socket
+                // These do not happen. We have already drained the socket
                 // before we got here. 
 
             case SSL_ERROR_WANT_WRITE:
@@ -1197,19 +1197,19 @@ static __inline__ void traceSupplementaryInfo(OM_uint32 code)
 
     if (code & GSS_S_DUPLICATE_TOKEN)
     {
-        trace_HTTP_SupplimentaryInfo("GSS_S_DUPLICATE_TOKEN");
+        trace_HTTP_SupplementaryInfo("GSS_S_DUPLICATE_TOKEN");
     }
     if (code & GSS_S_OLD_TOKEN )
     {
-        trace_HTTP_SupplimentaryInfo("GSS_S_OLD_TOKEN");
+        trace_HTTP_SupplementaryInfo("GSS_S_OLD_TOKEN");
     }
     if (code & GSS_S_UNSEQ_TOKEN )
     {
-        trace_HTTP_SupplimentaryInfo("GSS_S_UNSEQ_TOKEN");
+        trace_HTTP_SupplementaryInfo("GSS_S_UNSEQ_TOKEN");
     }
     if (code & GSS_S_GAP_TOKEN)
     {
-        trace_HTTP_SupplimentaryInfo("GSS_S_GAP_TOKEN");
+        trace_HTTP_SupplementaryInfo("GSS_S_GAP_TOKEN");
     }
 
 }
@@ -1704,7 +1704,7 @@ Done:
     handler->recvPage = 0;
     handler->receivedSize = 0;
     memset(&handler->recvHeaders, 0, sizeof(handler->recvHeaders));
-    handler->recvingState = RECV_STATE_HEADER;
+    handler->receivingState = RECV_STATE_HEADER;
 
     return MI_RESULT_OK;
 }
@@ -2277,7 +2277,7 @@ MI_Result Process_Authorized_Message(
 #if ENCRYPT_DECRYPT
     if (!Http_DecryptData(handler, &handler->recvHeaders, &handler->recvPage) )
     {
-        // Failed decrypt. No encryption counts as success. So this is an error in the decrpytion, probably
+        // Failed decrypt. No encryption counts as success. So this is an error in the decryption, probably
         // bad credential
 
         return MI_RESULT_FAILED;

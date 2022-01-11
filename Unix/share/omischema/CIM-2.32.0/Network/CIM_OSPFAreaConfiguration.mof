@@ -36,7 +36,7 @@
        "RangeOfIPAddresses would be associated to an OSPFArea, "
        "satisfying this semantic. \n"
        "- This class is inherited from LogicalElement, because a "
-       "suitable subclass \'lower\' in the inheritance hiearchy does "
+       "suitable subclass \'lower\' in the inheritance hierarchy does "
        "not exist." )]
 class CIM_OSPFAreaConfiguration : CIM_LogicalElement {
 

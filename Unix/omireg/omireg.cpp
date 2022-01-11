@@ -392,12 +392,12 @@ static void GenClassLine(
                 else if (!rcd2)
                     rcd2 = rcd;
                 else
-                    err(PAL_T("invalid assocation class: %T, which has more than two reference properties"), tcs(cd->name));
+                    err(PAL_T("invalid association class: %T, which has more than two reference properties"), tcs(cd->name));
             }
         }
 
         if (!rcd2)
-            err(PAL_T("invalid assocation class: %T, which has less than two reference properties"), tcs(cd->name));
+            err(PAL_T("invalid association class: %T, which has less than two reference properties"), tcs(cd->name));
 
         Fprintf(os, "{");
         PrintClassPath(os, rcd1);
@@ -584,7 +584,7 @@ static void GenRegFile(
         else
         {
             // Noting down all non implemented classes which are not a super class.
-            // With this all the classes present in a provider either implemented or not implemeted will be listed in .reg file.
+            // With this all the classes present in a provider either implemented or not implemented will be listed in .reg file.
             // EXTRACLASS=class1:class2:class3
 
             // Checking if the class is a super class of any other class (implemented or not-implemented)

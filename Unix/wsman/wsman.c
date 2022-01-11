@@ -120,7 +120,7 @@ const MI_Uint64 WSMAN_TIMEOUT_DEFAULT = 60 * 1000 * 1000; // 60 Seconds in micro
     "</SOAP-ENV:Body>\n" \
     "</SOAP-ENV:Envelope>\n"
 
-/* aproximate repsonse header size */
+/* approximate response header size */
 #define APPROX_ENUM_RESP_ENVELOPE_SIZE \
     (sizeof(TYPICAL_ENUM_RESPONSE_ENVELOPE) + 64)
 
@@ -134,7 +134,7 @@ typedef struct _WSMAN_ConnectionData    WSMAN_ConnectionData;
 typedef struct _WSMAN_EnumerateContext  WSMAN_EnumerateContext;
 
 /* Maximum number of enumeration contexts stored at the same time
-    effectively limits number of concurent enumerations */
+    effectively limits number of concurrent enumerations */
 #define WSMAN_MAX_ENUM_CONTEXTS 64
 
 struct _WSMAN
@@ -204,13 +204,13 @@ struct _WSMAN_ConnectionData
     }
     u;
 
-    /* incomming request msg */
+    /* incoming request msg */
     HttpRequestMsg * request;
 
     /* Request page (buffer for most pointers inside header/body structures) */
     Page* page;
 
-    /* for single-instance/single-schema repsonses, we keep mesage until result
+    /* for single-instance/single-schema responses, we keep message until result
        received to avoid conflicts with keep-alive enabled */
     Message* single_message;
 
@@ -244,7 +244,7 @@ typedef struct _WSMAN_EnumerateContextData
     MI_Uint32 requestTag;
 
     /* Success response to client sent or not */
-    MI_Boolean responsed;
+    MI_Boolean responded;
 }WSMAN_EnumerateContextData;
 
 /* Enumeration context:
@@ -267,15 +267,15 @@ struct _WSMAN_EnumerateContext
     /* Total size of all instances in response queue */
     MI_Uint32   totalResponseSize;
 
-    /* Number of messages in repsonse queue */
+    /* Number of messages in response queue */
     MI_Uint32   totalResponses;
 
-    /* lower 16 bits is aninxed in self->enumerateContexts, upper 16 bits are random data (for validation) */
+    /* lower 16 bits is initialized in self->enumerateContexts, upper 16 bits are random data (for validation) */
     MI_Uint32   enumerationContextID;
     MI_Result   finalResult;
     PostResultMsg *errorMessage;
 
-    /* Indicates that 'Result' recevied from provider and stored in finalResult.
+    /* Indicates that 'Result' received from provider and stored in finalResult.
      * Also blocks future posts from providers during shutdown scenarios. */
     MI_Boolean  enumerationCompleted;
 
@@ -883,7 +883,7 @@ static void _CD_SendFaultResponse(
                         WSBUF_FAULT_CODE        faultCode,
     _In_                const ZChar*            descriptionText)
 {
-    /* This method is called when there is Non-Cim error occured ...
+    /* This method is called when there is Non-Cim error occurred ...
      * so sending MI_RESULT_OK
      */
     PostResultMsg message;
@@ -1401,7 +1401,7 @@ static MI_Uint64 _GetTimeoutFromConnectionData(
     {
         /* A timeout was specified. Determine the correct value to use
          * or use the default.
-         * Note: OperationTimeout has precendence when both are specified. */
+         * Note: OperationTimeout has precedence when both are specified. */
         if (self->wsheader.operationTimeout.exists)
         {
             DatetimeToUsec(&self->wsheader.operationTimeout.value, &timeoutUsec);
@@ -1612,7 +1612,7 @@ static void _ProcessAssociatorsRequest(
     msg = AssociationsOfReq_New(
         _NextOperationID(),
         WSMANFlag | enumerationMode | _GetFlagsFromWsmanOptions(selfCD),
-        (selfCD->u.wsenumpullbody.associationFilter.isAssosiatorOperation == MI_TRUE) ? AssociatorsOfReqTag : ReferencesOfReqTag);
+        (selfCD->u.wsenumpullbody.associationFilter.isAssociatorOperation == MI_TRUE) ? AssociatorsOfReqTag : ReferencesOfReqTag);
 
     if (!msg || (_GetHTTPHeaderOpts(selfCD, &msg->base) != MI_RESULT_OK) || (_GetWSManHeaderOpts(selfCD, &msg->base) != MI_RESULT_OK))
     {
@@ -1649,7 +1649,7 @@ static void _ProcessAssociatorsRequest(
 
     AuthInfo_Copy( &msg->base.authInfo, &selfCD->httpHeaders->authInfo );
 
-    /* Set messages fileds from association filter */
+    /* Set messages fields from association filter */
     {
         WSMAN_AssociationFilter* filter =
             &selfCD->u.wsenumpullbody.associationFilter;
@@ -1658,7 +1658,7 @@ static void _ProcessAssociatorsRequest(
         msg->role = filter->role;
         msg->resultClass = filter->resultClassName;
 
-        if (filter->isAssosiatorOperation == MI_TRUE)
+        if (filter->isAssociatorOperation == MI_TRUE)
         {
             msg->assocClass = filter->associationClassName;
             msg->resultRole = filter->resultRole;
@@ -1798,7 +1798,7 @@ static void _ParseValidateProcessInvokeRequest(
 {
     InvokeReq* msg = 0;
 
-    /* if instance was created from batch, re-use exisintg batch to allocate message */
+    /* if instance was created from batch, re-use existing batch to allocate message */
     if (selfCD->wsheader.instanceBatch)
     {
         /* Allocate heap space for message */
@@ -1947,7 +1947,7 @@ static void _ParseValidateProcessGetInstanceRequest(
         return;
     }
 
-    /* if instance was created from batch, re-use exisintg batch to allocate message */
+    /* if instance was created from batch, re-use existing batch to allocate message */
     /* Allocate heap space for message */
     msg = Batch_GetClear(selfCD->wsheader.instanceBatch, sizeof(GetInstanceReq));
 
@@ -2121,7 +2121,7 @@ static void _ParseValidateProcessPutRequest(
         return;
     }
 
-    /* if instance was created from batch, re-use exisintg batch to allocate message */
+    /* if instance was created from batch, re-use existing batch to allocate message */
     /* Allocate heap space for message */
     msg = Batch_GetClear(selfCD->wsheader.instanceBatch, sizeof(ModifyInstanceReq));
 
@@ -2211,7 +2211,7 @@ static void _ParseValidateProcessDeleteRequest(
         return;
     }
 
-    /* if instance was created from batch, re-use exisintg batch to allocate message */
+    /* if instance was created from batch, re-use existing batch to allocate message */
     /* Allocate heap space for message */
     msg = Batch_GetClear(selfCD->wsheader.instanceBatch, sizeof(DeleteInstanceReq));
 
@@ -2393,7 +2393,7 @@ static void _ParseValidateProcessPullRequest(
         return;
     }
 
-    /* Process reqest */
+    /* Process request */
     _ProcessPullRequest(selfCD);
 }
 
@@ -2562,7 +2562,7 @@ static void _EC_ProcessPendingMessage(
 
 /*
  * Encapsulates the check to see if the last message has been sent for an
- * WSMAN_Enumeratecontext.  Returns TRUE if the last message has been sent
+ * WSMAN_EnumerateContext.  Returns TRUE if the last message has been sent
  * and it is OK to begin cleanup.
  */
 static MI_Boolean _EC_IsLastMessageSent(
@@ -2614,7 +2614,7 @@ static void _SendEnumPullResponse(
         _EC_GetMessageSubset(selfEC, selfCD, &subsetEnd, &messagesSize, &bookmarkToSend);
     }
 
-    /* validate if all mesages can be sent */
+    /* validate if all messages can be sent */
     if (endOfSequence && subsetEnd)
     {
         endOfSequence = MI_FALSE;
@@ -3242,7 +3242,7 @@ static void _EC_ProcessEnumResponse(
     /* do we have connected client to send response to? */
     if( selfEC->strand.base.info.thisClosedOther )
     {
-        // TODO: Current code keeps acumulating results if client is not connected (that looks wrong)
+        // TODO: Current code keeps accumulating results if client is not connected (that looks wrong)
         // DEBUG_ASSERT(!selfEC->activeConnection);
         return;
     }
@@ -3280,7 +3280,7 @@ static void _EC_ProcessEnumResponse(
 
     /* Check if partial response has to be sent (or enumeration is completed) */
     /* Update: send anything that is available once client re-connects with pull */
-    /* Send resposne now if:
+    /* Send response now if:
         - enumeration is complete
         - queue has enough instances to fill entire packet (by size or number)
         - pull request arrives. Normally, network is slower than providers,
@@ -3316,7 +3316,7 @@ static void _EC_ProcessEnumResponse(
          * been sent.
          */
         if (selfEC->data.requestTag == SubscribeReqTag &&
-            MI_FALSE == selfEC->data.responsed)
+            MI_FALSE == selfEC->data.responded)
         {
             return;
         }
@@ -3388,9 +3388,9 @@ static void _ProcessSubscribeResponseEnumerationContext(
 
     /* Success Subscribe Response continues the subscription */
     selfEC->finalResult = MI_RESULT_OK; // TODO: this is not actually a final result
-    if (MI_FALSE == selfEC->data.responsed)
+    if (MI_FALSE == selfEC->data.responded)
     {
-        selfEC->data.responsed = MI_TRUE;
+        selfEC->data.responded = MI_TRUE;
 
         if (NULL == selfEC->activeConnection)
         {
@@ -3539,7 +3539,7 @@ static void _InteractionWsman_Transport_Post( _In_ Strand* self_, _In_ Message* 
 
     Message_AddRef( msg );
 
-    // Schedule it as an auxiliary method, so anthing else scheduled already
+    // Schedule it as an auxiliary method, so anything else scheduled already
     // (like a pending ack from Http) is executed first
     StrandBoth_ScheduleAuxLeft( &self->strand, WSMANCONNECTION_STRANDAUX_PROCESSREQUEST );
 }
@@ -3917,7 +3917,7 @@ static void _InteractionWsman_Right_Ack( _In_ Strand* self_)
 
     //
     // Doesn't need to ack to left side (http layer) here
-    // since left was aleady acked upon opending this strand
+    // since left was already acked upon opening this strand
     //
 }
 
@@ -4023,7 +4023,7 @@ static void _InteractionWsmanEnum_Left_Timeout(
         trace_Wsman_ExpiredTimerForEnumerate(self, self->enumerationContextID);
 
         _PostHandlerForFiredTimers( self );
-        return; /* Prevents shutdown handling from occuring here */
+        return; /* Prevents shutdown handling from occurring here */
     }
     else
     {
@@ -4038,11 +4038,11 @@ static void _InteractionWsmanEnum_Left_Timeout(
             trace_WsmanEnumerationcontext_HeartbeatTimeout(self, self->enumerationContextID);
 
             /* Send what instances are available OR a heartbeat event.
-             * Return early to prevents shutdown handling from occuring here
+             * Return early to prevents shutdown handling from occurring here
              */
             self->ecTimer.forceResult = MI_TRUE;
             _PostHandlerForFiredTimers( self );
-            return; /* Prevents shutdown handling from occuring here */
+            return; /* Prevents shutdown handling from occurring here */
         }
 
         /* Else:
@@ -4190,7 +4190,7 @@ static void _InteractionWsmanEnum_Left_ConnectionDataTimeout( _In_ Strand* self_
  *         ECONNRESET termination of a running operation.
  *     2. The last message for a request has been sent.
  *     3. An error occurred during processing of a request.
- *     4. Its hearbeat timer expired without a pull attached.
+ *     4. Its heartbeat timer expired without a pull attached.
  *     5. An incoming request from CD timed out prior to EC sending an
  *         initial response.
  *
@@ -4612,7 +4612,7 @@ MI_Result WSMAN_New_Listener(
     self->numEnumerateContexts = 0;
     self->deleting = MI_FALSE;
 
-    /*ATTN! slector can be null!*/
+    /*ATTN! selector can be null!*/
     self->selector = selector;
 
     /* Set the magic number */
@@ -4925,7 +4925,7 @@ static int _ValidateSubscribeRequest(
             selfCD,
             NULL,
             WSBUF_FAULT_INTERNAL_ERROR,
-            ZT("mandatory parameters (className, namesapce) are not provided for subscribe request"));
+            ZT("mandatory parameters (className, namespace) are not provided for subscribe request"));
         return -1;
     }
 
@@ -5076,7 +5076,7 @@ static void _ProcessSubscribeRequest(
     enumContext->data.requestTag = msg->base.base.tag;
 
     /* mark the response flag to false */
-    enumContext->data.responsed = MI_FALSE;
+    enumContext->data.responded = MI_FALSE;
 
     if (selfCD->u.wsenumpullbody.heartbeat.exists)
     {
@@ -5139,7 +5139,7 @@ static void _ParseValidateProcessSubscribeRequest(
         return;
     }
 
-    /* Process reqest */
+    /* Process request */
     _ProcessSubscribeRequest(selfCD);
 }
 
@@ -5162,7 +5162,7 @@ static void _ParseValidateProcessUnsubscribeRequest(
         return;
     }
 
-    /* Process reqest */
+    /* Process request */
     _ProcessUnsubscribeRequest(selfCD);
 }
 

@@ -127,8 +127,8 @@ static void _Hash(
 
 /* Find position to add/update user:
     if user is already in cache, it returns this position,
-    otherwise if empty item available - retunrs it,
-    otherwise retunrs oldest element */
+    otherwise if empty item available - returns it,
+    otherwise returns oldest element */
 static int _FindUserEmptyOldest(
     const char* user)
 {
@@ -148,7 +148,7 @@ static int _FindUserEmptyOldest(
         }
         else if (-1 == posEmpty)
         {
-            /* Is it oldest with no epmty? */
+            /* Is it oldest with no empty? */
             if (timestampOldest > s_cache[pos].timestamp)
             {
                 timestampOldest = s_cache[pos].timestamp;
@@ -165,7 +165,7 @@ static int _FindUserEmptyOldest(
 
 /* Find position with given user:
     Returns:
-    user posiiton if found; -1 otherwise
+    user position if found; -1 otherwise
 */
 static int _Find(
     const char* user)
@@ -231,7 +231,7 @@ int CredCache_CheckUser(const char* user, const char* password)
     if (!s_init)
         return -1;
 
-    /* Does user exisit in cache */
+    /* Does user exist in cache */
     if (-1 == (pos = _Find(user)))
         return -1;
 
@@ -273,7 +273,7 @@ void CredCache_Clean()
 /*
     Generates crypto-suitable random data
     Parameters:
-    buf - bufer for random data
+    buf - buffer for random data
     size - number of bytes to generate
 
     Returns:

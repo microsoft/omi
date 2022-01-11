@@ -11,7 +11,7 @@ class CIM_PeerGatewayForTunnel : CIM_Dependency {
 
       [Override ( "Antecedent" ), 
        Description ( 
-          "The security gateway for the SA. Note that the absense "
+          "The security gateway for the SA. Note that the absence "
           "of this association indicates that: \n"
           "- When acting as a responder, IKE will accept phase 1 "
           "negotiations with any other security gateway \n"

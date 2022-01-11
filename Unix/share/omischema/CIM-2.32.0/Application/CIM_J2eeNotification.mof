@@ -79,7 +79,7 @@ class CIM_J2eeNotification : CIM_ProcessIndication {
    string Message;
 
       [Description ( 
-          "Optional data that the notication broadcaster wishes to "
+          "Optional data that the notification broadcaster wishes to "
           "communicate to listeners. The content of the data is "
           "user specific. The UserData property may be null." ), 
        OctetString]

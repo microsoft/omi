@@ -274,7 +274,7 @@ class CIM_DiagnosticSetting : CIM_Setting {
           "the managed element being serviced. \n"
           "* \"Service Errors\" (value = 8): Log errors related to "
           "the service itself rather than the element being "
-          "serviced, such as \'Resource Allocaton Failure\'. \n"
+          "serviced, such as \'Resource Allocation Failure\'. \n"
           "* \"Setting Data\" (value=9): Log the property values of "
           "the DiagnosticSetting object used to configure the "
           "service. \n"

@@ -37,7 +37,7 @@ int main(int argc, char** argv)
 static const char HELP[] = "\
 Open Instrumentation Generator \n\
 \n\
-The Open Istrumentation allows developers to \n\
+The Open Instrumentation allows developers to \n\
 - define event schemas by defining C function signatures\n\
 - annotate the signatures with formatting strings\n\
 \n\

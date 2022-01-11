@@ -3,7 +3,7 @@
     UMLPackagePath ( "CIM::Event" ), 
     Description ( 
        "CIM_FilterCollectionSubscription associates the "
-       "CIM_FilterCollection with a CIM_ListenerDestionation." )]
+       "CIM_FilterCollection with a CIM_ListenerDestination." )]
 class CIM_FilterCollectionSubscription : CIM_AbstractIndicationSubscription {
 
       [Override ( "Filter" ), 

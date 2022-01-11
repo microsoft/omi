@@ -70,7 +70,7 @@ NitsTestWithSetup(Test0, TestIoSetup)
         "CHAR{Test0}\n"
         "ZCHAR{Test0}\n";
 
-    // Be sure file contaisn what we expected:
+    // Be sure file contains what we expected:
 
     UT_ASSERT(strcmp(&data[0], DATA) == 0);
 }

@@ -1205,7 +1205,7 @@ NITS_EXPORT void NITS_CALL NitsTestCreate(
     _In_ void (NITS_CALL *body)(Switch &),
     bool deleteMeAfterRun = false);
 
-/* Only test code in nits process can call this to get parameter passed to the nits commandline */
+/* Only test code in nits process can call this to get parameter passed to the nits command-line */
 NITS_EXPORT const PAL_Char *NITS_CALL NitsTestGetParam(_In_z_ const PAL_Char *paramName);
 
 /* Only test code in nits process can call this to enable faultsim for all tests from this point */
@@ -2292,8 +2292,8 @@ void Crash_##name(TypeOfFixture(name) *_NitsContext) { TestSystem::Switch *curre
 
 
 // TODO:Get the following syntax to work
-// plan is to use the current fixture syntax and define a function with three lables for setup/body/cleanup and 
-// have all the setup/body/cleanup fixtures call into that function which will go to a specific lable depending on
+// plan is to use the current fixture syntax and define a function with three labels for setup/body/cleanup and 
+// have all the setup/body/cleanup fixtures call into that function which will go to a specific label depending on
 // who is calling it
 /*
 NitsTestGroup(foo)

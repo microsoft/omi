@@ -53,7 +53,7 @@ class CIM_AdministrativeDistance : CIM_LogicalElement {
    uint8 DirectConnect = 0;
 
       [Description ( 
-          "The distance for staticly connected peers. It has a "
+          "The distance for statically connected peers. It has a "
           "default value of 1." )]
    uint8 Static = 1;
 

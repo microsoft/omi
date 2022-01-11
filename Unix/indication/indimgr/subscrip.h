@@ -43,7 +43,7 @@ SubscriptionPersistType;
 **==============================================================================
 **
 ** Represents a CIM_IndicationSubscription OR CIM_FilterCollectionSubscription
-** instance; Both are assocation classes that associate Filter and Listener
+** instance; Both are association classes that associate Filter and Listener
 ** objects.
 **
 **==============================================================================

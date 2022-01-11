@@ -187,7 +187,7 @@ static void WriteBuffer_RecurseInstanceClass(
     }
     if (*writtenClassCount == 50)
     {
-        *result = MI_RESULT_FAILED; /*Overrite error in this case as this is very fatal!*/
+        *result = MI_RESULT_FAILED; /*Overwrite error in this case as this is very fatal!*/
         return;
     }
 
@@ -622,7 +622,7 @@ static void WriteBuffer_MiPropertyDecls(
             WriteBuffer_StringLiteral(clientBuffer, clientBufferLength, clientBufferNeeded, PAL_T("\""), escapingDepth, result);
         }
 
-        /* %ArraySize; -- property arays */
+        /* %ArraySize; -- property arrays */
         if ((propertyType & MI_ARRAY) && propertySubscript)
         {
             WriteBuffer_StringLiteral(clientBuffer, clientBufferLength, clientBufferNeeded, PAL_T(" ARRAYSIZE=\""), escapingDepth, result);
@@ -683,7 +683,7 @@ static void WriteBuffer_MiPropertyDecls(
             {
                 //Dynamic classes do not have qualifiers, only flags.  They don't even mark a property as being a property!
 
-                //If this is a dynanic instance and this is property is an embedded instance then we need to fabricate a EmbeddedObject qualifier otherwise
+                //If this is a dynamic instance and this is property is an embedded instance then we need to fabricate a EmbeddedObject qualifier otherwise
                 //deserialization will think it is a string
                 if ((propertyType&~MI_ARRAY) == MI_INSTANCE)
                 {
@@ -1760,7 +1760,7 @@ MI_Result MI_CALL XmlSerializer_SerializeClassEx(
     return result;
 }
 
-/* Wrapper method to accomendate WSMAN flags in using the API */
+/* Wrapper method to accommodate WSMAN flags in using the API */
 MI_Result MI_CALL XmlSerializer_SerializeClass(
     _Inout_ MI_Serializer *serializer,
     MI_Uint32 flags,
@@ -1839,7 +1839,7 @@ MI_Result MI_CALL XmlSerializer_SerializeInstanceEx(
     return result;
 }
 
-/* Wrapper method to accomendate WSMAN flags in using the API */
+/* Wrapper method to accommodate WSMAN flags in using the API */
 MI_Result MI_CALL XmlSerializer_SerializeInstance(
     _Inout_ MI_Serializer *serializer,
     MI_Uint32 flags,

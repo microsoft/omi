@@ -594,7 +594,7 @@ void MI_MofCodec_Delete(
         MI_Instance_Delete(self->errorInstance);
     }
     {
-        /* Clean up cached schema(s) since returnned instance(s) */
+        /* Clean up cached schema(s) since returned instance(s) */
         /* hold one reference to the schema */
         ClassesOfInstance* coi = self->coi;
         if (coi)

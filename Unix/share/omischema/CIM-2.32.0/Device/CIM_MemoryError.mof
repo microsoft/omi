@@ -85,7 +85,7 @@ class CIM_MemoryError : CIM_StorageError {
    uint32 ErrorTransferSize;
 
       [Description ( 
-          "Data captured during the last erroneous mebmory access. "
+          "Data captured during the last erroneous memory access. "
           "The data occupies the first n octets of the array "
           "necessary to hold the number of bits specified by the "
           "ErrorTransferSize property. If ErrorTransferSize is 0, "

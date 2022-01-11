@@ -273,7 +273,7 @@ int mof_parseliteralstring(_Inout_ MOF_State * state)
     /* Scan until the closing " is found */
     for (;;)
     {
-        if (mof_eof(mb) || mof_isdoulbequotes(mb->e, mb->cur))
+        if (mof_eof(mb) || mof_isdoublequotes(mb->e, mb->cur))
             break;
 
         bufToAppend = mb->cur;
@@ -298,7 +298,7 @@ int mof_parseliteralstring(_Inout_ MOF_State * state)
                 while(mof_neof(mb) && (len < 4))
                 {
                     c = mof_nextchar(mb);
-                    if (mof_isdoulbequotes(mb->e, mb->cur))
+                    if (mof_isdoublequotes(mb->e, mb->cur))
                     {
                         incompletechar = MI_TRUE;
                         break;
@@ -395,7 +395,7 @@ int mof_parseliteralstring(_Inout_ MOF_State * state)
     }
     n++;
 
-    /* Copy listeral string and return */
+    /* Copy literal string and return */
     {
         int ret;
         MOF_StringLen r;
@@ -949,7 +949,7 @@ int moflex(MOF_State * state)
             int cif = closeIncludeFile(state);
             if (cif == 1)
             {
-                /* Poped up valid include file */
+                /* Popped up valid include file */
                 rc = mofskipspace_comment(state);
                 if (rc == 0)
                 {
@@ -995,7 +995,7 @@ int moflex(MOF_State * state)
     }
 
     /* Parse literal string */
-    if (mof_isdoulbequotes(mb->e, mb->cur)) {
+    if (mof_isdoublequotes(mb->e, mb->cur)) {
         return mof_parseliteralstring(state);
     }
 

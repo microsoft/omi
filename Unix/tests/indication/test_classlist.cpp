@@ -153,7 +153,7 @@ NitsTest1(TestClassList_Success_OneClass, Test_Setup, sTestCS1)
     IndicationClassList_Delete(clist);
 NitsEndTest
 
-void _VerifyIndicaitonClassDiscoveryResult(
+void _VerifyIndicationClassDiscoveryResult(
     _In_ Test_ClasslistStruct* tcs,
     _In_opt_ StringTagElement* ste,
     _In_ MI_Uint32 steSize,
@@ -221,7 +221,7 @@ static struct Test_ClasslistStruct sTestCS2 = {
     NULL};
 
 NitsTest1(TestClassList_Success_ClassHierarchy, Test_Setup, sTestCS2)
-    _VerifyIndicaitonClassDiscoveryResult(
+    _VerifyIndicationClassDiscoveryResult(
         NitsContext()->_Test_Setup->_Test_ClasslistStruct,
         sTestCS2_ClassList,
         MI_COUNT(sTestCS2_ClassList));
@@ -285,7 +285,7 @@ static struct Test_ClasslistStruct sTestCS5 = {
     MI_FALSE,
     NULL};
 NitsTest1(TestClassList_Success_Lifecycle_IndicationClassOnly, Test_Setup, sTestCS5)
-    _VerifyIndicaitonClassDiscoveryResult(
+    _VerifyIndicationClassDiscoveryResult(
         NitsContext()->_Test_Setup->_Test_ClasslistStruct,
         sTestCS5_ClassList,
         MI_COUNT(sTestCS5_ClassList),
@@ -296,7 +296,7 @@ NitsEndTest
 **==============================================================================
 **
 **  Positive test for lifecycle indication query
-**  Following test cases are designed to test discoverying Indication Classes for a
+**  Following test cases are designed to test discovering Indication Classes for a
 **  given lifecycle query targets to both indication & normal classes
 **
 **==============================================================================
@@ -316,7 +316,7 @@ static struct Test_ClasslistStruct sTestCS_Mixed1 = {
     MI_FALSE,
     NULL};
 NitsTest1(TestClassList_Success_Lifecycle_Mixed, Test_Setup, sTestCS_Mixed1)
-    _VerifyIndicaitonClassDiscoveryResult(
+    _VerifyIndicationClassDiscoveryResult(
         NitsContext()->_Test_Setup->_Test_ClasslistStruct,
         s_ClassListMixed,
         MI_COUNT(s_ClassListMixed),
@@ -331,7 +331,7 @@ static struct Test_ClasslistStruct sTestCS_Mixed2 = {
     MI_FALSE,
     NULL};
 NitsTest1(TestClassList_Success_Lifecycle_Mixed2, Test_Setup, sTestCS_Mixed2)
-    _VerifyIndicaitonClassDiscoveryResult(
+    _VerifyIndicationClassDiscoveryResult(
         NitsContext()->_Test_Setup->_Test_ClasslistStruct,
         s_ClassListMixed,
         MI_COUNT(s_ClassListMixed),
@@ -342,7 +342,7 @@ NitsEndTest
 **==============================================================================
 **
 **  Positive test for lifecycle indication query
-**  Following test cases are designed to test discoverying Indication Classes for a
+**  Following test cases are designed to test discovering Indication Classes for a
 **  given lifecycle query targets to only normal classes (no indication class
 **  inherits from CIM_InstModification under root/indication2
 **
@@ -361,7 +361,7 @@ static struct Test_ClasslistStruct sTestCS_NormalClassOnly = {
     MI_FALSE,
     NULL};
 NitsTest1(TestClassList_Success_Lifecycle_Mixed3, Test_Setup, sTestCS_NormalClassOnly)
-    _VerifyIndicaitonClassDiscoveryResult(
+    _VerifyIndicationClassDiscoveryResult(
         NitsContext()->_Test_Setup->_Test_ClasslistStruct,
         s_ClassList_NormalClassOnly,
         MI_COUNT(s_ClassList_NormalClassOnly),
@@ -376,7 +376,7 @@ static struct Test_ClasslistStruct sTestCS_NormalClassOnly2 = {
     MI_FALSE,
     NULL};
 NitsTest1(TestClassList_Success_Lifecycle_Mixed4, Test_Setup, sTestCS_NormalClassOnly2)
-    _VerifyIndicaitonClassDiscoveryResult(
+    _VerifyIndicationClassDiscoveryResult(
         NitsContext()->_Test_Setup->_Test_ClasslistStruct,
         s_ClassList_NormalClassOnly,
         MI_COUNT(s_ClassList_NormalClassOnly),
@@ -387,7 +387,7 @@ NitsEndTest
 **==============================================================================
 **
 **  Positive test for lifecycle indication query
-**  Following test cases are designed to test discoverying Indication Classes for a
+**  Following test cases are designed to test discovering Indication Classes for a
 **  given lifecycle query targets to only one class
 **
 **==============================================================================
@@ -404,7 +404,7 @@ static struct Test_ClasslistStruct sTestCS_OneClass = {
     MI_FALSE,
     NULL};
 NitsTest1(TestClassList_Success_Lifecycle_OneClass, Test_Setup, sTestCS_OneClass)
-    _VerifyIndicaitonClassDiscoveryResult(
+    _VerifyIndicationClassDiscoveryResult(
         NitsContext()->_Test_Setup->_Test_ClasslistStruct,
         s_ClassList_OneClass,
         MI_COUNT(s_ClassList_OneClass),
@@ -428,7 +428,7 @@ static struct Test_ClasslistStruct sTestCS_NOTFOUND = {
     NULL};
 NitsTest1(TestClassList_Fail_Lifecycle_NOT_FOUND, Test_Setup, sTestCS_NOTFOUND)
     Test_ClasslistStruct* tcs = NitsContext()->_Test_Setup->_Test_ClasslistStruct;
-    _VerifyIndicaitonClassDiscoveryResult(
+    _VerifyIndicationClassDiscoveryResult(
         tcs,
         NULL,
         0,
@@ -444,7 +444,7 @@ NitsEndTest
 **==============================================================================
 */
 static struct Test_ClasslistStruct sTestCS_InvalidQuery1 = {
-    MI_T("select * from CIM_InstRead where (SourceInstance isa UnkownClass) OR (2>1)"),
+    MI_T("select * from CIM_InstRead where (SourceInstance isa UnknownClass) OR (2>1)"),
     QUERY_LANGUAGE_CQL,
     MI_T("root/indication2"),
     NULL,
@@ -452,7 +452,7 @@ static struct Test_ClasslistStruct sTestCS_InvalidQuery1 = {
     NULL};
 NitsTest1(TestClassList_Fail_Lifecycle_InvalidQuery1, Test_Setup, sTestCS_InvalidQuery1)
     Test_ClasslistStruct* tcs = NitsContext()->_Test_Setup->_Test_ClasslistStruct;
-    _VerifyIndicaitonClassDiscoveryResult(
+    _VerifyIndicationClassDiscoveryResult(
         tcs,
         NULL,
         0,
@@ -476,7 +476,7 @@ static struct Test_ClasslistStruct sTestCS_InvalidQuery2 = {
     NULL};
 NitsTest1(TestClassList_Fail_Lifecycle_InvalidQuery2, Test_Setup, sTestCS_InvalidQuery2)
     Test_ClasslistStruct* tcs = NitsContext()->_Test_Setup->_Test_ClasslistStruct;
-    _VerifyIndicaitonClassDiscoveryResult(
+    _VerifyIndicationClassDiscoveryResult(
         tcs,
         NULL,
         0,
@@ -500,7 +500,7 @@ static struct Test_ClasslistStruct sTestCS_InvalidQuery3 = {
     NULL};
 NitsTest1(TestClassList_Fail_Lifecycle_InvalidQuery3, Test_Setup, sTestCS_InvalidQuery3)
     Test_ClasslistStruct* tcs = NitsContext()->_Test_Setup->_Test_ClasslistStruct;
-    _VerifyIndicaitonClassDiscoveryResult(
+    _VerifyIndicationClassDiscoveryResult(
         tcs,
         NULL,
         0,

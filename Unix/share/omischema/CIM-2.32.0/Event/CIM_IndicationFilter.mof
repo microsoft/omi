@@ -155,7 +155,7 @@ class CIM_IndicationFilter : CIM_ManagedElement {
           "with the WBEM URI formatted object path of a "
           "CIM_ManagedElement, as in the following example, which "
           "selects only indications against "
-          "namedCIM_StorageSynchonized instances. It then uses SELF "
+          "namedCIM_StorageSynchronized instances. It then uses SELF "
           "to select the executing IndicationFilter, and then uses "
           "the entries of the TemplateVariable array to select "
           "particular instances of CIM_StorageSynchronized.\n"

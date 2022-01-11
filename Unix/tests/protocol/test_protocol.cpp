@@ -361,7 +361,7 @@ static void _TransferMessageUsingProtocol(
         }
     }
 
-    /* remove all handlers befroe destroying protocols */
+    /* remove all handlers before destroying protocols */
     if (selector)
         Selector_RemoveAllHandlers(selector);
 

@@ -225,7 +225,7 @@ void __Message_AddRef(
     CallSite cs);
 
 /*
-    Verifies if message is final reposne to the initial request
+    Verifies if message is final response to the initial request
 */
 MI_INLINE MI_Boolean Message_IsFinalResponse(
     const Message* msg)
@@ -1149,7 +1149,7 @@ void NoOpRsp_Print(const NoOpRsp* msg, FILE* os);
 **
 ** BinProtocolNotification
 **
-**     A internal notification transfered over bin protocol.
+**     A internal notification transferred over bin protocol.
 **
 **==============================================================================
 */
@@ -1287,7 +1287,7 @@ typedef struct _HttpHeader
 HttpHeader;
 #endif
 
-/* Headers strucutre is creaetd provided by http module
+/* Headers structure is created provided by http module
     and has several pre-parsed values from http headers */
 typedef struct _HttpHeaders
 {

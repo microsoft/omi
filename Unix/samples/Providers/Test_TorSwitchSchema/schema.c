@@ -2582,7 +2582,7 @@ static MI_CONST MI_PropertyDecl MSFT_ACL_ACLType_prop =
     &MSFT_ACL_ACLType_value,
 };
 
-static MI_CONST MI_Char* MSFT_ACL_ActionPolicy_Description_qual_value = MI_T("Set of policy on an ACLThe default Implicited states that all traffic is denied unless there is arule allowing trafficExplicit policy states that an explict rule must be stated for each permit and or allow action");
+static MI_CONST MI_Char* MSFT_ACL_ActionPolicy_Description_qual_value = MI_T("Set of policy on an ACLThe default Implicit states that all traffic is denied unless there is arule allowing trafficExplicit policy states that an explicit rule must be stated for each permit and or allow action");
 
 static MI_CONST MI_Qualifier MSFT_ACL_ActionPolicy_Description_qual =
 {
@@ -2711,7 +2711,7 @@ static MI_CONST MI_Qualifier MSFT_ACL_UMLPackagePath_qual =
     &MSFT_ACL_UMLPackagePath_qual_value
 };
 
-static MI_CONST MI_Char* MSFT_ACL_Description_qual_value = MI_T("MSFT_IPACL description.This class names the IP ACL in a system. It is used as an aggragation classfor an orderset of rules");
+static MI_CONST MI_Char* MSFT_ACL_Description_qual_value = MI_T("MSFT_IPACL description.This class names the IP ACL in a system. It is used as an aggregation classfor an orderset of rules");
 
 static MI_CONST MI_Qualifier MSFT_ACL_Description_qual =
 {
@@ -4260,7 +4260,7 @@ static MI_CONST MI_PropertyDecl CIM_ManagedSystemElement_DetailedStatus_prop =
     NULL,
 };
 
-static MI_CONST MI_Char* CIM_ManagedSystemElement_OperatingStatus_Description_qual_value = MI_T("OperatingStatus provides a current status value for the operational condition of the element and can be used for providing more detail with respect to the value of EnabledState. It can also provide the transitional states when an element is transitioning from one state to another, such as when an element is transitioning between EnabledState and RequestedState, as well as other transitional conditions.\nOperatingStatus consists of one of the following values: Unknown, Not Available, In Service, Starting, Stopping, Stopped, Aborted, Dormant, Completed, Migrating, Emmigrating, Immigrating, Snapshotting. Shutting Down, In Test \nA Null return indicates the implementation (provider) does not implement this property. \n\"Unknown\" indicates the implementation is in general capable of returning this property, but is unable to do so at this time. \n\"None\" indicates that the implementation (provider) is capable of returning a value for this property, but not ever for this particular piece of hardware/software or the property is intentionally not used because it adds no meaningful information (as in the case of a property that is intended to add additional info to another property). \n\"Servicing\" describes an element being configured, maintained, cleaned, or otherwise administered. \n\"Starting\" describes an element being initialized. \n\"Stopping\" describes an element being brought to an orderly stop. \n\"Stopped\" and \"Aborted\" are similar, although the former implies a clean and orderly stop, while the latter implies an abrupt stop where the state and configuration of the element might need to be updated. \n\"Dormant\" indicates that the element is inactive or quiesced. \n\"Completed\" indicates that the element has completed its operation. This value should be combined with either OK, Error, or Degraded in the PrimaryStatus so that a client can tell if the complete operation Completed with OK (passed), Completed with Error (failed), or Completed with Degraded (the operation finished, but it did not complete OK or did not report an error). \n\"Migrating\" element is being moved between host elements. \n\"Immigrating\" element is being moved to new host element. \n\"Emigrating\" element is being moved away from host element. \n\"Shutting Down\" describes an element being brought to an abrupt stop. \n\"In Test\" element is performing test functions. \n\"Transitioning\" describes an element that is between states, that is, it is not fully available in either its previous state or its next state. This value should be used if other values indicating a transition to a specific state are not applicable.\n\"In Service\" describes an element that is in service and operational.");
+static MI_CONST MI_Char* CIM_ManagedSystemElement_OperatingStatus_Description_qual_value = MI_T("OperatingStatus provides a current status value for the operational condition of the element and can be used for providing more detail with respect to the value of EnabledState. It can also provide the transitional states when an element is transitioning from one state to another, such as when an element is transitioning between EnabledState and RequestedState, as well as other transitional conditions.\nOperatingStatus consists of one of the following values: Unknown, Not Available, In Service, Starting, Stopping, Stopped, Aborted, Dormant, Completed, Migrating, Emigrating, Immigrating, Snapshotting. Shutting Down, In Test \nA Null return indicates the implementation (provider) does not implement this property. \n\"Unknown\" indicates the implementation is in general capable of returning this property, but is unable to do so at this time. \n\"None\" indicates that the implementation (provider) is capable of returning a value for this property, but not ever for this particular piece of hardware/software or the property is intentionally not used because it adds no meaningful information (as in the case of a property that is intended to add additional info to another property). \n\"Servicing\" describes an element being configured, maintained, cleaned, or otherwise administered. \n\"Starting\" describes an element being initialized. \n\"Stopping\" describes an element being brought to an orderly stop. \n\"Stopped\" and \"Aborted\" are similar, although the former implies a clean and orderly stop, while the latter implies an abrupt stop where the state and configuration of the element might need to be updated. \n\"Dormant\" indicates that the element is inactive or quiesced. \n\"Completed\" indicates that the element has completed its operation. This value should be combined with either OK, Error, or Degraded in the PrimaryStatus so that a client can tell if the complete operation Completed with OK (passed), Completed with Error (failed), or Completed with Degraded (the operation finished, but it did not complete OK or did not report an error). \n\"Migrating\" element is being moved between host elements. \n\"Immigrating\" element is being moved to new host element. \n\"Emigrating\" element is being moved away from host element. \n\"Shutting Down\" describes an element being brought to an abrupt stop. \n\"In Test\" element is performing test functions. \n\"Transitioning\" describes an element that is between states, that is, it is not fully available in either its previous state or its next state. This value should be used if other values indicating a transition to a specific state are not applicable.\n\"In Service\" describes an element that is in service and operational.");
 
 static MI_CONST MI_Qualifier CIM_ManagedSystemElement_OperatingStatus_Description_qual =
 {
@@ -9010,7 +9010,7 @@ MI_CONST MI_MethodDecl CIM_ConcreteJob_GetError_rtti =
     (MI_ProviderFT_Invoke)CIM_ConcreteJob_Invoke_GetError, /* method */
 };
 
-static MI_CONST MI_Char* CIM_ConcreteJob_GetErrors_Description_qual_value = MI_T("If JobState is \"Completed\" and Operational Status is \"Completed\" then no instance of CIM_Error is returned. \nIf JobState is \"Exception\" then GetErrors may return intances of CIM_Error related to the execution of the procedure or method invoked by the job.\nIf Operatational Status is not \"OK\" or \"Completed\"then GetErrors may return CIM_Error instances related to the running of the job.");
+static MI_CONST MI_Char* CIM_ConcreteJob_GetErrors_Description_qual_value = MI_T("If JobState is \"Completed\" and Operational Status is \"Completed\" then no instance of CIM_Error is returned. \nIf JobState is \"Exception\" then GetErrors may return instances of CIM_Error related to the execution of the procedure or method invoked by the job.\nIf Operational Status is not \"OK\" or \"Completed\"then GetErrors may return CIM_Error instances related to the running of the job.");
 
 static MI_CONST MI_Qualifier CIM_ConcreteJob_GetErrors_Description_qual =
 {
@@ -9132,7 +9132,7 @@ static MI_CONST MI_ParameterDecl CIM_ConcreteJob_GetErrors_Errors_param =
     offsetof(CIM_ConcreteJob_GetErrors, Errors), /* offset */
 };
 
-static MI_CONST MI_Char* CIM_ConcreteJob_GetErrors_MIReturn_Description_qual_value = MI_T("If JobState is \"Completed\" and Operational Status is \"Completed\" then no instance of CIM_Error is returned. \nIf JobState is \"Exception\" then GetErrors may return intances of CIM_Error related to the execution of the procedure or method invoked by the job.\nIf Operatational Status is not \"OK\" or \"Completed\"then GetErrors may return CIM_Error instances related to the running of the job.");
+static MI_CONST MI_Char* CIM_ConcreteJob_GetErrors_MIReturn_Description_qual_value = MI_T("If JobState is \"Completed\" and Operational Status is \"Completed\" then no instance of CIM_Error is returned. \nIf JobState is \"Exception\" then GetErrors may return instances of CIM_Error related to the execution of the procedure or method invoked by the job.\nIf Operational Status is not \"OK\" or \"Completed\"then GetErrors may return CIM_Error instances related to the running of the job.");
 
 static MI_CONST MI_Qualifier CIM_ConcreteJob_GetErrors_MIReturn_Description_qual =
 {
@@ -12040,7 +12040,7 @@ static MI_CONST MI_Char* CIM_ProtocolEndpoint_ProtocolIFType_Values_qual_data_va
     MI_T("Proprietary Wireless Downstream"),
     MI_T("Proprietary Wireless Upstream"),
     MI_T("HIPERLAN Type 2"),
-    MI_T("Proprietary Broadband Wireless Access Point to Mulipoint"),
+    MI_T("Proprietary Broadband Wireless Access Point to Multipoint"),
     MI_T("SONET Overhead Channel"),
     MI_T("Digital Wrapper Overhead Channel"),
     MI_T("ATM Adaptation Layer 2"),
@@ -13275,7 +13275,7 @@ static MI_CONST MI_PropertyDecl CIM_IPProtocolEndpoint_IPVersionSupport_prop =
     NULL,
 };
 
-static MI_CONST MI_Char* CIM_IPProtocolEndpoint_AddressOrigin_Description_qual_value = MI_T("AddressOrigin identifies the method by which the IP Address, Subnet Mask, and Gateway were assigned to the IPProtocolEndpoint.A value of 3 \"Static\" shall indicate the values were assigned manually. A value of 4 \"DHCP\" shall indicate the values were assigned utilizing the Dynamic Host Configuration Protocol. See RFC 2131 and related. \nA value of 5 \"BOOTP\" shall indicate the values were assigned utilizing BOOTP. See RFC 951 and related. \nA value of 6 \"IPv4 Link Local\" shall indicate the values were assigned using the IPv4 Link Local protocol. See RFC 3927.\nA value of 7 \"DHCPv6\" shall indicate the values were assigned using DHCPv6. See RFC 3315. \nA value of 8 \"IPv6 AutoConfig\" shall indicate the values were assinged using the IPv6 AutoConfig Protocol. See RFC 4862. \nA value of 9 \"Stateless\" shall indicate Stateless values were assigned. \nA value of 10 \"Link Local\" shall indicate Link Local values were assigned.");
+static MI_CONST MI_Char* CIM_IPProtocolEndpoint_AddressOrigin_Description_qual_value = MI_T("AddressOrigin identifies the method by which the IP Address, Subnet Mask, and Gateway were assigned to the IPProtocolEndpoint.A value of 3 \"Static\" shall indicate the values were assigned manually. A value of 4 \"DHCP\" shall indicate the values were assigned utilizing the Dynamic Host Configuration Protocol. See RFC 2131 and related. \nA value of 5 \"BOOTP\" shall indicate the values were assigned utilizing BOOTP. See RFC 951 and related. \nA value of 6 \"IPv4 Link Local\" shall indicate the values were assigned using the IPv4 Link Local protocol. See RFC 3927.\nA value of 7 \"DHCPv6\" shall indicate the values were assigned using DHCPv6. See RFC 3315. \nA value of 8 \"IPv6 AutoConfig\" shall indicate the values were assigned using the IPv6 AutoConfig Protocol. See RFC 4862. \nA value of 9 \"Stateless\" shall indicate Stateless values were assigned. \nA value of 10 \"Link Local\" shall indicate Link Local values were assigned.");
 
 static MI_CONST MI_Qualifier CIM_IPProtocolEndpoint_AddressOrigin_Description_qual =
 {
@@ -13373,7 +13373,7 @@ static MI_CONST MI_PropertyDecl CIM_IPProtocolEndpoint_AddressOrigin_prop =
     &CIM_IPProtocolEndpoint_AddressOrigin_value,
 };
 
-static MI_CONST MI_Char* CIM_IPProtocolEndpoint_IPv6AddressType_Description_qual_value = MI_T("IPv6AddressType indentified the type of address found in the IPv6Address property. The values of this property shall be interpreted according to RFC4291, Section 2.4");
+static MI_CONST MI_Char* CIM_IPProtocolEndpoint_IPv6AddressType_Description_qual_value = MI_T("IPv6AddressType identified the type of address found in the IPv6Address property. The values of this property shall be interpreted according to RFC4291, Section 2.4");
 
 static MI_CONST MI_Qualifier CIM_IPProtocolEndpoint_IPv6AddressType_Description_qual =
 {
@@ -18478,7 +18478,7 @@ static MI_CONST MI_PropertyDecl MSFT_AuthenticationAuthorizationAccounting_Serve
     NULL,
 };
 
-static MI_CONST MI_Char* MSFT_AuthenticationAuthorizationAccounting_LoginDefaultGroup_Description_qual_value = MI_T("An enumeration indicating the the login defaul group ");
+static MI_CONST MI_Char* MSFT_AuthenticationAuthorizationAccounting_LoginDefaultGroup_Description_qual_value = MI_T("An enumeration indicating the the login default group ");
 
 static MI_CONST MI_Qualifier MSFT_AuthenticationAuthorizationAccounting_LoginDefaultGroup_Description_qual =
 {
@@ -18554,7 +18554,7 @@ static MI_CONST MI_PropertyDecl MSFT_AuthenticationAuthorizationAccounting_Login
     NULL,
 };
 
-static MI_CONST MI_Char* MSFT_AuthenticationAuthorizationAccounting_OtherLoginDefaultGroup_Description_qual_value = MI_T("A string that describes a login defaul group when a well defined value is not available login defaul group has the value \"Other\".");
+static MI_CONST MI_Char* MSFT_AuthenticationAuthorizationAccounting_OtherLoginDefaultGroup_Description_qual_value = MI_T("A string that describes a login default group when a well defined value is not available login default group has the value \"Other\".");
 
 static MI_CONST MI_Qualifier MSFT_AuthenticationAuthorizationAccounting_OtherLoginDefaultGroup_Description_qual =
 {
@@ -19296,18 +19296,18 @@ MI_CONST MI_ClassDecl MSFT_Banner_rtti =
 **==============================================================================
 */
 
-/* property MSFT_BGPBestpathConfiguration.IsAlwaysCopareMed */
-static MI_CONST MI_PropertyDecl MSFT_BGPBestpathConfiguration_IsAlwaysCopareMed_prop =
+/* property MSFT_BGPBestpathConfiguration.IsAlwaysCompareMed */
+static MI_CONST MI_PropertyDecl MSFT_BGPBestpathConfiguration_IsAlwaysCompareMed_prop =
 {
     MI_FLAG_PROPERTY|MI_FLAG_READONLY, /* flags */
     0x00696411, /* code */
-    MI_T("IsAlwaysCopareMed"), /* name */
+    MI_T("IsAlwaysCompareMed"), /* name */
     NULL, /* qualifiers */
     0, /* numQualifiers */
     MI_BOOLEAN, /* type */
     NULL, /* className */
     0, /* subscript */
-    offsetof(MSFT_BGPBestpathConfiguration, IsAlwaysCopareMed), /* offset */
+    offsetof(MSFT_BGPBestpathConfiguration, IsAlwaysCompareMed), /* offset */
     MI_T("MSFT_BGPBestpathConfiguration"), /* origin */
     MI_T("MSFT_BGPBestpathConfiguration"), /* propagator */
     NULL,
@@ -19421,7 +19421,7 @@ static MI_PropertyDecl MI_CONST* MI_CONST MSFT_BGPBestpathConfiguration_props[] 
     &CIM_ManagedElement_Caption_prop,
     &CIM_ManagedElement_Description_prop,
     &CIM_SettingData_ElementName_prop,
-    &MSFT_BGPBestpathConfiguration_IsAlwaysCopareMed_prop,
+    &MSFT_BGPBestpathConfiguration_IsAlwaysCompareMed_prop,
     &MSFT_BGPBestpathConfiguration_ISAsPathMultiplePathRelax_prop,
     &MSFT_BGPBestpathConfiguration_ISCompareRouteId_prop,
     &MSFT_BGPBestpathConfiguration_IsCostCommunityIgnore_prop,
@@ -20462,7 +20462,7 @@ static MI_CONST MI_Qualifier CIM_LogicalDevice_PowerManagementSupported_Deprecat
     &CIM_LogicalDevice_PowerManagementSupported_Deprecated_qual_value
 };
 
-static MI_CONST MI_Char* CIM_LogicalDevice_PowerManagementSupported_Description_qual_value = MI_T("Boolean indicating that the Device can be power managed. The use of this property has been deprecated. Instead, the existence of an associated PowerManagementCapabilities class (associated using the ElementCapabilities relationhip) indicates that power management is supported.");
+static MI_CONST MI_Char* CIM_LogicalDevice_PowerManagementSupported_Description_qual_value = MI_T("Boolean indicating that the Device can be power managed. The use of this property has been deprecated. Instead, the existence of an associated PowerManagementCapabilities class (associated using the ElementCapabilities relationship) indicates that power management is supported.");
 
 static MI_CONST MI_Qualifier CIM_LogicalDevice_PowerManagementSupported_Description_qual =
 {
@@ -20514,7 +20514,7 @@ static MI_CONST MI_Qualifier CIM_LogicalDevice_PowerManagementCapabilities_Depre
     &CIM_LogicalDevice_PowerManagementCapabilities_Deprecated_qual_value
 };
 
-static MI_CONST MI_Char* CIM_LogicalDevice_PowerManagementCapabilities_Description_qual_value = MI_T("An enumerated array describing the power management capabilities of the Device. The use of this property has been deprecated. Instead, the PowerCapabilites property in an associated PowerManagementCapabilities class should be used.");
+static MI_CONST MI_Char* CIM_LogicalDevice_PowerManagementCapabilities_Description_qual_value = MI_T("An enumerated array describing the power management capabilities of the Device. The use of this property has been deprecated. Instead, the PowerCapabilities property in an associated PowerManagementCapabilities class should be used.");
 
 static MI_CONST MI_Qualifier CIM_LogicalDevice_PowerManagementCapabilities_Description_qual =
 {
@@ -21234,7 +21234,7 @@ static MI_CONST MI_PropertyDecl CIM_LogicalDevice_IdentifyingDescriptions_prop =
     NULL,
 };
 
-static MI_CONST MI_Char* CIM_LogicalDevice_AdditionalAvailability_Description_qual_value = MI_T("Additional availability and status of the Device, beyond that specified in the Availability property. The Availability property denotes the primary status and availability of the Device. In some cases, this will not be sufficient to denote the complete status of the Device. In those cases, the AdditionalAvailability property can be used to provide further information. For example, a Device\'s primary Availability may be \"Off line\" (value=8), but it may also be in a low power state (AdditonalAvailability value=14), or the Device could be running Diagnostics (AdditionalAvailability value=5, \"In Test\").");
+static MI_CONST MI_Char* CIM_LogicalDevice_AdditionalAvailability_Description_qual_value = MI_T("Additional availability and status of the Device, beyond that specified in the Availability property. The Availability property denotes the primary status and availability of the Device. In some cases, this will not be sufficient to denote the complete status of the Device. In those cases, the AdditionalAvailability property can be used to provide further information. For example, a Device\'s primary Availability may be \"Off line\" (value=8), but it may also be in a low power state (AdditionalAvailability value=14), or the Device could be running Diagnostics (AdditionalAvailability value=5, \"In Test\").");
 
 static MI_CONST MI_Qualifier CIM_LogicalDevice_AdditionalAvailability_Description_qual =
 {
@@ -24664,7 +24664,7 @@ static MI_CONST MI_PropertyDecl MSFT_Feature_InstanceID_prop =
     NULL,
 };
 
-static MI_CONST MI_Char* MSFT_Feature_FeatureName_Description_qual_value = MI_T("An enumeration indicating the avalible feature. ");
+static MI_CONST MI_Char* MSFT_Feature_FeatureName_Description_qual_value = MI_T("An enumeration indicating the available feature. ");
 
 static MI_CONST MI_Qualifier MSFT_Feature_FeatureName_Description_qual =
 {
@@ -34464,7 +34464,7 @@ static MI_CONST MI_Qualifier MSFT_LinkAggregationAssociation_EthernetPorts_Key_q
     &MSFT_LinkAggregationAssociation_EthernetPorts_Key_qual_value
 };
 
-static MI_CONST MI_Char* MSFT_LinkAggregationAssociation_EthernetPorts_Description_qual_value = MI_T("A member Ehternet Switch port");
+static MI_CONST MI_Char* MSFT_LinkAggregationAssociation_EthernetPorts_Description_qual_value = MI_T("A member Ethernet Switch port");
 
 static MI_CONST MI_Qualifier MSFT_LinkAggregationAssociation_EthernetPorts_Description_qual =
 {
@@ -34898,7 +34898,7 @@ static MI_CONST MI_Qualifier MSFT_LinkAggregationSettingData_UMLPackagePath_qual
     &MSFT_LinkAggregationSettingData_UMLPackagePath_qual_value
 };
 
-static MI_CONST MI_Char* MSFT_LinkAggregationSettingData_Description_qual_value = MI_T("MSFT_LinkAggragationSettingData description.");
+static MI_CONST MI_Char* MSFT_LinkAggregationSettingData_Description_qual_value = MI_T("MSFT_LinkAggregationSettingData description.");
 
 static MI_CONST MI_Qualifier MSFT_LinkAggregationSettingData_Description_qual =
 {
@@ -36145,77 +36145,77 @@ static MI_CONST MI_PropertyDecl MSFT_Neighbor_Password_prop =
     NULL,
 };
 
-static MI_CONST MI_Char* MSFT_Neighbor_KeyEncriptionMethod_Description_qual_value = MI_T("");
+static MI_CONST MI_Char* MSFT_Neighbor_KeyEncryptionMethod_Description_qual_value = MI_T("");
 
-static MI_CONST MI_Qualifier MSFT_Neighbor_KeyEncriptionMethod_Description_qual =
+static MI_CONST MI_Qualifier MSFT_Neighbor_KeyEncryptionMethod_Description_qual =
 {
     MI_T("Description"),
     MI_STRING,
     MI_FLAG_ENABLEOVERRIDE|MI_FLAG_TOSUBCLASS|MI_FLAG_TRANSLATABLE,
-    &MSFT_Neighbor_KeyEncriptionMethod_Description_qual_value
+    &MSFT_Neighbor_KeyEncryptionMethod_Description_qual_value
 };
 
-static MI_CONST MI_Char* MSFT_Neighbor_KeyEncriptionMethod_ValueMap_qual_data_value[] =
+static MI_CONST MI_Char* MSFT_Neighbor_KeyEncryptionMethod_ValueMap_qual_data_value[] =
 {
     MI_T("1"),
     MI_T("2"),
     MI_T("3"),
 };
 
-static MI_CONST MI_ConstStringA MSFT_Neighbor_KeyEncriptionMethod_ValueMap_qual_value =
+static MI_CONST MI_ConstStringA MSFT_Neighbor_KeyEncryptionMethod_ValueMap_qual_value =
 {
-    MSFT_Neighbor_KeyEncriptionMethod_ValueMap_qual_data_value,
-    MI_COUNT(MSFT_Neighbor_KeyEncriptionMethod_ValueMap_qual_data_value),
+    MSFT_Neighbor_KeyEncryptionMethod_ValueMap_qual_data_value,
+    MI_COUNT(MSFT_Neighbor_KeyEncryptionMethod_ValueMap_qual_data_value),
 };
 
-static MI_CONST MI_Qualifier MSFT_Neighbor_KeyEncriptionMethod_ValueMap_qual =
+static MI_CONST MI_Qualifier MSFT_Neighbor_KeyEncryptionMethod_ValueMap_qual =
 {
     MI_T("ValueMap"),
     MI_STRINGA,
     MI_FLAG_ENABLEOVERRIDE|MI_FLAG_TOSUBCLASS,
-    &MSFT_Neighbor_KeyEncriptionMethod_ValueMap_qual_value
+    &MSFT_Neighbor_KeyEncryptionMethod_ValueMap_qual_value
 };
 
-static MI_CONST MI_Char* MSFT_Neighbor_KeyEncriptionMethod_Values_qual_data_value[] =
+static MI_CONST MI_Char* MSFT_Neighbor_KeyEncryptionMethod_Values_qual_data_value[] =
 {
     MI_T("Unencrypted"),
     MI_T("ThreeDes"),
     MI_T("CiscoType7"),
 };
 
-static MI_CONST MI_ConstStringA MSFT_Neighbor_KeyEncriptionMethod_Values_qual_value =
+static MI_CONST MI_ConstStringA MSFT_Neighbor_KeyEncryptionMethod_Values_qual_value =
 {
-    MSFT_Neighbor_KeyEncriptionMethod_Values_qual_data_value,
-    MI_COUNT(MSFT_Neighbor_KeyEncriptionMethod_Values_qual_data_value),
+    MSFT_Neighbor_KeyEncryptionMethod_Values_qual_data_value,
+    MI_COUNT(MSFT_Neighbor_KeyEncryptionMethod_Values_qual_data_value),
 };
 
-static MI_CONST MI_Qualifier MSFT_Neighbor_KeyEncriptionMethod_Values_qual =
+static MI_CONST MI_Qualifier MSFT_Neighbor_KeyEncryptionMethod_Values_qual =
 {
     MI_T("Values"),
     MI_STRINGA,
     MI_FLAG_ENABLEOVERRIDE|MI_FLAG_TOSUBCLASS|MI_FLAG_TRANSLATABLE,
-    &MSFT_Neighbor_KeyEncriptionMethod_Values_qual_value
+    &MSFT_Neighbor_KeyEncryptionMethod_Values_qual_value
 };
 
-static MI_Qualifier MI_CONST* MI_CONST MSFT_Neighbor_KeyEncriptionMethod_quals[] =
+static MI_Qualifier MI_CONST* MI_CONST MSFT_Neighbor_KeyEncryptionMethod_quals[] =
 {
-    &MSFT_Neighbor_KeyEncriptionMethod_Description_qual,
-    &MSFT_Neighbor_KeyEncriptionMethod_ValueMap_qual,
-    &MSFT_Neighbor_KeyEncriptionMethod_Values_qual,
+    &MSFT_Neighbor_KeyEncryptionMethod_Description_qual,
+    &MSFT_Neighbor_KeyEncryptionMethod_ValueMap_qual,
+    &MSFT_Neighbor_KeyEncryptionMethod_Values_qual,
 };
 
-/* property MSFT_Neighbor.KeyEncriptionMethod */
-static MI_CONST MI_PropertyDecl MSFT_Neighbor_KeyEncriptionMethod_prop =
+/* property MSFT_Neighbor.KeyEncryptionMethod */
+static MI_CONST MI_PropertyDecl MSFT_Neighbor_KeyEncryptionMethod_prop =
 {
     MI_FLAG_PROPERTY|MI_FLAG_READONLY, /* flags */
     0x006B6413, /* code */
-    MI_T("KeyEncriptionMethod"), /* name */
-    MSFT_Neighbor_KeyEncriptionMethod_quals, /* qualifiers */
-    MI_COUNT(MSFT_Neighbor_KeyEncriptionMethod_quals), /* numQualifiers */
+    MI_T("KeyEncryptionMethod"), /* name */
+    MSFT_Neighbor_KeyEncryptionMethod_quals, /* qualifiers */
+    MI_COUNT(MSFT_Neighbor_KeyEncryptionMethod_quals), /* numQualifiers */
     MI_UINT32, /* type */
     NULL, /* className */
     0, /* subscript */
-    offsetof(MSFT_Neighbor, KeyEncriptionMethod), /* offset */
+    offsetof(MSFT_Neighbor, KeyEncryptionMethod), /* offset */
     MI_T("MSFT_Neighbor"), /* origin */
     MI_T("MSFT_Neighbor"), /* propagator */
     NULL,
@@ -36259,7 +36259,7 @@ static MI_PropertyDecl MI_CONST* MI_CONST MSFT_Neighbor_props[] =
     &CIM_AutonomousSystem_AggregationType_prop,
     &MSFT_Neighbor_RouteMap_prop,
     &MSFT_Neighbor_Password_prop,
-    &MSFT_Neighbor_KeyEncriptionMethod_prop,
+    &MSFT_Neighbor_KeyEncryptionMethod_prop,
 };
 
 static MI_CONST MI_Char* MSFT_Neighbor_RequestStateChange_Description_qual_value = MI_T("Requests that the state of the element be changed to the value specified in the RequestedState parameter. When the requested state change takes place, the EnabledState and RequestedState of the element will be the same. Invoking the RequestStateChange method multiple times could result in earlier requests being overwritten or lost. \nA return code of 0 shall indicate the state change was successfully initiated. \nA return code of 3 shall indicate that the state transition cannot complete within the interval specified by the TimeoutPeriod parameter. \nA return code of 4096 (0x1000) shall indicate the state change was successfully initiated, a ConcreteJob has been created, and its reference returned in the output parameter Job. Any other return code indicates an error condition.");
@@ -36837,77 +36837,77 @@ static MI_CONST MI_PropertyDecl MSFT_NeighborTemplate_Password_prop =
     NULL,
 };
 
-static MI_CONST MI_Char* MSFT_NeighborTemplate_KeyEncriptionMethod_Description_qual_value = MI_T("");
+static MI_CONST MI_Char* MSFT_NeighborTemplate_KeyEncryptionMethod_Description_qual_value = MI_T("");
 
-static MI_CONST MI_Qualifier MSFT_NeighborTemplate_KeyEncriptionMethod_Description_qual =
+static MI_CONST MI_Qualifier MSFT_NeighborTemplate_KeyEncryptionMethod_Description_qual =
 {
     MI_T("Description"),
     MI_STRING,
     MI_FLAG_ENABLEOVERRIDE|MI_FLAG_TOSUBCLASS|MI_FLAG_TRANSLATABLE,
-    &MSFT_NeighborTemplate_KeyEncriptionMethod_Description_qual_value
+    &MSFT_NeighborTemplate_KeyEncryptionMethod_Description_qual_value
 };
 
-static MI_CONST MI_Char* MSFT_NeighborTemplate_KeyEncriptionMethod_ValueMap_qual_data_value[] =
+static MI_CONST MI_Char* MSFT_NeighborTemplate_KeyEncryptionMethod_ValueMap_qual_data_value[] =
 {
     MI_T("1"),
     MI_T("2"),
     MI_T("3"),
 };
 
-static MI_CONST MI_ConstStringA MSFT_NeighborTemplate_KeyEncriptionMethod_ValueMap_qual_value =
+static MI_CONST MI_ConstStringA MSFT_NeighborTemplate_KeyEncryptionMethod_ValueMap_qual_value =
 {
-    MSFT_NeighborTemplate_KeyEncriptionMethod_ValueMap_qual_data_value,
-    MI_COUNT(MSFT_NeighborTemplate_KeyEncriptionMethod_ValueMap_qual_data_value),
+    MSFT_NeighborTemplate_KeyEncryptionMethod_ValueMap_qual_data_value,
+    MI_COUNT(MSFT_NeighborTemplate_KeyEncryptionMethod_ValueMap_qual_data_value),
 };
 
-static MI_CONST MI_Qualifier MSFT_NeighborTemplate_KeyEncriptionMethod_ValueMap_qual =
+static MI_CONST MI_Qualifier MSFT_NeighborTemplate_KeyEncryptionMethod_ValueMap_qual =
 {
     MI_T("ValueMap"),
     MI_STRINGA,
     MI_FLAG_ENABLEOVERRIDE|MI_FLAG_TOSUBCLASS,
-    &MSFT_NeighborTemplate_KeyEncriptionMethod_ValueMap_qual_value
+    &MSFT_NeighborTemplate_KeyEncryptionMethod_ValueMap_qual_value
 };
 
-static MI_CONST MI_Char* MSFT_NeighborTemplate_KeyEncriptionMethod_Values_qual_data_value[] =
+static MI_CONST MI_Char* MSFT_NeighborTemplate_KeyEncryptionMethod_Values_qual_data_value[] =
 {
     MI_T("Unencrypted"),
     MI_T("ThreeDes"),
     MI_T("CiscoType7"),
 };
 
-static MI_CONST MI_ConstStringA MSFT_NeighborTemplate_KeyEncriptionMethod_Values_qual_value =
+static MI_CONST MI_ConstStringA MSFT_NeighborTemplate_KeyEncryptionMethod_Values_qual_value =
 {
-    MSFT_NeighborTemplate_KeyEncriptionMethod_Values_qual_data_value,
-    MI_COUNT(MSFT_NeighborTemplate_KeyEncriptionMethod_Values_qual_data_value),
+    MSFT_NeighborTemplate_KeyEncryptionMethod_Values_qual_data_value,
+    MI_COUNT(MSFT_NeighborTemplate_KeyEncryptionMethod_Values_qual_data_value),
 };
 
-static MI_CONST MI_Qualifier MSFT_NeighborTemplate_KeyEncriptionMethod_Values_qual =
+static MI_CONST MI_Qualifier MSFT_NeighborTemplate_KeyEncryptionMethod_Values_qual =
 {
     MI_T("Values"),
     MI_STRINGA,
     MI_FLAG_ENABLEOVERRIDE|MI_FLAG_TOSUBCLASS|MI_FLAG_TRANSLATABLE,
-    &MSFT_NeighborTemplate_KeyEncriptionMethod_Values_qual_value
+    &MSFT_NeighborTemplate_KeyEncryptionMethod_Values_qual_value
 };
 
-static MI_Qualifier MI_CONST* MI_CONST MSFT_NeighborTemplate_KeyEncriptionMethod_quals[] =
+static MI_Qualifier MI_CONST* MI_CONST MSFT_NeighborTemplate_KeyEncryptionMethod_quals[] =
 {
-    &MSFT_NeighborTemplate_KeyEncriptionMethod_Description_qual,
-    &MSFT_NeighborTemplate_KeyEncriptionMethod_ValueMap_qual,
-    &MSFT_NeighborTemplate_KeyEncriptionMethod_Values_qual,
+    &MSFT_NeighborTemplate_KeyEncryptionMethod_Description_qual,
+    &MSFT_NeighborTemplate_KeyEncryptionMethod_ValueMap_qual,
+    &MSFT_NeighborTemplate_KeyEncryptionMethod_Values_qual,
 };
 
-/* property MSFT_NeighborTemplate.KeyEncriptionMethod */
-static MI_CONST MI_PropertyDecl MSFT_NeighborTemplate_KeyEncriptionMethod_prop =
+/* property MSFT_NeighborTemplate.KeyEncryptionMethod */
+static MI_CONST MI_PropertyDecl MSFT_NeighborTemplate_KeyEncryptionMethod_prop =
 {
     MI_FLAG_PROPERTY|MI_FLAG_READONLY, /* flags */
     0x006B6413, /* code */
-    MI_T("KeyEncriptionMethod"), /* name */
-    MSFT_NeighborTemplate_KeyEncriptionMethod_quals, /* qualifiers */
-    MI_COUNT(MSFT_NeighborTemplate_KeyEncriptionMethod_quals), /* numQualifiers */
+    MI_T("KeyEncryptionMethod"), /* name */
+    MSFT_NeighborTemplate_KeyEncryptionMethod_quals, /* qualifiers */
+    MI_COUNT(MSFT_NeighborTemplate_KeyEncryptionMethod_quals), /* numQualifiers */
     MI_UINT32, /* type */
     NULL, /* className */
     0, /* subscript */
-    offsetof(MSFT_NeighborTemplate, KeyEncriptionMethod), /* offset */
+    offsetof(MSFT_NeighborTemplate, KeyEncryptionMethod), /* offset */
     MI_T("MSFT_NeighborTemplate"), /* origin */
     MI_T("MSFT_NeighborTemplate"), /* propagator */
     NULL,
@@ -36918,7 +36918,7 @@ static MI_PropertyDecl MI_CONST* MI_CONST MSFT_NeighborTemplate_props[] =
     &MSFT_AutonomousSystemSettingData_ASNumber_prop,
     &MSFT_NeighborTemplate_RouteMap_prop,
     &MSFT_NeighborTemplate_Password_prop,
-    &MSFT_NeighborTemplate_KeyEncriptionMethod_prop,
+    &MSFT_NeighborTemplate_KeyEncryptionMethod_prop,
 };
 
 static MI_CONST MI_ProviderFT MSFT_NeighborTemplate_funcs =
@@ -37649,7 +37649,7 @@ static MI_CONST MI_Qualifier CIM_Service_UMLPackagePath_qual =
     &CIM_Service_UMLPackagePath_qual_value
 };
 
-static MI_CONST MI_Char* CIM_Service_Description_qual_value = MI_T("A Service is a LogicalElement that represents the availability of functionality that can be managed. This functionality may be provided by a seperately modeled entity such as a LogicalDevice or a SoftwareFeature, or both. The modeled Service typically provides only functionality required for management of itself or the elements it affects.");
+static MI_CONST MI_Char* CIM_Service_Description_qual_value = MI_T("A Service is a LogicalElement that represents the availability of functionality that can be managed. This functionality may be provided by a separately modeled entity such as a LogicalDevice or a SoftwareFeature, or both. The modeled Service typically provides only functionality required for management of itself or the elements it affects.");
 
 static MI_CONST MI_Qualifier CIM_Service_Description_qual =
 {
@@ -38773,7 +38773,7 @@ static MI_CONST MI_PropertyDecl CIM_NetworkPolicyCondition_InstanceID_prop =
     NULL,
 };
 
-static MI_CONST MI_Char* CIM_NetworkPolicyCondition_ParameterType_Description_qual_value = MI_T("Defines the type of parameter that is used to match traffic.\n\nSourceIPAddress: IP address indicating the sender of the packet.\nDestinationIPAddress: IP address indicating the receiver of the packet.\nVirtualIPAddress: describes the IP address from which the server pool is accessed from.\nSourcePort: identifies the sending port\nSourcePortRange: identifies a range of sending ports\nDestinationPort: identifies the receiving port\nDestinationPortRange: identifies a range of receiving ports\nHTTPURL: identifies the URL under a HTTP request.\nHTTPContent: identifies the Content-Type field under the HTPP request\nHTTPCookieName: identifies a cookie name under the HTTP request\nHTTPCookieValue: identifies a cookie value under the HTTP request\nHTTPHeaderName: identifies a header name under the HTTP request\nHTTPHeaderValue: identifies a header value under the HTTP request\nHTTPMethod: identifies the HTTP method used in the HTTP request.\nProtocol: identifies the Protocol field under the IPv4 Header.\nNextHeader: identifies the Protocol field under the IPv6 Header.\nSourceSubnet: identifies the subnet of the sender of the packet.\nDestinationSubnet: identifies the subnet of the receiver of the packet.\nApplication: identifies the name of the application.\nSourceDomainName: identifies the domain name of the sender of the packet.\nDestinationDomainName: identifies the domain name of the receiver of the packet.\nSourceMACAddress: MAC address indicating the sender of the packet.\nDestinationMACAddress: MAC address indicating the receiver of the packet.\nSourceHostName: identifies the host name of the sender of the packet.\nDestinationHostName: identifies the host name of the receiver of the packet.\nSourceNetwork: identifies the network of the sender of the packet.\nDestinationNetwork: identifies the network of the sender of the packet.\nTCPFlag: identifies the flags field under the TCP header.\nTCPState: identifies the state of the TCP connection.\nEtherType: identifies the etherType field under the Ethernet frame.\nICMPType: identifies the Type field under a ICMP header.\nConnectionLimit: identifies maximum number of concurrent connections.\nVirtualSystemName: identifies the name of a VirtualSystem.\nVNIC-ID: identifies the ID of a Virtual NIC.\nCoS: identifies the Class of Service (CoS) field that is present in an Ethernet frame header.\nDSCP: identifies the Differentiated Services Code Point (DSCP) field under the IPv4 Header.\nPacketLength: identifies the TotalLength field under the IP Header\nSSLCipher: identifies the SSL cipher suite used for the HTTPS connection.\nSSLCipherStrength: identifies the SSL cipher strength of the SSL Certificate.");
+static MI_CONST MI_Char* CIM_NetworkPolicyCondition_ParameterType_Description_qual_value = MI_T("Defines the type of parameter that is used to match traffic.\n\nSourceIPAddress: IP address indicating the sender of the packet.\nDestinationIPAddress: IP address indicating the receiver of the packet.\nVirtualIPAddress: describes the IP address from which the server pool is accessed from.\nSourcePort: identifies the sending port\nSourcePortRange: identifies a range of sending ports\nDestinationPort: identifies the receiving port\nDestinationPortRange: identifies a range of receiving ports\nHTTPURL: identifies the URL under a HTTP request.\nHTTPContent: identifies the Content-Type field under the HTTP request\nHTTPCookieName: identifies a cookie name under the HTTP request\nHTTPCookieValue: identifies a cookie value under the HTTP request\nHTTPHeaderName: identifies a header name under the HTTP request\nHTTPHeaderValue: identifies a header value under the HTTP request\nHTTPMethod: identifies the HTTP method used in the HTTP request.\nProtocol: identifies the Protocol field under the IPv4 Header.\nNextHeader: identifies the Protocol field under the IPv6 Header.\nSourceSubnet: identifies the subnet of the sender of the packet.\nDestinationSubnet: identifies the subnet of the receiver of the packet.\nApplication: identifies the name of the application.\nSourceDomainName: identifies the domain name of the sender of the packet.\nDestinationDomainName: identifies the domain name of the receiver of the packet.\nSourceMACAddress: MAC address indicating the sender of the packet.\nDestinationMACAddress: MAC address indicating the receiver of the packet.\nSourceHostName: identifies the host name of the sender of the packet.\nDestinationHostName: identifies the host name of the receiver of the packet.\nSourceNetwork: identifies the network of the sender of the packet.\nDestinationNetwork: identifies the network of the sender of the packet.\nTCPFlag: identifies the flags field under the TCP header.\nTCPState: identifies the state of the TCP connection.\nEtherType: identifies the etherType field under the Ethernet frame.\nICMPType: identifies the Type field under a ICMP header.\nConnectionLimit: identifies maximum number of concurrent connections.\nVirtualSystemName: identifies the name of a VirtualSystem.\nVNIC-ID: identifies the ID of a Virtual NIC.\nCoS: identifies the Class of Service (CoS) field that is present in an Ethernet frame header.\nDSCP: identifies the Differentiated Services Code Point (DSCP) field under the IPv4 Header.\nPacketLength: identifies the TotalLength field under the IP Header\nSSLCipher: identifies the SSL cipher suite used for the HTTPS connection.\nSSLCipherStrength: identifies the SSL cipher strength of the SSL Certificate.");
 
 static MI_CONST MI_Qualifier CIM_NetworkPolicyCondition_ParameterType_Description_qual =
 {
@@ -40850,7 +40850,7 @@ MI_CONST MI_MethodDecl MSFT_NetworkACLService_StopService_rtti =
     (MI_ProviderFT_Invoke)MSFT_NetworkACLService_Invoke_StopService, /* method */
 };
 
-static MI_CONST MI_Char* MSFT_NetworkACLService_CreateACL_Description_qual_value = MI_T("Creates ande Names a new ACL");
+static MI_CONST MI_Char* MSFT_NetworkACLService_CreateACL_Description_qual_value = MI_T("Creates and Names a new ACL");
 
 static MI_CONST MI_Qualifier MSFT_NetworkACLService_CreateACL_Description_qual =
 {
@@ -41053,7 +41053,7 @@ static MI_CONST MI_ParameterDecl MSFT_NetworkACLService_CreateACL_Job_param =
     offsetof(MSFT_NetworkACLService_CreateACL, Job), /* offset */
 };
 
-static MI_CONST MI_Char* MSFT_NetworkACLService_CreateACL_MIReturn_Description_qual_value = MI_T("Creates ande Names a new ACL");
+static MI_CONST MI_Char* MSFT_NetworkACLService_CreateACL_MIReturn_Description_qual_value = MI_T("Creates and Names a new ACL");
 
 static MI_CONST MI_Qualifier MSFT_NetworkACLService_CreateACL_MIReturn_Description_qual =
 {
@@ -41244,7 +41244,7 @@ static MI_CONST MI_ParameterDecl MSFT_NetworkACLService_AddRule_TargetACL_param 
     offsetof(MSFT_NetworkACLService_AddRule, TargetACL), /* offset */
 };
 
-static MI_CONST MI_Char* MSFT_NetworkACLService_AddRule_NetworkPolicyRule_Description_qual_value = MI_T("A string an containing an embedded instance of class subclass of CIM_NetworkPolicyRuleThis rule has an associated array of conditions and actions  The way the conditions areevaluated are contained in the rule");
+static MI_CONST MI_Char* MSFT_NetworkACLService_AddRule_NetworkPolicyRule_Description_qual_value = MI_T("A string an containing an embedded instance of class subclass of CIM_NetworkPolicyRuleThis rule has an associated array of conditions and actions  The way the conditions are evaluated are contained in the rule");
 
 static MI_CONST MI_Qualifier MSFT_NetworkACLService_AddRule_NetworkPolicyRule_Description_qual =
 {
@@ -43400,7 +43400,7 @@ static MI_CONST MI_ParameterDecl MSFT_NetworkACLService_AddRuleWithMatchedACL_Ta
     offsetof(MSFT_NetworkACLService_AddRuleWithMatchedACL, TargetACL), /* offset */
 };
 
-static MI_CONST MI_Char* MSFT_NetworkACLService_AddRuleWithMatchedACL_NetworkPolicyRule_Description_qual_value = MI_T("A string an containing an embedded instance of class subclass of CIM_NetworkPolicyRuleThis rule has an associated array of conditions and actions  The way the conditions areevaluated are contained in the rule");
+static MI_CONST MI_Char* MSFT_NetworkACLService_AddRuleWithMatchedACL_NetworkPolicyRule_Description_qual_value = MI_T("A string an containing an embedded instance of class subclass of CIM_NetworkPolicyRuleThis rule has an associated array of conditions and actions  The way the conditions are evaluated are contained in the rule");
 
 static MI_CONST MI_Qualifier MSFT_NetworkACLService_AddRuleWithMatchedACL_NetworkPolicyRule_Description_qual =
 {
@@ -45698,7 +45698,7 @@ static MI_CONST MI_Qualifier CIM_ComputerSystem_PowerManagementCapabilities_Depr
     &CIM_ComputerSystem_PowerManagementCapabilities_Deprecated_qual_value
 };
 
-static MI_CONST MI_Char* CIM_ComputerSystem_PowerManagementCapabilities_Description_qual_value = MI_T("An enumerated array describing the power management capabilities of the ComputerSystem. The use of this property has been deprecated. Instead, the Power Capabilites property in an associated PowerManagement Capabilities class should be used.");
+static MI_CONST MI_Char* CIM_ComputerSystem_PowerManagementCapabilities_Description_qual_value = MI_T("An enumerated array describing the power management capabilities of the ComputerSystem. The use of this property has been deprecated. Instead, the Power Capabilities property in an associated PowerManagement Capabilities class should be used.");
 
 static MI_CONST MI_Qualifier CIM_ComputerSystem_PowerManagementCapabilities_Description_qual =
 {
@@ -47225,7 +47225,7 @@ MI_CONST MI_MethodDecl MSFT_SwitchService_StopService_rtti =
     (MI_ProviderFT_Invoke)MSFT_SwitchService_Invoke_StopService, /* method */
 };
 
-static MI_CONST MI_Char* MSFT_SwitchService_AddProtocolEndpoint_Description_qual_value = MI_T("Defines and assigns a protcol endpoint subclass to a physical or virtual port or interface,for example an instance of CIM_EthernetPort or MSFT_Subinterface\nInput that is not completely specified may be filled out with default values.");
+static MI_CONST MI_Char* MSFT_SwitchService_AddProtocolEndpoint_Description_qual_value = MI_T("Defines and assigns a protocol endpoint subclass to a physical or virtual port or interface,for example an instance of CIM_EthernetPort or MSFT_Subinterface\nInput that is not completely specified may be filled out with default values.");
 
 static MI_CONST MI_Qualifier MSFT_SwitchService_AddProtocolEndpoint_Description_qual =
 {
@@ -47497,7 +47497,7 @@ static MI_CONST MI_ParameterDecl MSFT_SwitchService_AddProtocolEndpoint_Job_para
     offsetof(MSFT_SwitchService_AddProtocolEndpoint, Job), /* offset */
 };
 
-static MI_CONST MI_Char* MSFT_SwitchService_AddProtocolEndpoint_MIReturn_Description_qual_value = MI_T("Defines and assigns a protcol endpoint subclass to a physical or virtual port or interface,for example an instance of CIM_EthernetPort or MSFT_Subinterface\nInput that is not completely specified may be filled out with default values.");
+static MI_CONST MI_Char* MSFT_SwitchService_AddProtocolEndpoint_MIReturn_Description_qual_value = MI_T("Defines and assigns a protocol endpoint subclass to a physical or virtual port or interface,for example an instance of CIM_EthernetPort or MSFT_Subinterface\nInput that is not completely specified may be filled out with default values.");
 
 static MI_CONST MI_Qualifier MSFT_SwitchService_AddProtocolEndpoint_MIReturn_Description_qual =
 {
@@ -47600,7 +47600,7 @@ MI_CONST MI_MethodDecl MSFT_SwitchService_AddProtocolEndpoint_rtti =
     (MI_ProviderFT_Invoke)MSFT_SwitchService_Invoke_AddProtocolEndpoint, /* method */
 };
 
-static MI_CONST MI_Char* MSFT_SwitchService_RemoveProtocolEndpoint_Description_qual_value = MI_T("removes a protcol endpoint subclass from a physical or virtual port or interface,for example an instance of CIM_EthernetPort or MSFT_Subinterface\n");
+static MI_CONST MI_Char* MSFT_SwitchService_RemoveProtocolEndpoint_Description_qual_value = MI_T("removes a protocol endpoint subclass from a physical or virtual port or interface,for example an instance of CIM_EthernetPort or MSFT_Subinterface\n");
 
 static MI_CONST MI_Qualifier MSFT_SwitchService_RemoveProtocolEndpoint_Description_qual =
 {
@@ -47741,7 +47741,7 @@ static MI_CONST MI_ParameterDecl MSFT_SwitchService_RemoveProtocolEndpoint_Job_p
     offsetof(MSFT_SwitchService_RemoveProtocolEndpoint, Job), /* offset */
 };
 
-static MI_CONST MI_Char* MSFT_SwitchService_RemoveProtocolEndpoint_MIReturn_Description_qual_value = MI_T("removes a protcol endpoint subclass from a physical or virtual port or interface,for example an instance of CIM_EthernetPort or MSFT_Subinterface\n");
+static MI_CONST MI_Char* MSFT_SwitchService_RemoveProtocolEndpoint_MIReturn_Description_qual_value = MI_T("removes a protocol endpoint subclass from a physical or virtual port or interface,for example an instance of CIM_EthernetPort or MSFT_Subinterface\n");
 
 static MI_CONST MI_Qualifier MSFT_SwitchService_RemoveProtocolEndpoint_MIReturn_Description_qual =
 {
@@ -48959,44 +48959,44 @@ static MI_Qualifier MI_CONST* MI_CONST MSFT_SwitchService_CreateLinkAggregation_
     &MSFT_SwitchService_CreateLinkAggregation_Values_qual,
 };
 
-static MI_CONST MI_Char* MSFT_SwitchService_CreateLinkAggregation_LinkAggragation_Description_qual_value = MI_T("A string an containing an embedded instance of class subclass of LinkAggragation that describes the aspects of the Link aggregation. ");
+static MI_CONST MI_Char* MSFT_SwitchService_CreateLinkAggregation_LinkAggregation_Description_qual_value = MI_T("A string an containing an embedded instance of class subclass of LinkAggregation that describes the aspects of the Link aggregation. ");
 
-static MI_CONST MI_Qualifier MSFT_SwitchService_CreateLinkAggregation_LinkAggragation_Description_qual =
+static MI_CONST MI_Qualifier MSFT_SwitchService_CreateLinkAggregation_LinkAggregation_Description_qual =
 {
     MI_T("Description"),
     MI_STRING,
     MI_FLAG_ENABLEOVERRIDE|MI_FLAG_TOSUBCLASS|MI_FLAG_TRANSLATABLE,
-    &MSFT_SwitchService_CreateLinkAggregation_LinkAggragation_Description_qual_value
+    &MSFT_SwitchService_CreateLinkAggregation_LinkAggregation_Description_qual_value
 };
 
-static MI_CONST MI_Char* MSFT_SwitchService_CreateLinkAggregation_LinkAggragation_EmbeddedInstance_qual_value = MI_T("MSFT_LinkAggregation");
+static MI_CONST MI_Char* MSFT_SwitchService_CreateLinkAggregation_LinkAggregation_EmbeddedInstance_qual_value = MI_T("MSFT_LinkAggregation");
 
-static MI_CONST MI_Qualifier MSFT_SwitchService_CreateLinkAggregation_LinkAggragation_EmbeddedInstance_qual =
+static MI_CONST MI_Qualifier MSFT_SwitchService_CreateLinkAggregation_LinkAggregation_EmbeddedInstance_qual =
 {
     MI_T("EmbeddedInstance"),
     MI_STRING,
     MI_FLAG_ENABLEOVERRIDE|MI_FLAG_TOSUBCLASS,
-    &MSFT_SwitchService_CreateLinkAggregation_LinkAggragation_EmbeddedInstance_qual_value
+    &MSFT_SwitchService_CreateLinkAggregation_LinkAggregation_EmbeddedInstance_qual_value
 };
 
-static MI_Qualifier MI_CONST* MI_CONST MSFT_SwitchService_CreateLinkAggregation_LinkAggragation_quals[] =
+static MI_Qualifier MI_CONST* MI_CONST MSFT_SwitchService_CreateLinkAggregation_LinkAggregation_quals[] =
 {
-    &MSFT_SwitchService_CreateLinkAggregation_LinkAggragation_Description_qual,
-    &MSFT_SwitchService_CreateLinkAggregation_LinkAggragation_EmbeddedInstance_qual,
+    &MSFT_SwitchService_CreateLinkAggregation_LinkAggregation_Description_qual,
+    &MSFT_SwitchService_CreateLinkAggregation_LinkAggregation_EmbeddedInstance_qual,
 };
 
-/* parameter MSFT_SwitchService.CreateLinkAggregation(): LinkAggragation */
-static MI_CONST MI_ParameterDecl MSFT_SwitchService_CreateLinkAggregation_LinkAggragation_param =
+/* parameter MSFT_SwitchService.CreateLinkAggregation(): LinkAggregation */
+static MI_CONST MI_ParameterDecl MSFT_SwitchService_CreateLinkAggregation_LinkAggregation_param =
 {
     MI_FLAG_PARAMETER, /* flags */
     0x006C6E0F, /* code */
-    MI_T("LinkAggragation"), /* name */
-    MSFT_SwitchService_CreateLinkAggregation_LinkAggragation_quals, /* qualifiers */
-    MI_COUNT(MSFT_SwitchService_CreateLinkAggregation_LinkAggragation_quals), /* numQualifiers */
+    MI_T("LinkAggregation"), /* name */
+    MSFT_SwitchService_CreateLinkAggregation_LinkAggregation_quals, /* qualifiers */
+    MI_COUNT(MSFT_SwitchService_CreateLinkAggregation_LinkAggregation_quals), /* numQualifiers */
     MI_INSTANCEA, /* type */
     MI_T("MSFT_LinkAggregation"), /* className */
     0, /* subscript */
-    offsetof(MSFT_SwitchService_CreateLinkAggregation, LinkAggragation), /* offset */
+    offsetof(MSFT_SwitchService_CreateLinkAggregation, LinkAggregation), /* offset */
 };
 
 static MI_CONST MI_Char* MSFT_SwitchService_CreateLinkAggregation_EthernetPort_Description_qual_value = MI_T("An array of references to instance of CIM_EthernetPort that will be used to form the aggregation ");
@@ -49208,7 +49208,7 @@ static MI_CONST MI_ParameterDecl MSFT_SwitchService_CreateLinkAggregation_MIRetu
 static MI_ParameterDecl MI_CONST* MI_CONST MSFT_SwitchService_CreateLinkAggregation_params[] =
 {
     &MSFT_SwitchService_CreateLinkAggregation_MIReturn_param,
-    &MSFT_SwitchService_CreateLinkAggregation_LinkAggragation_param,
+    &MSFT_SwitchService_CreateLinkAggregation_LinkAggregation_param,
     &MSFT_SwitchService_CreateLinkAggregation_EthernetPort_param,
     &MSFT_SwitchService_CreateLinkAggregation_ResultingLinkAggregation_param,
     &MSFT_SwitchService_CreateLinkAggregation_Job_param,
@@ -54287,7 +54287,7 @@ static MI_CONST MI_Qualifier CIM_EnabledLogicalElementCapabilities_UMLPackagePat
     &CIM_EnabledLogicalElementCapabilities_UMLPackagePath_qual_value
 };
 
-static MI_CONST MI_Char* CIM_EnabledLogicalElementCapabilities_Description_qual_value = MI_T("EnabledLogicalElementCapabilities describes the capabilities supported for changing the state of the assciated EnabledLogicalElement.");
+static MI_CONST MI_Char* CIM_EnabledLogicalElementCapabilities_Description_qual_value = MI_T("EnabledLogicalElementCapabilities describes the capabilities supported for changing the state of the associated EnabledLogicalElement.");
 
 static MI_CONST MI_Qualifier CIM_EnabledLogicalElementCapabilities_Description_qual =
 {
@@ -55229,7 +55229,7 @@ static MI_CONST MI_Qualifier CIM_SecurityService_UMLPackagePath_qual =
     &CIM_SecurityService_UMLPackagePath_qual_value
 };
 
-static MI_CONST MI_Char* CIM_SecurityService_Description_qual_value = MI_T("A service providing security functionaity.");
+static MI_CONST MI_Char* CIM_SecurityService_Description_qual_value = MI_T("A service providing security functionality.");
 
 static MI_CONST MI_Qualifier CIM_SecurityService_Description_qual =
 {
@@ -57930,7 +57930,7 @@ static MI_CONST MI_Qualifier CIM_AccountManagementService_UMLPackagePath_qual =
     &CIM_AccountManagementService_UMLPackagePath_qual_value
 };
 
-static MI_CONST MI_Char* CIM_AccountManagementService_Description_qual_value = MI_T("CIM_AccountManagementService creates, manages, and if necessary destroys Accounts on behalf of other SecuritySerices.");
+static MI_CONST MI_Char* CIM_AccountManagementService_Description_qual_value = MI_T("CIM_AccountManagementService creates, manages, and if necessary destroys Accounts on behalf of other SecurityServices.");
 
 static MI_CONST MI_Qualifier CIM_AccountManagementService_Description_qual =
 {
@@ -58242,7 +58242,7 @@ static MI_CONST MI_Qualifier CIM_AccountSettingData_UMLPackagePath_qual =
     &CIM_AccountSettingData_UMLPackagePath_qual_value
 };
 
-static MI_CONST MI_Char* CIM_AccountSettingData_Description_qual_value = MI_T("CIM_AccountSettingData provides the ability to manage the desired configuration for an instance of CIM_Account. When associated with an instance of CIM_AccountManagementService, this class may be used to constrain the properties of instances of CIM_Accountcreated using the service. When associated with an instance of CIM_Account, this class may be used to manage the configuration of the CIM_Acount instance.");
+static MI_CONST MI_Char* CIM_AccountSettingData_Description_qual_value = MI_T("CIM_AccountSettingData provides the ability to manage the desired configuration for an instance of CIM_Account. When associated with an instance of CIM_AccountManagementService, this class may be used to constrain the properties of instances of CIM_Accountcreated using the service. When associated with an instance of CIM_Account, this class may be used to manage the configuration of the CIM_Account instance.");
 
 static MI_CONST MI_Qualifier CIM_AccountSettingData_Description_qual =
 {
@@ -64894,7 +64894,7 @@ static MI_CONST MI_Qualifier CIM_ElementSettingData_IsMinimum_Experimental_qual 
     &CIM_ElementSettingData_IsMinimum_Experimental_qual_value
 };
 
-static MI_CONST MI_Char* CIM_ElementSettingData_IsMinimum_Description_qual_value = MI_T("This property affects the interpretation of all non-null, non-enumerated, non-binary, numeric, non-key properties of the associated SettingData instance. All other properties of the associated SettingData instance are not affected by this property. \nNote: It is assumed that the semantics of each property of this set are designed to be compared mathematically. \nWhen IsMinimum = \"Is Miniumum\", this property indicates that the affected property values specified in the associated SettingData instance shall define desired minimum setting values. The operational minimum values should be modeled as a properties of the CIM_ManagedElement instance.\nWhen IsMinimum = \"Is Not Miniumum\", this property indicates that the affected property values specified in the associated SettingData instance shall not define desired minimum setting values. \nWhen IsMinimum = \"Unknown\", this property indicates that the affected property values specified in the associated SettingData instance may correspond to minimum desired setting values. \nWhen IsMinimum = \"Not Applicable\", this property indicates that the affected property values specified in the associated SettingData instance shall not be interpreted with respect to whether each defines a desired minimum.");
+static MI_CONST MI_Char* CIM_ElementSettingData_IsMinimum_Description_qual_value = MI_T("This property affects the interpretation of all non-null, non-enumerated, non-binary, numeric, non-key properties of the associated SettingData instance. All other properties of the associated SettingData instance are not affected by this property. \nNote: It is assumed that the semantics of each property of this set are designed to be compared mathematically. \nWhen IsMinimum = \"Is Minimum\", this property indicates that the affected property values specified in the associated SettingData instance shall define desired minimum setting values. The operational minimum values should be modeled as a properties of the CIM_ManagedElement instance.\nWhen IsMinimum = \"Is Not Minimum\", this property indicates that the affected property values specified in the associated SettingData instance shall not define desired minimum setting values. \nWhen IsMinimum = \"Unknown\", this property indicates that the affected property values specified in the associated SettingData instance may correspond to minimum desired setting values. \nWhen IsMinimum = \"Not Applicable\", this property indicates that the affected property values specified in the associated SettingData instance shall not be interpreted with respect to whether each defines a desired minimum.");
 
 static MI_CONST MI_Qualifier CIM_ElementSettingData_IsMinimum_Description_qual =
 {
@@ -64985,7 +64985,7 @@ static MI_CONST MI_Qualifier CIM_ElementSettingData_IsMaximum_Experimental_qual 
     &CIM_ElementSettingData_IsMaximum_Experimental_qual_value
 };
 
-static MI_CONST MI_Char* CIM_ElementSettingData_IsMaximum_Description_qual_value = MI_T("This property affects the interpretation of all non-null, non-enumerated, non-binary, numeric, non-key properties of the associated SettingData instance. All other properties of the associated SettingData instance are not affected by this property. \nNote: It is assumed that the semantics of each property of this set are designed to be compared mathematically. \nWhen IsMaximum = \"Is Maxiumum\", this property indicates that the affected property values specified in the associated SettingData instance shall define desired maximum setting values. The operational maximum values should be modeled as a properties of the CIM_ManagedElement instance.\nWhen IsMaximum = \"Is Not Maxiumum\", this property indicates that the affected property values specified in the associated SettingData instance shall not define desired maximum setting values. \nWhen IsMaximum = \"Unknown\", this property indicates that the affected property values specified in the associated SettingData instance may correspond to maximum desired setting values. \nWhen IsMaximum = \"Not Applicable\", this property indicates that the affected property values specified in the associated SettingData instance shall not be interpreted with respect to whether each defines a desired maximum.");
+static MI_CONST MI_Char* CIM_ElementSettingData_IsMaximum_Description_qual_value = MI_T("This property affects the interpretation of all non-null, non-enumerated, non-binary, numeric, non-key properties of the associated SettingData instance. All other properties of the associated SettingData instance are not affected by this property. \nNote: It is assumed that the semantics of each property of this set are designed to be compared mathematically. \nWhen IsMaximum = \"Is Maximum\", this property indicates that the affected property values specified in the associated SettingData instance shall define desired maximum setting values. The operational maximum values should be modeled as a properties of the CIM_ManagedElement instance.\nWhen IsMaximum = \"Is Not Maximum\", this property indicates that the affected property values specified in the associated SettingData instance shall not define desired maximum setting values. \nWhen IsMaximum = \"Unknown\", this property indicates that the affected property values specified in the associated SettingData instance may correspond to maximum desired setting values. \nWhen IsMaximum = \"Not Applicable\", this property indicates that the affected property values specified in the associated SettingData instance shall not be interpreted with respect to whether each defines a desired maximum.");
 
 static MI_CONST MI_Qualifier CIM_ElementSettingData_IsMaximum_Description_qual =
 {
@@ -67052,7 +67052,7 @@ static MI_CONST MI_PropertyDecl CIM_EthernetPortAllocationSettingData_DefaultPri
     NULL,
 };
 
-static MI_CONST MI_Char* CIM_EthernetPortAllocationSettingData_GroupID_Description_qual_value = MI_T("The GroupID is an identifier that refers to the VLAN associated with the VSI specified in the VDP TLV as definded in IEEE 802.1Qbg.");
+static MI_CONST MI_Char* CIM_EthernetPortAllocationSettingData_GroupID_Description_qual_value = MI_T("The GroupID is an identifier that refers to the VLAN associated with the VSI specified in the VDP TLV as defined in IEEE 802.1Qbg.");
 
 static MI_CONST MI_Qualifier CIM_EthernetPortAllocationSettingData_GroupID_Description_qual =
 {
@@ -67420,7 +67420,7 @@ static MI_CONST MI_PropertyDecl CIM_EthernetPortAllocationSettingData_Promiscuou
     NULL,
 };
 
-static MI_CONST MI_Char* CIM_EthernetPortAllocationSettingData_ReceiveBandwidthLimit_Description_qual_value = MI_T("This property specifes the upper bounds or maximum amount of receive bandwidth allowed through this port. The value of the ReceiveBandwidthLimit property is expressed in the unit specified by the value of the AllocationUnits property.");
+static MI_CONST MI_Char* CIM_EthernetPortAllocationSettingData_ReceiveBandwidthLimit_Description_qual_value = MI_T("This property specifies the upper bounds or maximum amount of receive bandwidth allowed through this port. The value of the ReceiveBandwidthLimit property is expressed in the unit specified by the value of the AllocationUnits property.");
 
 static MI_CONST MI_Qualifier CIM_EthernetPortAllocationSettingData_ReceiveBandwidthLimit_Description_qual =
 {
@@ -73786,7 +73786,7 @@ static MI_CONST MI_PropertyDecl CIM_PhysicalComputerSystemView_OSVersion_prop =
     NULL,
 };
 
-static MI_CONST MI_Char* CIM_PhysicalComputerSystemView_OSEnabledState_Description_qual_value = MI_T("EnabledState of the current or last running operating system on this physcial computer system.");
+static MI_CONST MI_Char* CIM_PhysicalComputerSystemView_OSEnabledState_Description_qual_value = MI_T("EnabledState of the current or last running operating system on this physical computer system.");
 
 static MI_CONST MI_Qualifier CIM_PhysicalComputerSystemView_OSEnabledState_Description_qual =
 {
@@ -75028,7 +75028,7 @@ static MI_CONST MI_Qualifier CIM_PhysicalComputerSystemView_ClearLog_LogInstance
     &CIM_PhysicalComputerSystemView_ClearLog_LogInstanceID_In_qual_value
 };
 
-static MI_CONST MI_Char* CIM_PhysicalComputerSystemView_ClearLog_LogInstanceID_Description_qual_value = MI_T("Idenfier for the log that is requested to be cleared.");
+static MI_CONST MI_Char* CIM_PhysicalComputerSystemView_ClearLog_LogInstanceID_Description_qual_value = MI_T("Identifier for the log that is requested to be cleared.");
 
 static MI_CONST MI_Qualifier CIM_PhysicalComputerSystemView_ClearLog_LogInstanceID_Description_qual =
 {
@@ -85561,7 +85561,7 @@ MI_CONST MI_ClassDecl CIM_SystemDevice_rtti =
 **==============================================================================
 */
 
-static MI_CONST MI_Char* CIM_VirtualSystemSettingData_VirtualSystemIdentifier_Description_qual_value = MI_T("VirtualSystemIdentifier shall reflect a unique name for the system as it is used within the virtualization platform. Note that the VirtualSystemIdentifier is not the hostname assigned to the operating system instance running within the virtual system, nor is it an IP address or MAC address assigned to any of its network ports. \nOn create requests VirtualSystemIdentifier may contain implementation specific rules (like simple patterns or regular expresssion) that may be interpreted by the implementation when assigning a VirtualSystemIdentifier.");
+static MI_CONST MI_Char* CIM_VirtualSystemSettingData_VirtualSystemIdentifier_Description_qual_value = MI_T("VirtualSystemIdentifier shall reflect a unique name for the system as it is used within the virtualization platform. Note that the VirtualSystemIdentifier is not the hostname assigned to the operating system instance running within the virtual system, nor is it an IP address or MAC address assigned to any of its network ports. \nOn create requests VirtualSystemIdentifier may contain implementation specific rules (like simple patterns or regular expression) that may be interpreted by the implementation when assigning a VirtualSystemIdentifier.");
 
 static MI_CONST MI_Qualifier CIM_VirtualSystemSettingData_VirtualSystemIdentifier_Description_qual =
 {
@@ -86133,7 +86133,7 @@ static MI_CONST MI_PropertyDecl CIM_VirtualSystemSettingData_AutomaticShutdownAc
     NULL,
 };
 
-static MI_CONST MI_Char* CIM_VirtualSystemSettingData_AutomaticRecoveryAction_Description_qual_value = MI_T("Action to take for the virtual system when the software executed by the virtual system fails. Failures in this case means a failure that is detectable by the host platform, such as a non-interuptable wait state condition.");
+static MI_CONST MI_Char* CIM_VirtualSystemSettingData_AutomaticRecoveryAction_Description_qual_value = MI_T("Action to take for the virtual system when the software executed by the virtual system fails. Failures in this case means a failure that is detectable by the host platform, such as a non-interruptible wait state condition.");
 
 static MI_CONST MI_Qualifier CIM_VirtualSystemSettingData_AutomaticRecoveryAction_Description_qual =
 {
@@ -86211,7 +86211,7 @@ static MI_CONST MI_PropertyDecl CIM_VirtualSystemSettingData_AutomaticRecoveryAc
     NULL,
 };
 
-static MI_CONST MI_Char* CIM_VirtualSystemSettingData_RecoveryFile_Description_qual_value = MI_T("Filepath of a file where recovery relateded information of the virtual system is stored.Format shall be URI based on RFC 2079.");
+static MI_CONST MI_Char* CIM_VirtualSystemSettingData_RecoveryFile_Description_qual_value = MI_T("Filepath of a file where recovery related information of the virtual system is stored.Format shall be URI based on RFC 2079.");
 
 static MI_CONST MI_Qualifier CIM_VirtualSystemSettingData_RecoveryFile_Description_qual =
 {
@@ -86383,7 +86383,7 @@ static MI_CONST MI_PropertyDecl CIM_VirtualEthernetSwitchSettingData_VLANConnect
     NULL,
 };
 
-static MI_CONST MI_Char* CIM_VirtualEthernetSwitchSettingData_AssociatedResourcePool_Description_qual_value = MI_T("A list of host resource pools to be associated or that are currently associated with the Ethernet bridge for the purpose of the allocation of Ethernet connections between a virtual system and an Ethernet bridge Each non-Null value of the AssoicatedResourcePool property shall conform to the production WBEM_URI_UntypedInstancePath as defined in DSP0207");
+static MI_CONST MI_Char* CIM_VirtualEthernetSwitchSettingData_AssociatedResourcePool_Description_qual_value = MI_T("A list of host resource pools to be associated or that are currently associated with the Ethernet bridge for the purpose of the allocation of Ethernet connections between a virtual system and an Ethernet bridge Each non-Null value of the AssociatedResourcePool property shall conform to the production WBEM_URI_UntypedInstancePath as defined in DSP0207");
 
 static MI_CONST MI_Qualifier CIM_VirtualEthernetSwitchSettingData_AssociatedResourcePool_Description_qual =
 {
@@ -86415,7 +86415,7 @@ static MI_CONST MI_PropertyDecl CIM_VirtualEthernetSwitchSettingData_AssociatedR
     NULL,
 };
 
-static MI_CONST MI_Char* CIM_VirtualEthernetSwitchSettingData_MaxNumMACAddress_Description_qual_value = MI_T("This property specifies the number of unique MAC addresses that can be learned by the bridge to support MAC Address Learning, as defined in the IEEE 802.1D standard or in a VLAN-aware bridge this property specifies the number of MAC,VID pairs learned by the bridge to support learning as definded in the IEEE 802.1Q standard.");
+static MI_CONST MI_Char* CIM_VirtualEthernetSwitchSettingData_MaxNumMACAddress_Description_qual_value = MI_T("This property specifies the number of unique MAC addresses that can be learned by the bridge to support MAC Address Learning, as defined in the IEEE 802.1D standard or in a VLAN-aware bridge this property specifies the number of MAC,VID pairs learned by the bridge to support learning as defined in the IEEE 802.1Q standard.");
 
 static MI_CONST MI_Qualifier CIM_VirtualEthernetSwitchSettingData_MaxNumMACAddress_Description_qual =
 {
@@ -87283,7 +87283,7 @@ static MI_CONST MI_Qualifier CIM_VLAN_UMLPackagePath_qual =
     &CIM_VLAN_UMLPackagePath_qual_value
 };
 
-static MI_CONST MI_Char* CIM_VLAN_Description_qual_value = MI_T("An instance of VLAN represents a VLAN within a switch. In a particular switch, there should be an instance of VLAN for every VLAN available. For example, in a switch with port-based VLANs, if there are 16 VLANs to which ports can be assigned (VLAN 1 through VLAN 16), there should be an instance of CIM_VLAN for each of VLAN 1 through VLAN 16. \n\nVLAN inherits Name from ServiceAccessPoint. Use this for the textual name of the VLAN, if there is one. Otherwise, synthesize a textual name, e.g., VLAN 0003. (Consider leading zero fill, as shown, to ensure that if the textual VLAN names are extracted and presented by a management applictions, the VLAN names will sort in the expected order.) The numeric part of the name should be at least four digits wide since 802.1Q specifies 4095 VLANs. \n\nIt is intended that VLAN be subclassed only if necessary to add attributes. The type of the VLAN can be inferred from the VLANService(s) with which the VLAN is associated in the VLANFor association. \n\nAn instance of VLAN may be associated with more than one VLANService. For example, there are switches that support both 802.1Q VLANs and the vendor\'s proprietary VLANs. In some such switches, if a broadcast packet is received on a port in an 802.1Q VLAN (VLAN 5, for example), it may be be transmitted from a port in a \'proprietary\' VLAN 5. In effect, there is only one VLAN 5, and the type of port only determines the packet format for tagged packets. In the case just described, only one instance of CIM_VLAN should be instantiated for VLAN 5, and it should be associated both with the 802.1Q VLANService and the proprietary VLANService. \n\nIn typical VLAN-aware switches, packets can be assigned to a VLAN based on the port on which they are received (port-based VLANS), based on the source MAC address (MAC-based VLANs), or based on the value of a set of bits in the packet (protocol-based VLANs). If it is desirable to represent the VLAN assignment predicate for some MAC-based VLAN switch, it will be necessary to subclass VLAN. The list of MAC addresses associated with a VLAN might be an attribute of the subclass. If it is desirable to represent the VLAN assignment predicate in a protocol-based VLAN switch, it will also be necessary to subclass VLAN, InboundVLAN, or both. If the predicate applies to all ports in the switch, then only VLAN need be used/instantiated. If the predicate may vary based on the port, then InboundVLAN must be subclassed, and CIM_VLAN might have to be subclassed as well.");
+static MI_CONST MI_Char* CIM_VLAN_Description_qual_value = MI_T("An instance of VLAN represents a VLAN within a switch. In a particular switch, there should be an instance of VLAN for every VLAN available. For example, in a switch with port-based VLANs, if there are 16 VLANs to which ports can be assigned (VLAN 1 through VLAN 16), there should be an instance of CIM_VLAN for each of VLAN 1 through VLAN 16. \n\nVLAN inherits Name from ServiceAccessPoint. Use this for the textual name of the VLAN, if there is one. Otherwise, synthesize a textual name, e.g., VLAN 0003. (Consider leading zero fill, as shown, to ensure that if the textual VLAN names are extracted and presented by a management applications, the VLAN names will sort in the expected order.) The numeric part of the name should be at least four digits wide since 802.1Q specifies 4095 VLANs. \n\nIt is intended that VLAN be subclassed only if necessary to add attributes. The type of the VLAN can be inferred from the VLANService(s) with which the VLAN is associated in the VLANFor association. \n\nAn instance of VLAN may be associated with more than one VLANService. For example, there are switches that support both 802.1Q VLANs and the vendor\'s proprietary VLANs. In some such switches, if a broadcast packet is received on a port in an 802.1Q VLAN (VLAN 5, for example), it may be be transmitted from a port in a \'proprietary\' VLAN 5. In effect, there is only one VLAN 5, and the type of port only determines the packet format for tagged packets. In the case just described, only one instance of CIM_VLAN should be instantiated for VLAN 5, and it should be associated both with the 802.1Q VLANService and the proprietary VLANService. \n\nIn typical VLAN-aware switches, packets can be assigned to a VLAN based on the port on which they are received (port-based VLANS), based on the source MAC address (MAC-based VLANs), or based on the value of a set of bits in the packet (protocol-based VLANs). If it is desirable to represent the VLAN assignment predicate for some MAC-based VLAN switch, it will be necessary to subclass VLAN. The list of MAC addresses associated with a VLAN might be an attribute of the subclass. If it is desirable to represent the VLAN assignment predicate in a protocol-based VLAN switch, it will also be necessary to subclass VLAN, InboundVLAN, or both. If the predicate applies to all ports in the switch, then only VLAN need be used/instantiated. If the predicate may vary based on the port, then InboundVLAN must be subclassed, and CIM_VLAN might have to be subclassed as well.");
 
 static MI_CONST MI_Qualifier CIM_VLAN_Description_qual =
 {

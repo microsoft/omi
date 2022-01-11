@@ -12,7 +12,7 @@ class MSFT_VACLAppliesToVLAN : CIM_PolicySetAppliesToElement
 	 
 	 [Override ( "ManagedElement" ),
 		Description ("specialize this association to only apply to NetworkVLAN class"
-		              "to match VLAN Access List implentation") ]
+		              "to match VLAN Access List implementation") ]
 	CIM_NetworkVLAN REF ManagedElement;
 	
 };

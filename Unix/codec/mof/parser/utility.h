@@ -32,7 +32,7 @@ MI_Boolean mof_isalnum(MOF_Encoding e, void * data);
 
 MI_Boolean mof_isunderscore(MOF_Encoding e, void * data);
 
-MI_Boolean mof_isdoulbequotes(MOF_Encoding e, void * data);
+MI_Boolean mof_isdoublequotes(MOF_Encoding e, void * data);
 
 MI_Boolean mof_isbackslash(MOF_Encoding e, void * data);
 

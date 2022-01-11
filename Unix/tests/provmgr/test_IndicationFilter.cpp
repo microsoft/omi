@@ -93,7 +93,7 @@ NitsTest1(Test_InstanceFilter_New_with_unrecognized_query_language, Test_Instanc
     filter = InstanceFilter_New( &(subscribeReq->base.base) );
 
     NitsAssert(NULL != filter, PAL_T("Failed to initialize InstanceFilter with general or unrecognized (Not WQL/CQL) query language"));
-    NitsAssert(NULL == InstanceFilter_GetWQL(filter), PAL_T("Failed to initialize InstanceFilter with eneral or unrecognized (Not WQL/CQL) query language"));
+    NitsAssert(NULL == InstanceFilter_GetWQL(filter), PAL_T("Failed to initialize InstanceFilter with general or unrecognized (Not WQL/CQL) query language"));
 }
 NitsEndTest
 

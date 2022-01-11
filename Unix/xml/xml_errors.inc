@@ -26,7 +26,7 @@
     XML_ERROR_OPEN_ANGLE_BRACKET_EXPECTED L"Failed to parse XML. An open angle bracket '<' was expected and not found."
     XML_ERROR_COMMENT_CDATA_DOCTYPE_EXPECTED L"Failed to parse XML. A comment, CDATA or DOCTYPE element was expected and not found."
     XML_ERROR_ELEMENT_EXPECTED L"Failed to parse XML. An XML element was expected and not found."
-    XML_ERROR_UNEXPECTED_STATE L"Failed to parse XML. The XML parser hit an interal problem that stopped it from progressing."
+    XML_ERROR_UNEXPECTED_STATE L"Failed to parse XML. The XML parser hit an internal problem that stopped it from progressing."
     XML_ERROR_SPECIFIC_ELEMENT_EXPECTED L"Failed to parse XML. The element name %1 was expected but %1 was found instead."
     XML_ERROR_SPECIFIC_END_ELEMENT_EXPECTED L"Failed to parse XML. The element name %1 end tag was expected but %1 was found instead."
     XML_ERROR_CHARACTER_DATA_EXPECTED L"Failed to parse XML. Character data was expected but not found."

@@ -117,7 +117,7 @@ NitsTestWithSetup(TestRefCounting, TestStringSetup)
     String s3(s1);
     String s4;  s4 = s1;
 
-    // assign the same string again - should re-allocate string, but keep contetn the same
+    // assign the same string again - should re-allocate string, but keep content the same
     s1 = MI_T("str1");
 
     UT_ASSERT( s1 == s2 );

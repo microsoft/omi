@@ -12,7 +12,7 @@
        "association between a Service and the System on which the "
        "functionality resides. The class, HostedRoutingServices, is "
        "deprecated since it provides no additional semantics over "
-       "HostedService, and unecessarily restricts the Service to a "
+       "HostedService, and unnecessarily restricts the Service to a "
        "single ComputerSystem, when the Service could reside in a "
        "Network or other higher level System." )]
 class CIM_HostedRoutingServices : CIM_HostedService {

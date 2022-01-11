@@ -203,7 +203,7 @@ void __Logd(const ZChar* format, ...);
 void __Logv(const ZChar* format, ...);
 
 /*
- * This funtion appears as the false condition expression in the macros 
+ * This function appears as the false condition expression in the macros 
  * below. It suppresses the Windows 'conditional expression is constant' 
  * warning without the use of pragmas (which cannot be used in macros).
  */

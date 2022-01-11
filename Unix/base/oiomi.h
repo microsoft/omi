@@ -945,7 +945,7 @@ FILE_EVENT2(20122, trace_MI_SessionConnectFailed_Impl, LOG_ERR, PAL_T("Interacti
 #else
 #define trace_MI_InstanceToBatch_Failed(a0, a1) trace_MI_InstanceToBatch_Failed_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENT2(20123, trace_MI_InstanceToBatch_Failed_Impl, LOG_ERR, PAL_T("InstantchToBatch failed in MI session, session %p, result %d"), void *, MI_Result)
+FILE_EVENT2(20123, trace_MI_InstanceToBatch_Failed_Impl, LOG_ERR, PAL_T("InstanceToBatch failed in MI session, session %p, result %d"), void *, MI_Result)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SocketConnectorFailed(a0, a1) trace_SocketConnectorFailed_Impl(__FILE__, __LINE__, a0, scs(a1))
 #else
@@ -1637,11 +1637,11 @@ FILE_EVENT2(30080, trace_InstanceConversionFailed_Impl, LOG_WARNING, PAL_T("inst
 #endif
 FILE_EVENT1(30081, trace_InvalidQueryExpression_Impl, LOG_WARNING, PAL_T("invalid query expression: %T"), const TChar *)
 #if defined(CONFIG_ENABLE_DEBUG)
-#define trace_LibraryUnload_DidnotPostResult() trace_LibraryUnload_DidnotPostResult_Impl(__FILE__, __LINE__)
+#define trace_LibraryUnload_DidNotPostResult() trace_LibraryUnload_DidNotPostResult_Impl(__FILE__, __LINE__)
 #else
-#define trace_LibraryUnload_DidnotPostResult() trace_LibraryUnload_DidnotPostResult_Impl(0, 0)
+#define trace_LibraryUnload_DidNotPostResult() trace_LibraryUnload_DidNotPostResult_Impl(0, 0)
 #endif
-FILE_EVENT0(30082, trace_LibraryUnload_DidnotPostResult_Impl, LOG_WARNING, PAL_T("library unload did not call post result"))
+FILE_EVENT0(30082, trace_LibraryUnload_DidNotPostResult_Impl, LOG_WARNING, PAL_T("library unload did not call post result"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ModuleLoad_FailedPostResult() trace_ModuleLoad_FailedPostResult_Impl(__FILE__, __LINE__)
 #else
@@ -1655,11 +1655,11 @@ FILE_EVENT0(30083, trace_ModuleLoad_FailedPostResult_Impl, LOG_WARNING, PAL_T("m
 #endif
 FILE_EVENT0(30084, trace_NoDigestAvailable_Impl, LOG_WARNING, PAL_T("no digest available"))
 #if defined(CONFIG_ENABLE_DEBUG)
-#define trace_ProviderLoad_DidnotPostResult() trace_ProviderLoad_DidnotPostResult_Impl(__FILE__, __LINE__)
+#define trace_ProviderLoad_DidNotPostResult() trace_ProviderLoad_DidNotPostResult_Impl(__FILE__, __LINE__)
 #else
-#define trace_ProviderLoad_DidnotPostResult() trace_ProviderLoad_DidnotPostResult_Impl(0, 0)
+#define trace_ProviderLoad_DidNotPostResult() trace_ProviderLoad_DidNotPostResult_Impl(0, 0)
 #endif
-FILE_EVENT0(30085, trace_ProviderLoad_DidnotPostResult_Impl, LOG_WARNING, PAL_T("provider load did not call post result"))
+FILE_EVENT0(30085, trace_ProviderLoad_DidNotPostResult_Impl, LOG_WARNING, PAL_T("provider load did not call post result"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_QueryValidationFailed(a0) trace_QueryValidationFailed_Impl(__FILE__, __LINE__, tcs(a0))
 #else
@@ -2963,11 +2963,11 @@ FILE_EVENT6(45031, trace_DispHandleInteractionRequest_Impl, LOG_DEBUG, PAL_T("Di
 #endif
 FILE_EVENT6(45032, trace_DispUnsupportedMessage_Impl, LOG_DEBUG, PAL_T("Disp_HandleInteractionRequest: self (%p), interaction(%p), Unsupported msg(%p:%d:%T:%x)"), void *, Interaction *, Message *, MI_Uint32, const TChar *, MI_Uint64)
 #if defined(CONFIG_ENABLE_DEBUG)
-#define trace_DispHandlRequest() trace_DispHandlRequest_Impl(__FILE__, __LINE__)
+#define trace_DispHandleRequest() trace_DispHandleRequest_Impl(__FILE__, __LINE__)
 #else
-#define trace_DispHandlRequest() trace_DispHandlRequest_Impl(0, 0)
+#define trace_DispHandleRequest() trace_DispHandleRequest_Impl(0, 0)
 #endif
-FILE_EVENT0(45033, trace_DispHandlRequest_Impl, LOG_DEBUG, PAL_T("Disp_HandleRequest"))
+FILE_EVENT0(45033, trace_DispHandleRequest_Impl, LOG_DEBUG, PAL_T("Disp_HandleRequest"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_HttpSocketPosting(a0, a1) trace_HttpSocketPosting_Impl(__FILE__, __LINE__, a0, a1)
 #else
@@ -3825,7 +3825,7 @@ FILE_EVENT1(45175, trace_MultipleIndication_InitOfProviderForClass_Impl, LOG_DEB
 #else
 #define trace_ProviderInvokeSubscribe_Begin(a0, a1, a2, a3, a4) trace_ProviderInvokeSubscribe_Begin_Impl(0, 0, a0, a1, a2, a3, a4)
 #endif
-FILE_EVENT5(45176, trace_ProviderInvokeSubscribe_Begin_Impl, LOG_DEBUG, PAL_T("_Provider_InvokeSubscribe: Start  Thread %x: provider (%p), msg (%p) with tag (%d), subcription (%p)"), unsigned int, void *, void *, MI_Uint32, void*)
+FILE_EVENT5(45176, trace_ProviderInvokeSubscribe_Begin_Impl, LOG_DEBUG, PAL_T("_Provider_InvokeSubscribe: Start  Thread %x: provider (%p), msg (%p) with tag (%d), subscription (%p)"), unsigned int, void *, void *, MI_Uint32, void*)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ProviderInvokeSubscribe_End(a0, a1, a2) trace_ProviderInvokeSubscribe_End_Impl(__FILE__, __LINE__, a0, a1, a2)
 #else
@@ -4065,7 +4065,7 @@ FILE_EVENT1(45215, trace_ProcessSubscribeResponseEnumerationContext_Success_Impl
 #else
 #define trace_WsmanEnum(a0, a1, a2, a3) trace_WsmanEnum_Impl(0, 0, a0, a1, a2, a3)
 #endif
-FILE_EVENT4(45216, trace_WsmanEnum_Impl, LOG_DEBUG, PAL_T("WsmanEnum: %p _ProcessInstanceEnumerationContext: compeleted: %d, totalResponses: %d, totalResponseSize: %d"), void *, MI_Boolean, MI_Uint32, MI_Uint32)
+FILE_EVENT4(45216, trace_WsmanEnum_Impl, LOG_DEBUG, PAL_T("WsmanEnum: %p _ProcessInstanceEnumerationContext: completed: %d, totalResponses: %d, totalResponseSize: %d"), void *, MI_Boolean, MI_Uint32, MI_Uint32)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_WsmanConnection_PostingMsg(a0, a1, a2, a3, a4, a5, a6) trace_WsmanConnection_PostingMsg_Impl(__FILE__, __LINE__, a0, a1, tcs(a2), a3, a4, a5, a6)
 #else
@@ -4679,11 +4679,11 @@ FILE_EVENT5(45317, trace_MIClient_EnumerateInstance_Impl, LOG_DEBUG, PAL_T("MI_C
 #endif
 FILE_EVENT6(45318, trace_MIClient_QueryInstances_Impl, LOG_DEBUG, PAL_T("MI_Client Operation Query Instances: session=%p, operation=%p, internal-operation=%p, namespace=%T, queryDialect=%T, queryExpression=%T"), void *, void *, void *, const MI_Char *, const MI_Char *, const MI_Char *)
 #if defined(CONFIG_ENABLE_DEBUG)
-#define trace_MIClient_OperationInstancResultSync(a0, a1, a2, a3, a4) trace_MIClient_OperationInstancResultSync_Impl(__FILE__, __LINE__, a0, a1, a2, a3, tcs(a4))
+#define trace_MIClient_OperationInstanceResultSync(a0, a1, a2, a3, a4) trace_MIClient_OperationInstanceResultSync_Impl(__FILE__, __LINE__, a0, a1, a2, a3, tcs(a4))
 #else
-#define trace_MIClient_OperationInstancResultSync(a0, a1, a2, a3, a4) trace_MIClient_OperationInstancResultSync_Impl(0, 0, a0, a1, a2, a3, tcs(a4))
+#define trace_MIClient_OperationInstanceResultSync(a0, a1, a2, a3, a4) trace_MIClient_OperationInstanceResultSync_Impl(0, 0, a0, a1, a2, a3, tcs(a4))
 #endif
-FILE_EVENT5(45319, trace_MIClient_OperationInstancResultSync_Impl, LOG_DEBUG, PAL_T("MI_Client Operation Instance Result (sync): session=%p, operation=%p, internal-operation=%p, resultCode=%u, moreResults=%T"), void *, void *, void *, MI_Result, const MI_Char *)
+FILE_EVENT5(45319, trace_MIClient_OperationInstanceResultSync_Impl, LOG_DEBUG, PAL_T("MI_Client Operation Instance Result (sync): session=%p, operation=%p, internal-operation=%p, resultCode=%u, moreResults=%T"), void *, void *, void *, MI_Result, const MI_Char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_MIClient_IndicationResultSync(a0, a1, a2, a3, a4) trace_MIClient_IndicationResultSync_Impl(__FILE__, __LINE__, a0, a1, a2, a3, tcs(a4))
 #else
@@ -4991,17 +4991,17 @@ FILE_EVENT1(45369, trace_TrackerHashMapRemove_Impl, LOG_DEBUG, PAL_T("Tracker ha
 #endif
 FILE_EVENT2(45370, trace_TrackerHashMapFind_Impl, LOG_DEBUG, PAL_T("Tracker hash map found (%p, %d)"), void*, int)
 #if defined(CONFIG_ENABLE_DEBUG)
-#define trace_ClientCredentialsVerfied(a0) trace_ClientCredentialsVerfied_Impl(__FILE__, __LINE__, a0)
+#define trace_ClientCredentialsVerified(a0) trace_ClientCredentialsVerified_Impl(__FILE__, __LINE__, a0)
 #else
-#define trace_ClientCredentialsVerfied(a0) trace_ClientCredentialsVerfied_Impl(0, 0, a0)
+#define trace_ClientCredentialsVerified(a0) trace_ClientCredentialsVerified_Impl(0, 0, a0)
 #endif
-FILE_EVENT1(45371, trace_ClientCredentialsVerfied_Impl, LOG_DEBUG, PAL_T("Engine: Client Credentials Verified (%p)"), void*)
+FILE_EVENT1(45371, trace_ClientCredentialsVerified_Impl, LOG_DEBUG, PAL_T("Engine: Client Credentials Verified (%p)"), void*)
 #if defined(CONFIG_ENABLE_DEBUG)
-#define trace_ClientCredentialsVerfied2() trace_ClientCredentialsVerfied2_Impl(__FILE__, __LINE__)
+#define trace_ClientCredentialsVerified2() trace_ClientCredentialsVerified2_Impl(__FILE__, __LINE__)
 #else
-#define trace_ClientCredentialsVerfied2() trace_ClientCredentialsVerfied2_Impl(0, 0)
+#define trace_ClientCredentialsVerified2() trace_ClientCredentialsVerified2_Impl(0, 0)
 #endif
-FILE_EVENT0(45372, trace_ClientCredentialsVerfied2_Impl, LOG_DEBUG, PAL_T("Client: Client Credentials Verified"))
+FILE_EVENT0(45372, trace_ClientCredentialsVerified2_Impl, LOG_DEBUG, PAL_T("Client: Client Credentials Verified"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_AuthStates(a0, a1, a2, a3) trace_AuthStates_Impl(__FILE__, __LINE__, a0, a1, a2, a3)
 #else
@@ -5145,7 +5145,7 @@ FILE_EVENT1(50007, trace_HTTP_AuthMallocFailed_Impl, LOG_DEBUG, PAL_T("HTTP: Aut
 #else
 #define trace_HTTP_CryptInvalidArg(a0, a1) trace_HTTP_CryptInvalidArg_Impl(0, 0, scs(a0), scs(a1))
 #endif
-FILE_EVENT2(50008, trace_HTTP_CryptInvalidArg_Impl, LOG_DEBUG, PAL_T("HTTP: Http_Encrypt/Decrpyt invalid arg:(%s %s)"), const char *, const char *)
+FILE_EVENT2(50008, trace_HTTP_CryptInvalidArg_Impl, LOG_DEBUG, PAL_T("HTTP: Http_Encrypt/Decrypt invalid arg:(%s %s)"), const char *, const char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_HTTP_UserAuthFailed(a0) trace_HTTP_UserAuthFailed_Impl(__FILE__, __LINE__, scs(a0))
 #else
@@ -5183,11 +5183,11 @@ FILE_EVENT0(50013, trace_HTTP_SendNextAuthReply_Impl, LOG_DEBUG, PAL_T("HTTP: Se
 #endif
 FILE_EVENT0(50014, trace_HTTP_InvalidAuthToken_Impl, LOG_DEBUG, PAL_T("HTTP Auth: Input Token Invalid."))
 #if defined(CONFIG_ENABLE_DEBUG)
-#define trace_HTTP_SupplimentaryInfo(a0) trace_HTTP_SupplimentaryInfo_Impl(__FILE__, __LINE__, scs(a0))
+#define trace_HTTP_SupplementaryInfo(a0) trace_HTTP_SupplementaryInfo_Impl(__FILE__, __LINE__, scs(a0))
 #else
-#define trace_HTTP_SupplimentaryInfo(a0) trace_HTTP_SupplimentaryInfo_Impl(0, 0, scs(a0))
+#define trace_HTTP_SupplementaryInfo(a0) trace_HTTP_SupplementaryInfo_Impl(0, 0, scs(a0))
 #endif
-FILE_EVENT1(50015, trace_HTTP_SupplimentaryInfo_Impl, LOG_DEBUG, PAL_T("HTTP Auth: SupplimentaryInfo: (%s)."), const char *)
+FILE_EVENT1(50015, trace_HTTP_SupplementaryInfo_Impl, LOG_DEBUG, PAL_T("HTTP Auth: SupplementaryInfo: (%s)."), const char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_HTTP_CannotBuildAuthResponse() trace_HTTP_CannotBuildAuthResponse_Impl(__FILE__, __LINE__)
 #else
@@ -5457,7 +5457,7 @@ FILE_EVENTD3(55040, trace_SubscriptionManager_AcquireEnableLock_Start_Impl, LOG_
 #else
 #define trace_SubscriptionManager_AcquireEnableLock_AlreadyTerminated(a0, a1) trace_SubscriptionManager_AcquireEnableLock_AlreadyTerminated_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENTD2(55041, trace_SubscriptionManager_AcquireEnableLock_AlreadyTerminated_Impl, LOG_VERBOSE, PAL_T("SubscriptionManager_AcquireEnableLock: Thread %x: SubscriptionManager (%p), agggregation context terminated, acquire lock failed"), unsigned int, void *)
+FILE_EVENTD2(55041, trace_SubscriptionManager_AcquireEnableLock_AlreadyTerminated_Impl, LOG_VERBOSE, PAL_T("SubscriptionManager_AcquireEnableLock: Thread %x: SubscriptionManager (%p), aggregation context terminated, acquire lock failed"), unsigned int, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SubscriptionManager_AcquireEnableLock_IgnoreDisableCall(a0, a1) trace_SubscriptionManager_AcquireEnableLock_IgnoreDisableCall_Impl(__FILE__, __LINE__, a0, a1)
 #else
@@ -5475,7 +5475,7 @@ FILE_EVENTD2(55043, trace_SubscriptionManager_AcquireEnableLock_CancelAll_Impl, 
 #else
 #define trace_SubscriptionManager_AcquireEnableLock_ReleaseLock(a0, a1) trace_SubscriptionManager_AcquireEnableLock_ReleaseLock_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENTD2(55044, trace_SubscriptionManager_AcquireEnableLock_ReleaseLock_Impl, LOG_VERBOSE, PAL_T("SubscriptionManager_AcquireEnableLock: Thread %x: SubscriptionManager (%p); aggregation context active, found new subsription(s), release lock"), unsigned int, void *)
+FILE_EVENTD2(55044, trace_SubscriptionManager_AcquireEnableLock_ReleaseLock_Impl, LOG_VERBOSE, PAL_T("SubscriptionManager_AcquireEnableLock: Thread %x: SubscriptionManager (%p); aggregation context active, found new subscription(s), release lock"), unsigned int, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SubscriptionManager_AcquireEnableLock_Complete(a0, a1, a2) trace_SubscriptionManager_AcquireEnableLock_Complete_Impl(__FILE__, __LINE__, a0, a1, tcs(a2))
 #else

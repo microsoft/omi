@@ -76,7 +76,7 @@ First, to explain some terms:
      SPNs (pronounced "spin") are in the form service name/host, or http/myhost.contoso.com@CONTOSO.com. 
 
      Usually a given user will only be directly aware of their own user. Host and service principals are usually setup 
-     as part of the joining process. Some service principals, such as HTTP/myhost.contolso.com@CONTOSO.com will need to be 
+     as part of the joining process. Some service principals, such as HTTP/myhost.contoso.com@CONTOSO.com will need to be 
      added after the joining process.
 
      There are two implementations of Kerberos, which are used by pretty much everybody.  The MIT implementation
@@ -94,7 +94,7 @@ First, to explain some terms:
 
 So a given domain joined host will receive name services from myserver.contoso.com, Kerberos authentication services from
 `myserver.contoso.com@CONTOSO.com` and user and group information from `ldap/myserver.contoso.com@CONTOSO.COM`, and you can 
-login with ssh -K to `host/myserver.contols.com@CONTOSO.com`. The client will lookup password and group information via `ldap://_ldap.contoso.com`.
+login with ssh -K to `host/myserver.controls.com@CONTOSO.com`. The client will lookup password and group information via `ldap://_ldap.contoso.com`.
 
 ** Direct use of the domain controller should be done by your domain administrator.** On the active domain controller, You will need to verify:
 
@@ -243,7 +243,7 @@ Tasks:
 
   - Kerberos: Add `/etc/krb5.conf`.  We recommend that you keep a master krb5.conf and just copy it to each machine. The 
     contents of `/etc/krb5.conf` are not host sensitive, though they are, of course, unique to the domain.  Realmd and 
-    other authconfigure tools depend on at least a minimal `/etc/krb5.conf` in order to function.
+    other auth configure tools depend on at least a minimal `/etc/krb5.conf` in order to function.
 
   - Authconfig will setup the configuration files `/etc/nsswitch`, `/etc/smb.conf`, `/etc/pam.d/*`, `/etc/sssd/sssd.conf`.
 
@@ -701,7 +701,7 @@ TBD
  - <a name="cause-7">Cause 7: knvo inconsistent issue</a>
    - you may get the error "Key version number for principal in key table is incorrect", just run these commands to fix this issue:
      ```
-     kdestory(or rm -rf /etc/krb5.keytab)
+     kdestroy(or rm -rf /etc/krb5.keytab)
      net ads keytab add HTTP -U Administrator
      klist -k
      ```

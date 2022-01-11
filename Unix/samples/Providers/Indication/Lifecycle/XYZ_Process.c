@@ -247,7 +247,7 @@ void MI_CALL XYZ_Process_Load(
         (*self)->context, MI_LIFECYCLE_INDICATION_CREATE);
     CHECKR_POST_RETURN_VOID(context, r);
 
-    /* intialize global data */
+    /* initialize global data */
     r = _Initialize(context, *self);
     if (r != MI_RESULT_OK)
     {

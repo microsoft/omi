@@ -1511,7 +1511,7 @@ case 32:
         if (InitializerToValue(&yystack.l_mark[0].initializer, qd->type, &value) != 0)
         {
             yyerrorf(ID_INVALID_QUALIFIER_INITIALIZER, 
-                "invalid initializer for qualifer: \"%s\"", yystack.l_mark[-1].string);
+                "invalid initializer for qualifier: \"%s\"", yystack.l_mark[-1].string);
             YYABORT;
         }
         
@@ -1570,7 +1570,7 @@ case 34:
         if (InitializerToValue(&yystack.l_mark[-2].initializer, qd->type, &value) != 0)
         {
             yyerrorf(ID_INVALID_QUALIFIER_INITIALIZER, 
-                "invalid initializer for qualifer: \"%s\"", yystack.l_mark[-3].string);
+                "invalid initializer for qualifier: \"%s\"", yystack.l_mark[-3].string);
             YYABORT;
         }
         
@@ -2937,7 +2937,7 @@ break;
 case 143:
 #line 1901 "mof.y"
 	{
-        /* Reject incompatiable ToSubclass and Restricted flavors */
+        /* Reject incompatible ToSubclass and Restricted flavors */
         if (yystack.l_mark[-1].flags & MI_FLAG_TOSUBCLASS && yystack.l_mark[-1].flags & MI_FLAG_RESTRICTED)
         {
             yyerrorf(ID_INCOMPATIBLE_FLAVORS, "incompatible flavors: %s/%s", 
@@ -2945,7 +2945,7 @@ case 143:
             YYABORT;
         }
 
-        /* Reject incompatiable EnableOverride and DisableOverride flavors */
+        /* Reject incompatible EnableOverride and DisableOverride flavors */
         if (yystack.l_mark[-1].flags & MI_FLAG_ENABLEOVERRIDE && yystack.l_mark[-1].flags & MI_FLAG_DISABLEOVERRIDE)
         {
             yyerrorf(ID_INCOMPATIBLE_FLAVORS, "incompatible flavors: %s/%s", 

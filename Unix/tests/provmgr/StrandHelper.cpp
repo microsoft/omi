@@ -102,7 +102,7 @@ NITS_EXTERN_C void ContextTest_Ack_ForSubscriptionContext( _In_ Strand* self_)
 
     // al management done by strand implementation except broadcasting cond var
 
-    // wake up Context_PostMessageLeft if appropiate
+    // wake up Context_PostMessageLeft if appropriate
     // (no point on waking up Context_PostMessageLeft if CONTEXT_STRANDAUX_TRYPOSTLEFT is scheduled to run after us)
     if( CONTEXT_POSTLEFT_POSTING == tryingToPostLeftValue )    
     {
@@ -228,7 +228,7 @@ _Use_decl_annotations_
 MI_Result Test_Provider_Init(
     Provider* provider )
 {
-    /* Provider already intialized. Nothing to do. */
+    /* Provider already initialized. Nothing to do. */
     if (provider->subMgr)
     {
         return MI_RESULT_OK;

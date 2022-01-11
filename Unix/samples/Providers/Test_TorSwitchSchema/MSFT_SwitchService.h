@@ -2198,7 +2198,7 @@ typedef struct _MSFT_SwitchService_CreateLinkAggregation
 {
     MI_Instance __instance;
     /*OUT*/ MI_ConstUint32Field MIReturn;
-MSFT_LinkAggregation_ConstArrayRef LinkAggragation;
+MSFT_LinkAggregation_ConstArrayRef LinkAggregation;
 CIM_EthernetPort_ConstArrayRef EthernetPort;
     /*OUT*/ MSFT_LinkAggregation_ConstRef ResultingLinkAggregation;
     /*OUT*/ CIM_ConcreteJob_ConstRef Job;
@@ -2258,7 +2258,7 @@ MI_INLINE MI_Result MI_CALL MSFT_SwitchService_CreateLinkAggregation_Clear_MIRet
     return MI_RESULT_OK;
 }
 
-MI_INLINE MI_Result MI_CALL MSFT_SwitchService_CreateLinkAggregation_Set_LinkAggragation(
+MI_INLINE MI_Result MI_CALL MSFT_SwitchService_CreateLinkAggregation_Set_LinkAggregation(
     _Inout_ MSFT_SwitchService_CreateLinkAggregation* self,
     _In_reads_opt_(size) const MSFT_LinkAggregation * const * data,
     _In_ MI_Uint32 size)
@@ -2274,7 +2274,7 @@ MI_INLINE MI_Result MI_CALL MSFT_SwitchService_CreateLinkAggregation_Set_LinkAgg
         0);
 }
 
-MI_INLINE MI_Result MI_CALL MSFT_SwitchService_CreateLinkAggregation_SetPtr_LinkAggragation(
+MI_INLINE MI_Result MI_CALL MSFT_SwitchService_CreateLinkAggregation_SetPtr_LinkAggregation(
     _Inout_ MSFT_SwitchService_CreateLinkAggregation* self,
     _In_reads_opt_(size) const MSFT_LinkAggregation * const * data,
     _In_ MI_Uint32 size)
@@ -2290,7 +2290,7 @@ MI_INLINE MI_Result MI_CALL MSFT_SwitchService_CreateLinkAggregation_SetPtr_Link
         MI_FLAG_BORROW);
 }
 
-MI_INLINE MI_Result MI_CALL MSFT_SwitchService_CreateLinkAggregation_Clear_LinkAggragation(
+MI_INLINE MI_Result MI_CALL MSFT_SwitchService_CreateLinkAggregation_Clear_LinkAggregation(
     _Inout_ MSFT_SwitchService_CreateLinkAggregation* self)
 {
     return self->__instance.ft->ClearElementAt(

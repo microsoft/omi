@@ -1474,7 +1474,7 @@ NitsEndTest
 **
 ** TestBuf()
 **
-**     This test excercises the Buf implementation. It packs and unpacks
+**     This test exercises the Buf implementation. It packs and unpacks
 **     integer values of lengths 8-bit, 16-bit, 32-bit, and 64-bit. The values
 **     and the lengths are selected randomly. The unpacked values are compared
 **     with the original packed values (the original values are save in a 
@@ -1586,7 +1586,7 @@ NitsEndTest
 **
 ** TestBuf2()
 **
-**     This test excercises the string pack/unpack functions of Buf.
+**     This test exercises the string pack/unpack functions of Buf.
 **     It packs N decimal formatted strings and then unpacks them, comparing
 **     that backed and unpacked forms are consistent.
 **
@@ -1629,7 +1629,7 @@ NitsEndTest
 **
 ** TestBuf3()
 **
-**     This test excercises the integer array pack/unpack functions of Buf.
+**     This test exercises the integer array pack/unpack functions of Buf.
 **     It packs N arrays of various lengths and attempts to unpack them and
 **     compare the results.
 **
@@ -1742,7 +1742,7 @@ NitsEndTest
 **
 ** TestBuf4()
 **
-**     This test excercises the string array pack/unpack functions of Buf.
+**     This test exercises the string array pack/unpack functions of Buf.
 **
 **==============================================================================
 */
@@ -3586,7 +3586,7 @@ NitsTestWithSetup(TestStrandEnter, TestBaseSetup)
 
     Strand_ScheduleAck( strand1 );
 
-    // Thet one should run either
+    // That one should run either
     TEST_ASSERT( !strand1->info.otherAckPending );
     TEST_ASSERT( strand2->info.thisAckPending );
     
@@ -3606,7 +3606,7 @@ NitsTestWithSetup(TestStrandEnter, TestBaseSetup)
     Strand_Close( strand1 );
     Strand_Leave( strand1 );
 
-    // Previous Leave Strand gets the Post/Ack the oportunity to run
+    // Previous Leave Strand gets the Post/Ack the opportunity to run
     
     TEST_ASSERT( 0 == strandTest.numFinished );
 

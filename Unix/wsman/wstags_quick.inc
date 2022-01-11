@@ -66,7 +66,7 @@ int HashStr(HASHSTR_CHAR c, const HASHSTR_CHAR* s, size_t n)
         break;
         case 68:
             if (HASHSTR_STRCMP(s, HASHSTR_T("Dialect")) == 0)
-                return WSMANTAG_ENUM_DIALIECT;
+                return WSMANTAG_ENUM_DIALECT;
         break;
         case 69:
             if (c == 'e' && HASHSTR_STRCMP(s, HASHSTR_T("Expires")) == 0)

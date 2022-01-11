@@ -182,7 +182,7 @@ void printSingleCharTable()
 
 /*=============================================================================
 **
-** Read content from file and translate to string defition in C code
+** Read content from file and translate to string definition in C code
 **
 =============================================================================*/
 void file2str(const char * file, const char * opt)
@@ -433,7 +433,7 @@ MI_Result MI_CALL GetIncludedFileBufferCallback(
     }
     if (codecer->stackpos >= INCLUDE_STACK_SIZE)
     {
-        printf("coedcer included buffer overflowed");
+        printf("codecer included buffer overflowed");
         return MI_RESULT_FAILED;
     }
 
@@ -499,7 +499,7 @@ void MI_CALL FreeIncludedFileBufferCallback(
     }
     if (codecer->stackpos == 0)
     {
-        printf("coedcer included buffer underflowed");
+        printf("codecer included buffer underflowed");
         return;
     }
     codecer->stackpos--;
@@ -779,7 +779,7 @@ void printUsage()
     printf("    [sctable] - print single char table. The chars are treated as separate token for mof LALR(1) grammar\n");
     printf("    [file2str] - read text from file and print out in const string format. -a output ANSI string, -u outputs UNICODE string\n");
     printf("    [file2lex] - parse mof file and print out tokens.\n");
-    printf("    [printqual filename] - parse mof file and print out qualifiers declarasions.\n");
+    printf("    [printqual filename] - parse mof file and print out qualifiers declarations.\n");
     printf("    [parse filename [-c -i] -incroot dir [-pause]] - parse mof file and print out result. [-incrootpath] is a root path for search and load file(s), default is current folder.\n");
     printf("    [sparse filename [-c -i] - parse mof file with one class / instance and print result.\n");
     printf("    [createmof filename [-instance] [-count <number>]] - create a large class or instance mof file, contains 10K classes and 10K instances\n");

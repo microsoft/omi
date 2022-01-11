@@ -9,7 +9,7 @@
    [Version ( "2.6.0" ), 
     UMLPackagePath ( "CIM::Device::StorageDevices" ), 
     Description ( 
-       "Capabilities and managment of a TapeDrive, a subtype of "
+       "Capabilities and management of a TapeDrive, a subtype of "
        "MediaAccessDevice." )]
 class CIM_TapeDrive : CIM_MediaAccessDevice {
 

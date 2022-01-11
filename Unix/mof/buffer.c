@@ -40,7 +40,7 @@ int Buffer_Append(Buffer* self, const void* data , size_t size)
 
     capacity = self->size + size;
 
-    /* Grow buffer if neceessary */
+    /* Grow buffer if necessary */
     if (capacity > self->capacity)
     {
         size_t r = 16;

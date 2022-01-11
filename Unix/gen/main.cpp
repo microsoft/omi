@@ -25,7 +25,7 @@ Usage: %s [OPTIONS] PATH CLASSNAME[=ALIAS] ...\n\
 OVERVIEW:\n\
     This program generates provider source code from MOF class definitions.\n\
     PATH is a file that contains the MOF definitions (or includes them).\n\
-    It must include any dependent MOF defintions as well (such as the CIM\n\
+    It must include any dependent MOF definitions as well (such as the CIM\n\
     schema). The PATH is followed by a list of CLASSNAME arguments, which are\n\
     the names of the MOF classes to be generated. Each CLASSNAME argument may\n\
     be followed by an optional ALIAS argument (separated by an equal sign).\n\
@@ -462,7 +462,7 @@ static void _GetConfigFileOptions(GeneratorOptions& opts)
 //
 // _EncodeStr()
 //
-//     Encodes special characters in a string; replaces all 'lookfor wtih replacewith
+//     Encodes special characters in a string; replaces all 'lookfor with replacewith
 //
 //==============================================================================
 
@@ -516,7 +516,7 @@ int MI_MAIN_CALL main(int argc, const char** argv)
     // Set path of default CIM schema file.
     schemafile = OMI_GetPath(ID_SCHEMAFILE);
 
-    // Get configuraiton file options.
+    // Get configuration file options.
     _GetConfigFileOptions(options);
 
     // Get command-line options.

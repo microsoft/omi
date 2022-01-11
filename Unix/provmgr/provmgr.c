@@ -38,7 +38,7 @@
 /*
 **=============================================================================
 **
-** Local defintions
+** Local definitions
 **
 **=============================================================================
 */
@@ -138,7 +138,7 @@ static Library* MI_CALL _OpenLibraryInternal(
         }
     }
 
-    /* Allocate new libray object */
+    /* Allocate new library object */
     p = (Library*)PAL_Calloc(1, sizeof(Library));
 
     if (!p)
@@ -423,7 +423,7 @@ static Provider* MI_CALL _OpenProviderInternal(
 
             if (ctx.magic != 0xFFFFFFFF)
             {
-                trace_ProviderLoad_DidnotPostResult();
+                trace_ProviderLoad_DidNotPostResult();
             }
 
             if (MI_RESULT_OK != r)
@@ -775,7 +775,7 @@ void Provider_InvokeSubscribe(
         SubscriptionList_AddSubscription( &subMgr->subscrList, subscription );
 
         /*
-         * Upon SubscriptionContext was initialized successfull,
+         * Upon SubscriptionContext was initialized successful,
          * it hold one refcount of msg, which will be released
          * inside _Context_Destory;
          *
@@ -790,7 +790,7 @@ void Provider_InvokeSubscribe(
          *
          */
         SubMgrSubscription_Addref( subscription );
-        SubMgrSubscription_AcuquirePostLock( subscription );
+        SubMgrSubscription_AcquirePostLock( subscription );
 
         /* Alert indication setup */
         if (SUBSCRIP_TARGET_DEFAULT == msg->targetType )
@@ -818,7 +818,7 @@ void Provider_InvokeSubscribe(
             SubMgrSubscription_SetState(subscription, SubscriptionState_Subscribed);
 
             /*
-             * Invoke Subscribe with dummpy context
+             * Invoke Subscribe with dumpy context
              * provider cannot postinstance or indication to this context
              */
             {
@@ -884,7 +884,7 @@ void Provider_InvokeSubscribe(
     }
 
     /*
-     * Now release lock to allow Disable/other subscribe reqeuest to conitune
+     * Now release lock to allow Disable/other subscribe request to continue
      */
     if ( MI_TRUE == locked )
         SubMgr_ReleaseEnableLock( subMgr );
@@ -1090,7 +1090,7 @@ static MI_Result _HandleGetInstanceReq(
             &ctx->base,
             msg->nameSpace,
             className,
-            NULL, /* propertSet */
+            NULL, /* propertySet */
             MI_FALSE, /* keysOnly */
             NULL); /* filter */
     }
@@ -1545,7 +1545,7 @@ static MI_Result _HandleInvokeReq(
 
     if (msg->instanceParams)
     {
-        /* paramters (if any) */
+        /* parameters (if any) */
         r = _Instance_InitConvert_FromBatch(
             msg->base.base.batch,
             (const MI_ClassDecl*)md,
@@ -1914,7 +1914,7 @@ static void _UnloadAllProviders(
 
             if (p->refCounter != 0)
             {
-                /* Error condition - unloading active rpovider! */
+                /* Error condition - unloading active provider! */
                 trace_UnloadingActiveProvider(
                     tcs(p->classDecl->name), (int)p->refCounter);
                 trace_UnloadingActiveProviderWithLib(
@@ -1982,7 +1982,7 @@ static void _UnloadAllLibrariesInternal(
 
                 if (ctx.magic != 0xFFFFFFFF)
                 {
-                    trace_LibraryUnload_DidnotPostResult();
+                    trace_LibraryUnload_DidNotPostResult();
                 }
 
                 if (MI_RESULT_OK != r)
@@ -2056,7 +2056,7 @@ static MI_Boolean _TimeoutCallback(
         }
         else
         {
-            /* disbale timeout, since no more idle providers */
+            /* disable timeout, since no more idle providers */
             handler->fireTimeoutAt = TIME_NEVER;
         }
 
@@ -2074,7 +2074,7 @@ static MI_Boolean _TimeoutCallback(
 /*
 **=============================================================================
 **
-** Public defintions
+** Public definitions
 **
 **=============================================================================
 */

@@ -263,7 +263,7 @@ class CIM_ManagedSystemElement : CIM_ManagedElement {
           "OperatingStatus consists of one of the following values: "
           "Unknown, Not Available, In Service, Starting, Stopping, "
           "Stopped, Aborted, Dormant, Completed, Migrating, "
-          "Emmigrating, Immigrating, Snapshotting. Shutting Down, "
+          "Emigrating, Immigrating, Snapshotting. Shutting Down, "
           "In Test \n"
           "A Null return indicates the implementation (provider) "
           "does not implement this property. \n"

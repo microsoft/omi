@@ -783,7 +783,7 @@ MI_Boolean _StrandMethod_Both_CheckFinished( _In_ Strand* self_)
         return MI_FALSE;
 
     return _StrandMethodImp_CheckFinished( &self->base.info )
-        && ((!self->infoRight.opened) ||  _StrandMethodImp_CheckFinished( &self->infoRight )) //check right interation state only if its opeened
+        && ((!self->infoRight.opened) ||  _StrandMethodImp_CheckFinished( &self->infoRight )) //check right iteration state only if its opened
         && !self->base.delayFinish;
 }
 
@@ -807,8 +807,8 @@ MI_Boolean _StrandMethod_Left_Cancel( _In_ Strand* self_)
 
     if( !self->base.canceled  )
     {
-        // We pass to the right only if we have not been cancel already becase in that case it has go to the right already
-        // (cancelations always flow to the right first)
+        // We pass to the right only if we have not been cancel already because in that case it has go to the right already
+        // (cancellations always flow to the right first)
         // Note that we need to check this first as the canceled below may close the interaction with the right side
         if( self->infoRight.opened && !self->infoRight.thisClosedOther )
         {
@@ -925,7 +925,7 @@ MI_Boolean _StrandMethod_Right_Cancel( _In_ Strand* self_)
     if( self->base.info.opened && !self->base.info.thisClosedOther && !self->leftCanceled )
     {
         self->leftCanceled = MI_TRUE;
-        // We pass to the left even if we have been cancel already becase thet should be the cancelation coming back from the right
+        // We pass to the left even if we have been cancel already because that should be the cancelation coming back from the right
         self->base.info.interaction.other->ft->Cancel( self->base.info.interaction.other );
     }
 
@@ -3038,7 +3038,7 @@ void Strand_Leave( _In_ Strand* self )
 
     trace_Strand_Leave( self, STRAND_DEBUG_GETNAME(self), self->strandStealedFlag );
 
-    // If there is an encompasing loop, then set this to false so it will bail out
+    // If there is an encompassing loop, then set this to false so it will bail out
     if( NULL != self->strandStealedFlag )
     {
         *(self->strandStealedFlag) = MI_TRUE;

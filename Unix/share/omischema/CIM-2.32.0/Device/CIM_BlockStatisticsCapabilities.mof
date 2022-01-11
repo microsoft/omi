@@ -37,7 +37,7 @@ class CIM_BlockStatisticsCapabilities : CIM_StatisticsCapabilities {
 
       [Override ( "AsynchronousMethodsSupported" ), 
        Description ( 
-          "The asychronous mechanisms supported for retrieving statistics."
+          "The asynchronous mechanisms supported for retrieving statistics."
            ), 
        ValueMap { "2", "3", "..", "0x8000.." }, 
        Values { "GetStatisticsCollection", "Indications", 
@@ -48,7 +48,7 @@ class CIM_BlockStatisticsCapabilities : CIM_StatisticsCapabilities {
           "An internal clocking interval for all timers in the "
           "subsystem, measured in microseconds (Unit of measure in "
           "the timers, measured in microseconds). Time counters are "
-          "monotanically increasing counters that contain \'ticks\'. "
+          "monotonically increasing counters that contain \'ticks\'. "
           "Each tick represents one ClockTickInterval. If "
           "ClockTickInterval contained a value of 32 then each time "
           "counter tick would represent 32 microseconds." ), 

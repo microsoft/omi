@@ -24,7 +24,7 @@
 ** (1) called by dispatcher to handle the subscribe/unsubscribe request(s), which
 **     come from protocol;
 ** (2) aggregates results messages (subscribe response, unsubscribe response,
-**     and indication instances) from provider; delivers subsribe response to
+**     and indication instances) from provider; delivers subscribe response to
 **     and indication instance(s) to protocol;
 **
 **==============================================================================
@@ -37,7 +37,7 @@ typedef struct _SubscribeEntry SubscribeEntry;
 **
 ** This structure stores information of the request sent to the agentMgr;
 **
-** Upon a subscribe requrest reaches to indication manager, it will send
+** Upon a subscribe request reaches to indication manager, it will send
 ** multi-sub messages to provider due to the subscribe may targets to
 ** multi-classes. One object of the structure is for one target class.
 **
@@ -141,7 +141,7 @@ void _SubscribeElem_Ack(_In_ Strand* self_)
 }
 
 /*
- * Cancel can be callled due to protocol closed the connection
+ * Cancel can be called due to protocol closed the connection
  */
 void _SubscribeElem_Cancel( _In_ Strand* self_)
 {
@@ -298,7 +298,7 @@ void _SubscribeElem_NewEntry(
             return;
         }
 
-        /* calcuate handled class count */
+        /* calculate handled class count */
         se->nSent ++;
         se->nHandled ++;
 
@@ -536,7 +536,7 @@ void _SubscribeEntry_Ack( _In_ Strand* self_)
 }
 
 /*
- * Cancel can be callled due to the protocol (socket) was closed;
+ * Cancel can be called due to the protocol (socket) was closed;
  * Either lost the socket connection to client or server shutdown
  */
 void _SubscribeEntry_Cancel( _In_ Strand* self)

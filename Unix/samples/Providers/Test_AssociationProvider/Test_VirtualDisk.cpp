@@ -181,7 +181,7 @@ void MI_CALL Test_VirtualDisk_ModifyInstance(
         {
             instanceFound = MI_TRUE;
 
-            // check each proprty here for modification
+            // check each property here for modification
             MI_Uint32 numProperties = 0;
             
             result = MI_Instance_GetElementCount(&modifiedInstance->__instance, &numProperties);

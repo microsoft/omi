@@ -47,7 +47,7 @@ MI_Result Instance_Pack(
 **
 ** Parameters:
 **     self - shall point to a newly allocated instance.
-**     buf - buffer form whicn instance will be unpacked.
+**     buf - buffer form which instance will be unpacked.
 **     batch - if non-null, use this batch to allocate all elements.
 **     copy - if false, use pointers into batch (otherwise make copy).
 **

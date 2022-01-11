@@ -16,7 +16,7 @@
        "slots or equivalent packaging of the hardware? \n"
        "(2) Are there any physical constraints (such as power "
        "consumption) that prevent the FRU from being installed? \n"
-       "(3) Are the SoftwareFeatures packaged with the FRU compatiable "
+       "(3) Are the SoftwareFeatures packaged with the FRU compatible "
        "with the underlying operating system and other software "
        "already installed/to be installed on the platform? \n"
        "This latter question can be answered by first checking if an "

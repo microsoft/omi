@@ -382,7 +382,7 @@ static void _FreeInstance(
 
 /*
  * Each dynamic instance is 'wrapped' inside another instance (referred to
- * by the self field). This requiredment is imposed by the
+ * by the self field). This requirement is imposed by the
  * MI_Instance_AddElement() function, which does not allow the address of
  * the instance to change. Hence, indirection is required to allow the inner
  * instance to be relocated in memory as new properties are added. The
@@ -1686,7 +1686,7 @@ MI_Result MI_CALL __MI_Instance_AddElement(
     {
         MI_PropertyDecl* pd;
 
-        /* Allocate new peroperty declaration */
+        /* Allocate new property declaration */
         pd = (MI_PropertyDecl*)BCalloc(
             self->batch, sizeof(MI_PropertyDecl), CALLSITE);
 

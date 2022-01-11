@@ -583,7 +583,7 @@ class CIM_PhysicalComputerSystemView : CIM_View {
 
       [Description ( 
           "EnabledState of the current or last running operating "
-          "system on this physcial computer system." ), 
+          "system on this physical computer system." ), 
        ValueMap { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", 
           "10", "11..32767", "32768..65535" }, 
        Values { "Unknown", "Other", "Enabled", "Disabled", 
@@ -735,7 +735,7 @@ class CIM_PhysicalComputerSystemView : CIM_View {
           "Failed", "DMTF Reserved", "Vendor Reserved" }]
    uint32 ClearLog(
          [In, Description ( 
-             "Idenfier for the log that is requested to be cleared."
+             "Identifier for the log that is requested to be cleared."
               ), 
           ModelCorrespondence { "CIM_RecordLog.InstanceID", 
              "CIM_PhysicalComputerSystemView.LogInstanceID" }]

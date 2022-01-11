@@ -11,7 +11,7 @@ class CIM_FCSwitchCapabilities : CIM_EnabledLogicalElementCapabilities {
        MappingStrings { 
           "FC-SWAPI.INCITS-T11|SWAPI_UNIT_CONFIG_CAPS_T|EditDomainID" }, 
        ModelCorrespondence { "CIM_FCSwitchSettings.PreferredDomainID" }]
-   boolean DomainIDConfigureable;
+   boolean DomainIDConfigurable;
 
       [Description ( 
           "Minimum DomainID value supported by the switch." ), 

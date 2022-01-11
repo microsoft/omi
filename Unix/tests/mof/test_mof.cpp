@@ -417,7 +417,7 @@ NitsTestWithSetup(TestFailedIfFileDoesNotExist, TestMofSetup)
     MOF_Parser_SetQualifierDeclCallback(parser, QualifierDeclCallback, NULL);
 
     /* expecting error */
-    int r = MOF_Parser_Parse(parser, "fileThatDoesnotExist.mof");
+    int r = MOF_Parser_Parse(parser, "fileThatDoesNotExist.mof");
 
     MOF_Parser_Delete(parser);
 
@@ -636,7 +636,7 @@ static void AddQualifiersParseContentExpectToSucceed(const char* content, bool i
 
 NitsTestWithSetup(TestValidDateString, TestMofSetup)
 {
-    // create a mof file with valid date-time quilifier
+    // create a mof file with valid date-time qualifier
     const char content [] = 
         "Qualifier DatetimeQ : Datetime = \"20091225123000.123456-360\", Scope(any), Flavor(DisableOverride);\n\
         [DatetimeQ(\"12345678121212.123456:000\")] \n\
@@ -652,7 +652,7 @@ NitsEndTest
 
 NitsTestWithSetup(TestInvalidDateShortString, TestMofSetup)
 {
-    // create a mof file with invalid date-time quilifier
+    // create a mof file with invalid date-time qualifier
     const char content [] = 
         "Qualifier DatetimeQ : Datetime = \"20091225123000.123456-36\", Scope(any), Flavor(DisableOverride);";
 
@@ -663,7 +663,7 @@ NitsEndTest
 
 NitsTestWithSetup(TestInvalidDateInvalidString, TestMofSetup)
 {
-    // create a mof file with invalid date-time quilifier
+    // create a mof file with invalid date-time qualifier
     const char content [] = "Qualifier DatetimeQ : Datetime = \"xxx\", Scope(any), Flavor(DisableOverride);";
 
     ParseContentExpectToFail(content);
@@ -673,7 +673,7 @@ NitsEndTest
 
 NitsTestWithSetup(TestInvalidYear, TestMofSetup)
 {
-    // create a mof file with invalid date-time quilifier                  
+    // create a mof file with invalid date-time qualifier                  
     const char content [] = "Qualifier DatetimeQ : Datetime = \"y0091225123000.123456-360\", Scope(any), Flavor(DisableOverride);";
 
     ParseContentExpectToFail(content);
@@ -683,7 +683,7 @@ NitsEndTest
 
 NitsTestWithSetup(TestInvalidMonth, TestMofSetup)
 {
-    // create a mof file with invalid date-time quilifier                  
+    // create a mof file with invalid date-time qualifier                  
     const char content [] = "Qualifier DatetimeQ : Datetime = \"20091x25123000.123456-360\", Scope(any), Flavor(DisableOverride);";
 
     ParseContentExpectToFail(content);
@@ -693,7 +693,7 @@ NitsEndTest
 
 NitsTestWithSetup(TestInvalidDay, TestMofSetup)
 {
-    // create a mof file with invalid date-time quilifier                  
+    // create a mof file with invalid date-time qualifier                  
     const char content [] = "Qualifier DatetimeQ : Datetime = \"2009112z123000.123456-360\", Scope(any), Flavor(DisableOverride);";
 
     ParseContentExpectToFail(content);
@@ -703,7 +703,7 @@ NitsEndTest
 
 NitsTestWithSetup(TestInvalidHour, TestMofSetup)
 {
-    // create a mof file with invalid date-time quilifier                  
+    // create a mof file with invalid date-time qualifier                  
     const char content [] = "Qualifier DatetimeQ : Datetime = \"20091121v23000.123456-360\", Scope(any), Flavor(DisableOverride);";
 
     ParseContentExpectToFail(content);
@@ -713,7 +713,7 @@ NitsEndTest
 
 NitsTestWithSetup(TestInvalidMin, TestMofSetup)
 {
-    // create a mof file with invalid date-time quilifier                  
+    // create a mof file with invalid date-time qualifier                  
     const char content [] = "Qualifier DatetimeQ : Datetime = \"20091121v23000112hh56-360\", Scope(any), Flavor(DisableOverride);";
 
     ParseContentExpectToFail(content);
@@ -723,7 +723,7 @@ NitsEndTest
 
 NitsTestWithSetup(TestInvalidSec, TestMofSetup)
 {
-    // create a mof file with invalid date-time quilifier                  
+    // create a mof file with invalid date-time qualifier                  
     const char content [] = "Qualifier DatetimeQ : Datetime = \"20091121v2300011256ss-360\", Scope(any), Flavor(DisableOverride);";
 
     ParseContentExpectToFail(content);
@@ -733,7 +733,7 @@ NitsEndTest
 
 NitsTestWithSetup(TestInvalidDateFormat2, TestMofSetup)
 {
-    // create a mof file with invalid date-time quilifier                  
+    // create a mof file with invalid date-time qualifier                  
     const char content [] = "Qualifier DatetimeQ : Datetime = \"12345?78121212.123456:000\", Scope(any), Flavor(DisableOverride);";
 
     ParseContentExpectToFail(content);
@@ -780,7 +780,7 @@ NitsEndTest
 
 NitsTestWithSetup(TestInvalidDateTimeArray, TestMofSetup)
 {
-    // create a mof file with invalid date-time quilifier
+    // create a mof file with invalid date-time qualifier
     const char content [] = "Qualifier DatetimeQA : Datetime[] = { \"xxx1225123000.123456-360\" } , Scope(any), Flavor(DisableOverride);";
 
     ParseContentExpectToFail(content);
@@ -790,7 +790,7 @@ NitsEndTest
 
 NitsTestWithSetup(TestInvalidDateTimeLongArray, TestMofSetup)
 {
-    // create a mof file with invalid date-time quilifier
+    // create a mof file with invalid date-time qualifier
     const char content [] = "Qualifier DatetimeQA : Datetime[] = { \"20091225123000.123456-360\", \"20091225123000.123456-360\", \"20091225123000.123456-360\",\"xxx\" } , Scope(any), Flavor(DisableOverride);";
 
     ParseContentExpectToFail(content);
@@ -923,7 +923,7 @@ NitsEndTest
 NitsTestWithSetup(TestInvalidMinValueU64, TestMofSetup)
 {
     // u64 range is 0-18446744073709551615
-    // practically, attributes are limitted by sint64:
+    // practically, attributes are limited by sint64:
     // -9223372036854775807 - 1  - 9223372036854775807
     // however, MinValue is Sint64, so real max for Min value is 9223372036854775807
 
@@ -1046,7 +1046,7 @@ NitsEndTest
 NitsTestWithSetup(TestInvalidMinValueS64, TestMofSetup)
 {
     // u64 range is 0-18446744073709551615
-    // practically, attributes are limitted by sint64:
+    // practically, attributes are limited by sint64:
     // -9223372036854775807 - 1  - 9223372036854775807
     //ATTN! int64 errors are not processed correctly yet
 #if 0
@@ -1222,7 +1222,7 @@ NitsEndTest
 NitsTestWithSetup(TestInvalidMaxValueU64, TestMofSetup)
 {
     // u64 range is 0-18446744073709551615
-    // practically, attributes are limitted by sint64:
+    // practically, attributes are limited by sint64:
     // -9223372036854775807 - 1  - 9223372036854775807
     // however, MaxValue is Sint64, so real max for Max value is 9223372036854775807
 
@@ -1236,7 +1236,7 @@ NitsTestWithSetup(TestInvalidMaxValueU64, TestMofSetup)
         "class T { [MaxValue(1)]Uint64 x = 10; /* value too large */ };" );
     // ATTN:
     // next line is waiting for some bigger then 64-bit integer 
-    // internal representaitons of integers in the parser
+    // internal representations of integers in the parser
     AddQualifiersParseContentExpectToFail(
         "class T { [MaxValue(1)]Uint64 x = -1; /* underflow */ };" );
 }
@@ -1349,7 +1349,7 @@ NitsEndTest
 NitsTestWithSetup(TestInvalidMaxValueS64, TestMofSetup)
 {
     // u64 range is 0-18446744073709551615
-    // practically, attributes are limitted by sint64:
+    // practically, attributes are limited by sint64:
     // -9223372036854775807 - 1  - 9223372036854775807
     //ATTN! int64 errors are not processed correctly yet
 #if 0
@@ -1634,7 +1634,7 @@ END_EXTERNC
 
 NitsTestWithSetup(TestUint64ConstantValue, TestMofSetup)
 {
-    // verify that parser correctly interprets vlaue greater than LLONG_MAX
+    // verify that parser correctly interprets value greater than LLONG_MAX
     const unsigned char content [] =
         "class T { uint64 p_uint64 = 0xFFFFFFFFFFFFFFAA; /* ok */};";
     ut::writeFileContent( TEMP_FILE, vector<unsigned char>( content, (content)+ sizeof(content) ));
@@ -1678,7 +1678,7 @@ END_EXTERNC
 
 NitsTestWithSetup(TestInt64ConstantValue, TestMofSetup)
 {
-    // verify that parser correctly interprets vlaue greater than LLONG_MAX
+    // verify that parser correctly interprets value greater than LLONG_MAX
     const unsigned char content [] =
         "class T { sint64 p_int64 = -9223372036854775807; /* ok */};";
     ut::writeFileContent( TEMP_FILE, vector<unsigned char>( content, (content)+ sizeof(content) ));
@@ -1722,7 +1722,7 @@ END_EXTERNC
 
 NitsTestWithSetup(TestHexInt64ConstantValue, TestMofSetup)
 {
-    // verify that parser correctly interprets vlaue greater than LLONG_MAX
+    // verify that parser correctly interprets value greater than LLONG_MAX
     const unsigned char content [] =
         "class T { sint64 p_int64 = -0x7FFFFFFFFFFFFFAA; /* ok */};";
     ut::writeFileContent( TEMP_FILE, vector<unsigned char>( content, (content)+ sizeof(content) ));
@@ -1766,7 +1766,7 @@ END_EXTERNC
 
 NitsTestWithSetup(TestBinInt64ConstantValue, TestMofSetup)
 {
-    // verify that parser correctly interprets vlaue greater than LLONG_MAX
+    // verify that parser correctly interprets value greater than LLONG_MAX
     const unsigned char content [] =
         "class T { sint64 p_int64 = -111111111111111111111111111111111111111111111111111111111111101b; /* ok  dec*/};";
     ut::writeFileContent( TEMP_FILE, vector<unsigned char>( content, (content)+ sizeof(content) ));

@@ -94,7 +94,7 @@ static unsigned int ToHexit(
  stops at the first '?' character after the last slash.
 
  The scheme, for example, "http:", and host name are not normalized to lower case
- as specified in RFC 3986; neither are path segments mormalized.
+ as specified in RFC 3986; neither are path segments normalized.
 
  This function does not check for correctly-formatted UTF-8 multibyte characters,
  it simply encodes the characters in the input string character-by-character.
@@ -840,7 +840,7 @@ static MI_Uint32 _proc(
     void* self)
 {
     httpclient::IOThread* pThis = (httpclient::IOThread*)self;
-    // keep runnning until terminated
+    // keep running until terminated
     LOGD2((ZT("_proc - Begin. Running selector thread")));
     Selector_Run(&pThis->_selector, TIME_NEVER, MI_FALSE);
 

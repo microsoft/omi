@@ -700,7 +700,7 @@ static void Config_Subscribe_Validate(_In_ AlertTestStruct* ats)
     /* Cleanup actual result */
     memset((void*)&ats->actual, 0, sizeof(ats->actual));
 
-    /* Configure target indciation class(es)' behavior */
+    /* Configure target indication class(es)' behavior */
     miResult = _ConfigTargetClasses(ats);
     if (miResult != MI_RESULT_OK)
     {
@@ -795,7 +795,7 @@ NitsEndSplit
 */
 NitsSetup0(AlertTest_StartServer_Setup, AlertTestStruct)
     /*
-     * MI_Application_Intialize create global log file handler _os,
+     * MI_Application_Initialize create global log file handler _os,
      * MI_Application_Close closes it,
      * thus the test case needs to make sure not closing _os while
      * there are active MI_Application(s) objects
@@ -815,7 +815,7 @@ NitsEndSetup
 */
 NitsCleanup(AlertTest_StartServer_Setup)
     /*
-     * MI_Application_Intialize create global log file handler _os
+     * MI_Application_Initialize create global log file handler _os
      * MI_Application_Close closes it,
      * thus the test case needs to make sure not closing _os while
      * there are active MI_Application(s) objects
@@ -870,7 +870,7 @@ NitsTest1(Test_Alert_OneClass_Success, AlertTest_StartServer_Setup, ATS1)
         0 /* MI_Uint32 supportedSubscriptionTypes */);
 
     //
-    // Final result aggregated by mgrstand.c:SubscribeElem
+    // Final result aggregated by mgrstrand.c:SubscribeElem
     // if all indication class (provider) post OK during unsubscribe call,
     // then final result is MI_RESULT_OK;
     // current Test_Indication class do post MI_RESULT_OK during unsubscribe
@@ -938,7 +938,7 @@ NitsTest1(Test_Alert_ComplexClass_Success, AlertTest_StartServer_Setup, ATS2)
         0 /* MI_Uint32 supportedSubscriptionTypes */);
 
     //
-    // Final result aggregated by mgrstand.c:SubscribeElem
+    // Final result aggregated by mgrstrand.c:SubscribeElem
     // if all indication class (provider) post OK during unsubscribe call,
     // then final result is MI_RESULT_OK;
     // current Test_Indication class do post MI_RESULT_OK during unsubscribe
@@ -1001,7 +1001,7 @@ NitsTest1(Test_Alert_PolymorphismClasses_Success, AlertTest_StartServer_Setup, A
         0 /* MI_Uint32 supportedSubscriptionTypes */);
 
     //
-    // Final result aggregated by mgrstand.c:SubscribeElem
+    // Final result aggregated by mgrstrand.c:SubscribeElem
     // if all indication class (provider) post OK during unsubscribe call,
     // then final result is MI_RESULT_OK;
     // current Test_Indication class do post MI_RESULT_OK during unsubscribe
@@ -1166,7 +1166,7 @@ static void Lifecycle_Config_Subscribe_Validate(
     /* Cleanup actual result */
     memset((void*)&ats->actual, 0, sizeof(ats->actual));
 
-    /* Configure target indciation class(es)' behavior */
+    /* Configure target indication class(es)' behavior */
     miResult = _ConfigTargetClasses(ats);
     if (miResult != MI_RESULT_OK)
     {
@@ -1262,7 +1262,7 @@ NitsTest1(Test_Lifecycle_OneClass_Success, AlertTest_StartServer_Setup, ATS_Life
         MI_LIFECYCLE_INDICATION_CREATE  /* MI_Uint32 supportedSubscriptionTypes */);
 
     //
-    // Final result aggregated by mgrstand.c:SubscribeElem
+    // Final result aggregated by mgrstrand.c:SubscribeElem
     // if all indication class (provider) post OK during unsubscribe call,
     // then final result is MI_RESULT_OK;
     // current Test_Indication class do post MI_RESULT_OK during unsubscribe
@@ -1332,7 +1332,7 @@ NitsTest1(Test_Lifecycle_Complex_Success, AlertTest_StartServer_Setup, ATS_Lifec
         MI_LIFECYCLE_INDICATION_CREATE /* MI_Uint32 supportedSubscriptionTypes */);
 
     //
-    // Final result aggregated by mgrstand.c:SubscribeElem
+    // Final result aggregated by mgrstrand.c:SubscribeElem
     // if all indication class (provider) post OK during unsubscribe call,
     // then final result is MI_RESULT_OK;
     // current Test_Indication class do post MI_RESULT_OK during unsubscribe

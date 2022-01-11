@@ -33,7 +33,7 @@ typedef struct _MSFT_BGPBestpathConfiguration /* extends CIM_SettingData */
     MI_ConstStringField ElementName;
     /* CIM_SettingData properties */
     /* MSFT_BGPBestpathConfiguration properties */
-    MI_ConstBooleanField IsAlwaysCopareMed;
+    MI_ConstBooleanField IsAlwaysCompareMed;
     MI_ConstBooleanField ISAsPathMultiplePathRelax;
     MI_ConstBooleanField ISCompareRouteId;
     MI_ConstBooleanField IsCostCommunityIgnore;
@@ -259,19 +259,19 @@ MI_INLINE MI_Result MI_CALL MSFT_BGPBestpathConfiguration_Clear_ElementName(
         3);
 }
 
-MI_INLINE MI_Result MI_CALL MSFT_BGPBestpathConfiguration_Set_IsAlwaysCopareMed(
+MI_INLINE MI_Result MI_CALL MSFT_BGPBestpathConfiguration_Set_IsAlwaysCompareMed(
     _Inout_ MSFT_BGPBestpathConfiguration* self,
     _In_ MI_Boolean x)
 {
-    ((MI_BooleanField*)&self->IsAlwaysCopareMed)->value = x;
-    ((MI_BooleanField*)&self->IsAlwaysCopareMed)->exists = 1;
+    ((MI_BooleanField*)&self->IsAlwaysCompareMed)->value = x;
+    ((MI_BooleanField*)&self->IsAlwaysCompareMed)->exists = 1;
     return MI_RESULT_OK;
 }
 
-MI_INLINE MI_Result MI_CALL MSFT_BGPBestpathConfiguration_Clear_IsAlwaysCopareMed(
+MI_INLINE MI_Result MI_CALL MSFT_BGPBestpathConfiguration_Clear_IsAlwaysCompareMed(
     _Inout_ MSFT_BGPBestpathConfiguration* self)
 {
-    memset((void*)&self->IsAlwaysCopareMed, 0, sizeof(self->IsAlwaysCopareMed));
+    memset((void*)&self->IsAlwaysCompareMed, 0, sizeof(self->IsAlwaysCompareMed));
     return MI_RESULT_OK;
 }
 

@@ -36,7 +36,7 @@ BEGIN_EXTERNC
 
 typedef struct _HeaderBase
 {
-    /* Magic number (can be used to detect endianess of request) */
+    /* Magic number (can be used to detect endianness of request) */
     MI_Uint32 magic;
 
     /* Version number of protocol */
@@ -60,7 +60,7 @@ typedef struct _Header
 {
     HeaderBase  base;
 
-    /* folowed by */
+    /* followed by */
     Header_BatchInfoItem     batchInfo[PROTOCOL_HEADER_MAX_PAGES]; 
 }
 Header;

@@ -11,7 +11,7 @@ class CIM_USBRedirectionCapabilities : CIM_RedirectionServiceCapabilities {
           "value set to 2 = \"Listen\" shall indicate that the SAP "
           "will listen for a connection request from the remote USB "
           "redirection server. A CIM_BindsTo association to a "
-          "CIM_ProtocolEndoint may be used to represent where the "
+          "CIM_ProtocolEndpoint may be used to represent where the "
           "SAP is listening for the connection request. A value set "
           "to 3 = \"Connect\" shall indicate that the the SAP shall "
           "initiate the connection to the remote USB redirection "
@@ -67,7 +67,7 @@ class CIM_USBRedirectionCapabilities : CIM_RedirectionServiceCapabilities {
           "An enumeration indicating the USB Device SubClasses "
           "which are supported. Note that each entry of this array "
           "is related to the entries of the USBVersionsSupported, "
-          "ClassesSupproted, MaxDevicesSupported, and "
+          "ClassesSupported, MaxDevicesSupported, and "
           "MaxDevicesPerSAP arrays that are located at the same "
           "index." ), 
        ArrayType ( "Indexed" ), 
@@ -143,7 +143,7 @@ class CIM_USBRedirectionCapabilities : CIM_RedirectionServiceCapabilities {
 
       [Description ( 
           "An enumeration indicating which of the formats for "
-          "CIM_RemoteServiceAcccessPoint.InfoFormat are supported "
+          "CIM_RemoteServiceAccessPoint.InfoFormat are supported "
           "by the USB Redirection Service. When a USB Redirection "
           "Session is configured with ConnectionMode = 3 \'Connect\' "
           "the USB Redirection SAP needs to know the remote service "

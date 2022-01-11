@@ -144,7 +144,7 @@ class CIM_AbstractIndicationSubscription {
           "received. If the value of RepeatNotificationPolicy is 4 "
           "(\"Delay\") and an Indication is received, this "
           "Indication MUST be suppressed if, including this "
-          "Indication, RepeatNoticationCount or fewer Indications "
+          "Indication, RepeatNotificationCount or fewer Indications "
           "for this event have been received during the prior time "
           "interval defined by RepeatNotificationInterval. If this "
           "Indication is the RepeatNotificationCount + 1 "

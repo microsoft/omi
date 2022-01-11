@@ -60,8 +60,8 @@ typedef enum _PostBehavior
 {
     PostBehavior_Default = 0, /* Spawned thread to enable context */
     PostBehavior_Subcontext = 1, /* For MI_API_VERSION 1 & 2, post to subscribe context are not supported */
-    PostBehavior_Enablecontext_PostOnCalllthread = 2,
-    PostBehavior_Subcontext_PostOnCalllthread = 3 /* For MI_API_VERSION 1 & 2, post to subscribe context are not supported */
+    PostBehavior_Enablecontext_PostOnCallThread = 2,
+    PostBehavior_Subcontext_PostOnCallThread = 3 /* For MI_API_VERSION 1 & 2, post to subscribe context are not supported */
 }PostBehavior;
 
 typedef enum _MiscTestGroup
@@ -129,7 +129,7 @@ typedef struct _Config
                                  *
                                  */
     MI_Result initResultCode;
-    MI_Uint32 initTimeoutMS;    /* timeout value for intialization */
+    MI_Uint32 initTimeoutMS;    /* timeout value for initialization */
 
     MI_Uint32 finalizeBehavior;  /* Finalization behavior
                                  *
@@ -212,7 +212,7 @@ typedef struct _Config
     MI_Uint64 subscriptionID; /* subscription ID from subscribe call */
 
     Sem sem; /* semaphore */
-    MI_Boolean seminited; /* semaphore intialized */
+    MI_Boolean seminited; /* semaphore initialized */
 
     char* apicallseq[MAXLOGENTRY]; /* api call sequences */
     MI_Uint32 apicallseqcount; /* api call count */

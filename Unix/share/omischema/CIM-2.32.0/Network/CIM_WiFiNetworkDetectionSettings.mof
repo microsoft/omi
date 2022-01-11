@@ -14,7 +14,7 @@ class CIM_WiFiNetworkDetectionSettings : CIM_SettingData {
           "are enforced on the SSIDs searched for.\n"
           "A value of 3 \"Preferred\" shall indicate that only "
           "networks listed in the PreferredNetworks property are "
-          "searced for." ), 
+          "searched for." ), 
        ValueMap { "2", "3", "..", "16384..32767" }, 
        Values { "Any", "Preferred", "DMTF Reserved", 
           "Vendor Reserved" }]

@@ -33,7 +33,7 @@ MI_Uint32 MI_CALL TriggerIndication(
     CHECKR_POST_RETURN(context, r);
 
     /* set properties of indication */
-    r = XYZ_DiskFault_Set_detailmessage( &fault, MI_T("Disk fault messsage") );
+    r = XYZ_DiskFault_Set_detailmessage( &fault, MI_T("Disk fault  message") );
     CHECKR_POST_RETURN(context, r);
     XYZ_DiskFault_Set_SequenceNumber( &fault,  ++(self->self.seqid));
 
@@ -75,7 +75,7 @@ void MI_CALL XYZ_DiskFault_EnableIndications(
     const MI_Char* className)
 {
     /* TODO: store indicationsContext for posting indication usage */
-    /* NOTE:Call one of following functions if and ONLY if encount termination error,
+    /* NOTE:Call one of following functions if and ONLY if encounter termination error,
             which will finalize the indicationsContext, 
             and terminate all active subscriptions to current class,
              MI_Context_PostResult

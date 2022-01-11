@@ -9,7 +9,7 @@ SET TESTDIR=%BINPATH%\tests
 SET LOGDIR=%CD%
 SET LOGFILENAME=%LOGDIR%\test.log
 
-ECHO Current Direcotry: %LOGDIR% >%LOGFILENAME%  2>&1
+ECHO Current Directory: %LOGDIR% >%LOGFILENAME%  2>&1
 
 REM Workaround test failure around test_pal.cpp:TmpName function
 IF NOT EXIST C:\temp (
@@ -18,7 +18,7 @@ IF NOT EXIST C:\temp (
 
 REM ======================Check Unit Test ROOT directory=============
 IF NOT EXIST %BINPATH%\omiserver.exe (
-    echo Please check the configration. Omiserver.exe does not exist under %TEST_ROOT%    >> %LOGFILENAME%  2>&1
+    echo Please check the configuration. Omiserver.exe does not exist under %TEST_ROOT%    >> %LOGFILENAME%  2>&1
     GOTO :ERROR
 )
 

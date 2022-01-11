@@ -104,7 +104,7 @@ int IndiMgr_Shutdown(IndicationManager* self)
 */
 
 /* Get object from list */
-/* Caller need to make sure the approriate lock was taken on the linked list */
+/* Caller need to make sure the appropriate lock was taken on the linked list */
 CimBase* _List_FindObjectByID(
     _In_ CimBase* head,
     _In_ CimBase* tail,
@@ -297,7 +297,7 @@ int IndiMgr_RemoveFilterByName(
         &self->filterLock);
 }
 
-/* Find filter from cache, name (case insenstive) is the unique identifier of filter */
+/* Find filter from cache, name (case insensitive) is the unique identifier of filter */
 _Use_decl_annotations_
 FilterBase* IndiMgr_FindFilterByName(
     IndicationManager* self,

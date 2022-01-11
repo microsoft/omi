@@ -23,7 +23,7 @@
 **
 **     This structure maintains the static parser state for the current parser
 **     invocation. It maintains the heap, errors, warnings, class declarations,
-**     and qulifier declarations.
+**     and qualifier declarations.
 **
 **==============================================================================
 */

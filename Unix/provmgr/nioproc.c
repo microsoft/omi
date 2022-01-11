@@ -26,7 +26,7 @@ static RequestItem* RequestList_RemoveItem(_Inout_ RequestList* list);
 static MI_Result RequestList_RemoveSpecificItem(_Inout_ RequestList* list, _In_ RequestItem* item);
 
 //
-// A proc running from a spawned thread to unsuscribe the indication opertion(s)
+// A proc running from a spawned thread to unsubscribe the indication operation(s)
 //
 PAL_Uint32 THREAD_API noniothread_proc(void* p);
 
@@ -369,7 +369,7 @@ MI_Result Schedule_SubscribeRequest(
 }
 
 //
-// A proc running from a spawned thread to unsuscribe the indication provider
+// A proc running from a spawned thread to unsubscribe the indication provider
 //
 PAL_Uint32 THREAD_API noniothread_proc(void* p)
 {

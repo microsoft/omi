@@ -61,7 +61,7 @@ public:
         return GetHeader(m_instance)->u.s.m_disableCopyOnWrite ? false : true;
     }
 
-    // Forces a copy-on-write operation (if refrence count is not 1). After
+    // Forces a copy-on-write operation (if reference count is not 1). After
     // calling this function, the instance will have a pointer to its own
     // copy of MI_Instance whose reference count is 1.
     void __forceCopyOnWrite()

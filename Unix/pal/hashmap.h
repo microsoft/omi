@@ -33,7 +33,7 @@ typedef struct _HashMap
     /* User-defined hash function */
     HashMapHashProc hash;
 
-    /* User-defined euqal function (returns non-zeroif equal) */
+    /* User-defined equal function (returns non-zeroif equal) */
     HashMapEqualProc equal;
 
     /* User-defined function to release a hash bucket */

@@ -1921,7 +1921,7 @@ NitsTest(TestHashMap1)
         }
     }
 
-    /* Release all the memroy */
+    /* Release all the memory */
     HashMap_Destroy(&map);
 }
 NitsEndTest
@@ -1991,7 +1991,7 @@ NitsTest(TestHashMap2)
         TEST_ASSERT(r == 0);
     }
 
-    /* Release all the memroy */
+    /* Release all the memory */
     HashMap_Destroy(&map);
 }
 NitsEndTest
@@ -2061,7 +2061,7 @@ NitsTest(TestHashMap2_preallocated)
         TEST_ASSERT(r == 0);
     }
 
-    /* Release all the memroy */
+    /* Release all the memory */
     HashMap_Destroy(&map);
 }
 NitsEndTest

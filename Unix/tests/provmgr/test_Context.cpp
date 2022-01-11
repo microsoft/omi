@@ -196,7 +196,7 @@ NitsTest1(TestContext_IndPostIndication_GenericFailures, TestContext_SetupProvid
 
 #ifdef _PREFAST_
 #pragma prefast (push)
-#pragma prefast (disable: 6001) // OACR complian this context was invalid due to previous Context_Close, but it get re-initialized again by Context_Init_ByType
+#pragma prefast (disable: 6001) // OACR complains this context was invalid due to previous Context_Close, but it get re-initialized again by Context_Init_ByType
 #endif
     Context_Close( &setupStruct->context );
 #ifdef _PREFAST_
@@ -472,7 +472,7 @@ void TestContext_IndPostResult_SubscriptionContext_Helper(
 
     //
     // SubMgr_CreateSubscription:One refcount of subscription will be release in CONTEXT_STRANDAUX_INVOKESUBSCRIBE,
-    // however we are not invoking CONTEXT_STRANDAUX_INVOKESUBSCRIBE, so the refcount should be released explictly
+    // however we are not invoking CONTEXT_STRANDAUX_INVOKESUBSCRIBE, so the refcount should be released explicitly
     //
     MI_Result r = CreateAndAddSubscriptionHelper(
         subMgr,
@@ -502,7 +502,7 @@ void TestContext_IndPostResult_SubscriptionContext_Helper(
 
     _CallPostResult_SubCtx( setupStruct, state, result, postresult );
 
-    // Waits for asynchonous Disable thread to complete
+    // Waits for asynchronous Disable thread to complete
     while (ShutdownState_Released != disableState)
     {
         Sleep_Milliseconds(sleepTimeInMs);
@@ -648,7 +648,7 @@ void TestContext_IndPostError_SubscriptionContext_Helper(
 
     //
     // SubMgr_CreateSubscription:One refcount of subscription will be release in CONTEXT_STRANDAUX_INVOKESUBSCRIBE,
-    // however we are not invoking CONTEXT_STRANDAUX_INVOKESUBSCRIBE, so the refcount should be released explictly
+    // however we are not invoking CONTEXT_STRANDAUX_INVOKESUBSCRIBE, so the refcount should be released explicitly
     //
     MI_Result r = CreateAndAddSubscriptionHelper(
         subMgr,
@@ -685,7 +685,7 @@ void TestContext_IndPostError_SubscriptionContext_Helper(
         errmsg),
         PAL_T("PostError unexpected result") );
 
-    // Waits for asynchonous Disable thread to complete
+    // Waits for asynchronous Disable thread to complete
     while (ShutdownState_Released != disableState)
     {
         Sleep_Milliseconds(sleepTimeInMs);
@@ -747,7 +747,7 @@ void TestContext_IndPostCimError_SubscriptionContext_Helper(
 
     //
     // SubMgr_CreateSubscription:One refcount of subscription will be release in CONTEXT_STRANDAUX_INVOKESUBSCRIBE,
-    // however we are not invoking CONTEXT_STRANDAUX_INVOKESUBSCRIBE, so the refcount should be released explictly
+    // however we are not invoking CONTEXT_STRANDAUX_INVOKESUBSCRIBE, so the refcount should be released explicitly
     //
     MI_Result r = CreateAndAddSubscriptionHelper(
         subMgr,
@@ -934,7 +934,7 @@ NitsTest1(TestContext_IndPostIndication_SubscriptionContext_ValidatesInstance, T
 
     //
     // SubMgr_CreateSubscription:One refcount of subscription will be release in CONTEXT_STRANDAUX_INVOKESUBSCRIBE,
-    // however we are not invoking CONTEXT_STRANDAUX_INVOKESUBSCRIBE, so the refcount should be released explictly
+    // however we are not invoking CONTEXT_STRANDAUX_INVOKESUBSCRIBE, so the refcount should be released explicitly
     //
     result = CreateAndAddSubscriptionHelper(
         subMgr,
@@ -985,7 +985,7 @@ NitsTest1(TestContext_IndPostIndication_SubscriptionContext_ValidatesInstance, T
 
     _CallPostResult_SubCtx( setupStruct, SubscriptionState_Subscribed, MI_RESULT_OK, MI_RESULT_OK );
 
-    // Waits for asynchonous Disable thread to complete
+    // Waits for asynchronous Disable thread to complete
     while (ShutdownState_Released != disableState)
     {
         Sleep_Milliseconds(sleepTimeInMs);

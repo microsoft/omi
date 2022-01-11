@@ -32,7 +32,7 @@ class CIM_VirtualSystemSettingData : CIM_SettingData {
           "ports. \n"
           "On create requests VirtualSystemIdentifier may contain "
           "implementation specific rules (like simple patterns or "
-          "regular expresssion) that may be interpreted by the "
+          "regular expression) that may be interpreted by the "
           "implementation when assigning a VirtualSystemIdentifier." )]
    string VirtualSystemIdentifier;
 
@@ -180,7 +180,7 @@ class CIM_VirtualSystemSettingData : CIM_SettingData {
           "Action to take for the virtual system when the software "
           "executed by the virtual system fails. Failures in this "
           "case means a failure that is detectable by the host "
-          "platform, such as a non-interuptable wait state "
+          "platform, such as a non-interruptible wait state "
           "condition." ), 
        ValueMap { "2", "3", "4", ".." }, 
        Values { "None", "Restart", "Revert to snapshot", 
@@ -188,7 +188,7 @@ class CIM_VirtualSystemSettingData : CIM_SettingData {
    uint16 AutomaticRecoveryAction;
 
       [Description ( 
-          "Filepath of a file where recovery relateded information "
+          "Filepath of a file where recovery related information "
           "of the virtual system is stored.Format shall be URI "
           "based on RFC 2079." )]
    string RecoveryFile;

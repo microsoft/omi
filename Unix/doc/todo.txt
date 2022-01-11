@@ -73,7 +73,7 @@
 
     (X) Fixed cimcli bug with argument encoding of arrays of instances.
 
-    (X) Added 'server --httptrace' feaature.
+    (X) Added 'server --httptrace' feature.
 
     (X) Fixed bug with crash in stubs.cpp where associators stub crashed
         in Instance destructor. Fix was in Instance.cpp.
@@ -84,7 +84,7 @@
 
     (X) Fixed bug with WS-Management Put: if property appeared in both
         selector set and in property list, the parser rejected the property
-        list occurence as a duplicate feature.
+        list occurrence as a duplicate feature.
 
     (X) Fixed WS-Managed put-instance error: the parser was not accepting
         null properties. For example:

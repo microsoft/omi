@@ -5,7 +5,7 @@
        "This SettingData instance represents an IP version. This "
        "instance can be associated to one or more CIM_ManagedElements "
        "(Eg. CIM_ComputerSystem or CIM_IPNetworkConnection) to "
-       "respresent the IP version. The properties of the "
+       "represent the IP version. The properties of the "
        "CIM_ElementSettingData can be used show the IPVersions that "
        "are configured as default, current or Next boot." )]
 class CIM_IPVersionSettingData : CIM_SettingData {

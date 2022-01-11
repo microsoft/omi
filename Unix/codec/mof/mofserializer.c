@@ -690,7 +690,7 @@ static MI_Result _PutDependentInstances(
             if (!value.instance) 
                 continue;
 
-            /* Only put keys for referenes */
+            /* Only put keys for references */
 
             RETERR(_PutInstance(
                 out, 

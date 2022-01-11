@@ -448,7 +448,7 @@ Soap_Fault_Information g_SoapFaults[]=
         WSMANTAG_ACTION_FAULT_TRANSFER
     },    
     {
-        ERROR_WSMAN_INSUFFCIENT_SELECTORS,
+        ERROR_WSMAN_INSUFFICIENT_SELECTORS,
         SOAP_FAULT_SENDER,        
         SOAP_FAULT_SUBCODE_ERROR_WSMAN_INVALID_SELECTORS,
         SOAP_FAULT_WSMAN_DETAIL_SELECTORS_INSUFFICIENT,
@@ -1199,8 +1199,8 @@ Error_Types_Information g_errorTypes[]=
         ZT("ERROR_WSMAN_INVALID_REPRESENTATION")
     },
     {
-        ERROR_WSMAN_INSUFFCIENT_SELECTORS,
-        ZT("ERROR_WSMAN_INSUFFCIENT_SELECTORS")
+        ERROR_WSMAN_INSUFFICIENT_SELECTORS,
+        ZT("ERROR_WSMAN_INSUFFICIENT_SELECTORS")
     },
     {
         ERROR_WSMAN_INVALID_URI_WMI_SINGLETON,
@@ -1452,7 +1452,7 @@ Probable_Cause_Data g_ProbableCauses[]=
 };
 
 /*++
- Gets soap fault information assoicated with wsman error code
+ Gets soap fault information associated with wsman error code
 --*/
 Soap_Fault_Information*
 GetFaultInformation(

@@ -87,7 +87,7 @@ static void _SessionBucket_Release(HashBucket *b)
         sessionId - the session id
         hash - the has value for the session id produced by _SessionId_Hash
 
-    NOTE: The caller must aquire a WriteLock.
+    NOTE: The caller must acquire a WriteLock.
 */
 static SessionBucket* _SessionBucket_New(SessionMap *self, _In_z_ const char* sessionId, size_t hash)
 {

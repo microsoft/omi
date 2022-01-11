@@ -58,9 +58,9 @@ MI_Result MI_CALL Instance_New(
         _In_opt_z_ const MI_Char *namespaceName, /* Not needed if parentClass is passed in */
         _In_opt_z_ const MI_Char *serverName,    /* Not needed if parentClass is passed in */
         _In_z_ const MI_Char *className, 
-        MI_Uint32 numberClassQualifiers,         /* number of extra class qualifiers you want to create.  Allowes us to pre-create array of correct size */
-        MI_Uint32 numberProperties,              /* number of extra properties you want to create.  Allowes us to pre-create array of correct size */
-        MI_Uint32 numberMethods,                 /* number of extra methods you want to create. Allowes us to pre-create array of correct size */
+        MI_Uint32 numberClassQualifiers,         /* number of extra class qualifiers you want to create.  Allows us to pre-create array of correct size */
+        MI_Uint32 numberProperties,              /* number of extra properties you want to create.  Allows us to pre-create array of correct size */
+        MI_Uint32 numberMethods,                 /* number of extra methods you want to create. Allows us to pre-create array of correct size */
         _Out_ MI_Class **newClass              /* Object that is ready to receive new qualifiers/properties/methods */
         );
 
@@ -74,7 +74,7 @@ MI_Result MI_CALL Instance_New(
         MI_Value value,                 /* Value of qualifier */
         MI_Uint32 flavors);             /* Flavor of qualifier */
     
-    /* Array verion of RCClass_AddClassQualifier.  Pass in how many items there are and it returns a qualifier index to be used to add each
+    /* Array version of RCClass_AddClassQualifier.  Pass in how many items there are and it returns a qualifier index to be used to add each
      * item in tern.
      */
     MI_Result RCClass_AddClassQualifierArray(

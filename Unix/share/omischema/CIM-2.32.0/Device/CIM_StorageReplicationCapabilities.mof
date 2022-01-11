@@ -108,7 +108,7 @@ class CIM_StorageReplicationCapabilities : CIM_Capabilities {
 
       [Description ( 
           "Indicates host access restrictions for replicas with "
-          "thesecapabilities. Values: 2 = not accessible. \n"
+          "these capabilities. Values: 2 = not accessible. \n"
           "3 = no restrictions. Any host may access. 4 = only "
           "accessible by associated source element hosts. 5 = not "
           "accessible by source element hosts. Other hosts OK." ), 

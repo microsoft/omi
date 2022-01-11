@@ -12,7 +12,7 @@
        "properties of this Service, describing how it operates and its "
        "necessary parameters. The Service does the calculation on "
        "behalf of a RED dropper (as indicated by the association, "
-       "CalculationServiceForDroppper). A "
+       "CalculationServiceForDropper). A "
        "DropThresholdCalculationService is always associated to the "
        "single queue that it examines via the Calculation BasedOnQueue "
        "relationship." )]

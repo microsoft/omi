@@ -599,7 +599,7 @@ Sem unsubscribeCompletedSem;
 //
 void _InitializeTestProvMgrSemaphore()
 {
-    NitsAssert( Sem_Init(&unsubscribeCompletedSem, SEM_USER_ACCESS_ALLOW_ALL, 0) == 0, PAL_T("Unable to intialize unsubscribe semaphore") );
+    NitsAssert( Sem_Init(&unsubscribeCompletedSem, SEM_USER_ACCESS_ALLOW_ALL, 0) == 0, PAL_T("Unable to initialize unsubscribe semaphore") );
     unsubscribeCompletedSemActive = MI_TRUE;
 }
 
@@ -755,7 +755,7 @@ NitsSetup1(TestProvMgr_SetupProvider, TestProvMgr_SetupStruct, TestProvmg_SetUp,
         (ListElem*)&setupStruct->library);
 
     // Provider init
-    setupStruct->provider.refCounter = 1; // simulates one outstanding reqest to the provider (prevents Load and unload)
+    setupStruct->provider.refCounter = 1; // simulates one outstanding request to the provider (prevents Load and unload)
     setupStruct->provider.lib = &setupStruct->library;
     setupStruct->provider.classDecl = &g_dummyTestClassDecl;
     setupStruct->provider.subMgr = &setupStruct->subMgr;
@@ -838,7 +838,7 @@ NITS_EXTERN_C void TestProvMgr_MI_LifecycleIndicationCallback(
     }
 }
 
-// Initializes an already intialized provider struct for lifecycle indications
+// Initializes an already initialized provider struct for lifecycle indications
 NitsSetup1(TestProvMgr_SetupLifecycle, NitsEmptyStruct, TestProvMgr_SetupProvider, genericProvMgrTemplate)
 {
     TestProvMgr_SetupStruct* setupStruct = NitsContext()->_TestProvMgr_SetupProvider->_TestProvMgr_SetupStruct;
@@ -860,7 +860,7 @@ NitsSetup1(TestProvMgr_SetupLifecycle, NitsEmptyStruct, TestProvMgr_SetupProvide
 
     //
     // Initialize unsubscribe handler
-    // single threaded platform require that unsubsribe happen on a separate thread
+    // single threaded platform require that unsubscribe happen on a separate thread
     //
     RequestHandler_Init(&g_requesthandler);
 }
@@ -876,7 +876,7 @@ NitsCleanup(TestProvMgr_SetupLifecycle)
 
     //
     // Wait for the unsubscribe handler to complete.
-    // Single threaded platform require that unsubsribe happen on a separate thread
+    // Single threaded platform require that unsubscribe happen on a separate thread
     // wait for that thread to finish the unsubscribe call
     //
     while ( Atomic_Read( &g_requesthandler.running ) == 1 )
@@ -912,7 +912,7 @@ NitsTest1(TestProvMgr_LifeSubscribe_NotSupported_If_Message_Type_Not_Supported, 
 
     Strand_Open(&setupStruct->leftSideStrand,ProvMgr_OpenCallback,&data,&setupStruct->msg->base.base,MI_TRUE);
 
-    NitsAssert( SUBSCRIP_TARGET_UNSUPPORTED == setupStruct->msg->targetType, PAL_T("Unexpected change to messsage") );
+    NitsAssert( SUBSCRIP_TARGET_UNSUPPORTED == setupStruct->msg->targetType, PAL_T("Unexpected change to message") );
     
     // The result is returned in another thread, so it cannot be checked directly here
     setupStruct->expectedResult = MI_RESULT_FAILED;
@@ -1066,7 +1066,7 @@ NitsEndTest
 
 //
 // This simulates a provider invoking PostCreate after notification of
-// subscirption to MI_LIFECYCLE_INDICATION_DELETE.  This is a wrong post
+// subscription to MI_LIFECYCLE_INDICATION_DELETE.  This is a wrong post
 // type test.
 //
 NitsTest1(TestProvMgr_LifeSubscribe_Post_To_Wrong_Type, TestProvMgr_SetupLifecycle, NitsEmptyValue)

@@ -52,7 +52,7 @@ class CIM_BlockStatisticsManifest : CIM_ManagedElement {
           "same set of statistical metrics is calculated for "
           "several types of devices. In this way, a single "
           "BlockStatisticsManifest instance can be used to filter "
-          "all the StatsiticalData instances that contain metrics "
+          "all the StatisticalData instances that contain metrics "
           "for the same type of element in a StatisticsCollection. "
           "If used, a subclass should override this property to "
           "specify the element types supported by that class, "

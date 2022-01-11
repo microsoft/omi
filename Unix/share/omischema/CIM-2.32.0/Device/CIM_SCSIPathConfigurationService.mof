@@ -10,7 +10,7 @@ class CIM_SCSIPathConfigurationService : CIM_Service {
       [Description ( 
           "This method requests that the target change the access "
           "states of the requested SCSITargetPortGroups. This will "
-          "have the effect of doing a failover or failback "
+          "have the effect of doing a failover or fallback "
           "operation." ), 
        ValueMap { "0", "1", "2", "3", "4", "5", "..", "4096", 
           "4097", "4098", "4099", "..", "32768..65535" }, 

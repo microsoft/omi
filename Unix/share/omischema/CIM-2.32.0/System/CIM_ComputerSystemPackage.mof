@@ -26,7 +26,7 @@ class CIM_ComputerSystemPackage : CIM_SystemPackaging {
    CIM_ComputerSystem REF Dependent;
 
       [Description ( 
-          "A Gloabally Unique Identifier for the System\'s Package." )]
+          "A Globally Unique Identifier for the System\'s Package." )]
    string PlatformGUID;
 
 

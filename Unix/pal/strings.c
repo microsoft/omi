@@ -101,7 +101,7 @@ void TcsFromUInt64(_Pre_writable_size_(64) PAL_Char buf[64], PAL_Uint64 value, _
 
 // The following defines string literals for the numbers 0 through 63. The
 // first character is the length of the string. The subsequent characters
-// are the string literal iteslf.
+// are the string literal itself.
 static const char* _numberStrings[] =
 {
     "\0010",

@@ -51,7 +51,7 @@ class CIM_IndicationServiceCapabilities : CIM_Capabilities {
 
       [Description ( 
           "MaxActiveSubscriptions specifies the maximum total "
-          "number of instances of CIM_IndicationSubcription and "
+          "number of instances of CIM_IndicationSubscription and "
           "CIM_FilterCollectionSubscription instances supported by "
           "the CIM_IndicationService." ), 
        MinValue ( 1 )]

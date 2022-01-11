@@ -40,7 +40,7 @@ class CIM_PowerUtilizationManagementService : CIM_Service {
           "represents.the power aspect of the system. When applied "
           "to a system\'s Power Allocation settings, a system\'s "
           "power allocation settingsmay be modified.Upon "
-          "successfull execution if the limit property of the power "
+          "successful execution if the limit property of the power "
           "aspectis modified the power cap is modified" ), 
        ValueMap { "0", "1", "2", "4096", "..", "32768..65535" }, 
        Values { "Completed with No Error", "Not Supported", 

@@ -163,7 +163,7 @@ MI_INLINE int ChildList_GetCurrentList(_Inout_ ChildList *list, _Out_cap_post_co
         ChildListNode *currentNode = list->headNode;
         (*outboundUsed) = 0;
         while (currentNode && 
-            ((*outboundUsed) < inboundSize))    //redumbdant check to shut prefast up, it does not know list->childCount is how many items in list
+            ((*outboundUsed) < inboundSize))    //redundant check to shut prefast up, it does not know list->childCount is how many items in list
         {
             outstandingHandles[*outboundUsed].clientHandle = currentNode->clientHandle;
             outstandingHandles[*outboundUsed].debugHandlePointer = &currentNode->clientHandle;

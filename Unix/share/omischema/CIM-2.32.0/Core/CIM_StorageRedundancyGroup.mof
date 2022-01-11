@@ -26,7 +26,7 @@ class CIM_StorageRedundancyGroup : CIM_RedundancyGroup {
           "redundancy is not active. An inactive redundancy should "
           "only be instantiated if data striping or concatenation "
           "are active. These are indicated by the IsStriped or "
-          "IsConcatentated boolean properties of this "
+          "IsConcatenated boolean properties of this "
           "RedundancyGroup." ), 
        ValueMap { "0", "1", "2", "3", "4", "5", "6", "7" }, 
        Values { "None", "Other", "Unknown", "Copy", "XOR", "P+Q", 

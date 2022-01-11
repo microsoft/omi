@@ -333,7 +333,7 @@ int MI_MAIN_CALL main(int argc, _In_reads_(argc) CharPtr argv[])
 
     Tprintf(ZT("\n"));
 
-    /* Print test executation summary */
+    /* Print test execution summary */
 
 s_summary = true;
 

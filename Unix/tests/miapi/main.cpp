@@ -206,7 +206,7 @@ NitsEndSetup
 NitsCleanup(SetupTestInstance)
 {
     MI_Instance *instance = NitsContext()->_BaseSetup->_RuntimeTestData->testInstance;
-    NitsCompare(MI_Instance_Delete(instance), MI_RESULT_OK, PAL_T("Failed to delete instace"));
+    NitsCompare(MI_Instance_Delete(instance), MI_RESULT_OK, PAL_T("Failed to delete instance"));
 }
 NitsEndCleanup
 
@@ -350,7 +350,7 @@ NitsTest1(MI_Application_NewSession_Success_CloseSync,
 NitsEndTest
 
 /* Test creation of session, then close asynchronously */
-extern "C" void MI_CALL Test_Sesson_CloseAync_Callback(void *context)
+extern "C" void MI_CALL Test_Sesson_CloseAsync_Callback(void *context)
 {
     ptrdiff_t *wait = (ptrdiff_t*) context;
     *wait = 1;
@@ -367,7 +367,7 @@ NitsTest1(MI_Application_NewSession_Success_CloseAsync,
     NitsCompare(MI_Application_NewSession(application, PAL_T("Test1"), NULL, NULL, NULL, NULL, &session), MI_RESULT_OK, PAL_T("MI_Application_NewSession returns OK"));
     NitsAssert(session.ft != NULL, PAL_T("MI_Session function table should not be NULL"));
 
-    MI_Session_Close(&session, (void*) &wait, Test_Sesson_CloseAync_Callback);
+    MI_Session_Close(&session, (void*) &wait, Test_Sesson_CloseAsync_Callback);
     
     ptrdiff_t currentWait = wait;
     while (!currentWait)
@@ -1523,7 +1523,7 @@ NitsTest2(MI_Session_GetInstance_Sync_InvalidParameters,
 
                 session.ft->GetInstance(NULL, 0, NULL, NULL, testInstance, NULL, &operation);
                 MI_Operation_GetInstance(&operation, &result, &moreResults, &resultCode, &errorMessage, &extendedInfo);
-                NitsCompare(resultCode, MI_RESULT_INVALID_PARAMETER, PAL_T("GetInstance should faul due to NULL session"));
+                NitsCompare(resultCode, MI_RESULT_INVALID_PARAMETER, PAL_T("GetInstance should fail due to NULL session"));
                 MI_Operation_Close(&operation);
 
                 session.ft->GetInstance(&session, 0, NULL, NULL, NULL, NULL, &operation);
@@ -2040,7 +2040,7 @@ NitsTest2(MI_Session_ModifyInstance_Sync_InvalidParameters,
 
         session.ft->ModifyInstance(NULL, 0, NULL, NULL, testInstance, NULL, &operation);
         MI_Operation_GetInstance(&operation, &result, &moreResults, &resultCode, &errorMessage, &extendedInfo);
-        NitsCompare(resultCode, MI_RESULT_INVALID_PARAMETER, PAL_T("GetInstance should faul due to NULL session"));
+        NitsCompare(resultCode, MI_RESULT_INVALID_PARAMETER, PAL_T("GetInstance should fail due to NULL session"));
         MI_Operation_Close(&operation);
 
         session.ft->ModifyInstance(&session, 0, NULL, NULL, NULL, NULL, &operation);
@@ -2258,7 +2258,7 @@ NitsTest2(MI_Session_CreateInstance_Sync_InvalidParameters,
 
         session.ft->CreateInstance(NULL, 0, NULL, NULL, testInstance, NULL, &operation);
         MI_Operation_GetInstance(&operation, &result, &moreResults, &resultCode, &errorMessage, &extendedInfo);
-        NitsCompare(resultCode, MI_RESULT_INVALID_PARAMETER, PAL_T("GetInstance should faul due to NULL session"));
+        NitsCompare(resultCode, MI_RESULT_INVALID_PARAMETER, PAL_T("GetInstance should fail due to NULL session"));
         MI_Operation_Close(&operation);
 
         session.ft->CreateInstance(&session, 0, NULL, NULL, NULL, NULL, &operation);
@@ -2478,7 +2478,7 @@ NitsTest3(MI_Session_DeleteInstance_Sync_InvalidParameters,
 
         session.ft->DeleteInstance(NULL, 0, NULL, NULL, testInstance, NULL, &operation);
         MI_Operation_GetInstance(&operation, &result, &moreResults, &resultCode, &errorMessage, &extendedInfo);
-        NitsCompare(resultCode, MI_RESULT_INVALID_PARAMETER, PAL_T("GetInstance should faul due to NULL session"));
+        NitsCompare(resultCode, MI_RESULT_INVALID_PARAMETER, PAL_T("GetInstance should fail due to NULL session"));
         MI_Operation_Close(&operation);
 
         session.ft->DeleteInstance(&session, 0, NULL, NULL, NULL, NULL, &operation);
@@ -2862,7 +2862,7 @@ NitsTest2(MI_Session_EnumerateInstances_Sync_InvalidParameters,
         NitsCompare(resultCount, 10, PAL_T("Should have 10 results"));
         MI_Operation_Close(&operation);
     }
-    {/* no opertion */
+    {/* no operation */
         MI_Session_EnumerateInstances(session, 0, NULL, NULL, PAL_T("testClass"), MI_FALSE, NULL, NULL);
         /* nothing more we can do as no where for result to go */
     }
@@ -3034,7 +3034,7 @@ NitsTest2(MI_Session_QueryInstances_Sync_InvalidParameters,
         NitsCompare(result, MI_RESULT_OK, PAL_T("Operation should succeed"));
         MI_Operation_Close(&operation);
     }
-    {/* no opertion */
+    {/* no operation */
         MI_Session_QueryInstances(session, 0, NULL, NULL, PAL_T("dialect"), PAL_T("filter"), NULL, NULL);
         /* nothing more we can do as no where for result to go */
     }
@@ -3209,7 +3209,7 @@ NitsTest3(MI_Session_AssociatorInstances_Sync_InvalidParameters,
         NitsCompare(result, MI_RESULT_INVALID_PARAMETER, PAL_T("Operation should succeed"));
         MI_Operation_Close(&operation);
     }
-    {/* no opertion */
+    {/* no operation */
         MI_Session_AssociatorInstances(session, 0, NULL, NULL, testInstance, NULL, PAL_T("test"), NULL, NULL, MI_FALSE, NULL, NULL);
         /* nothing more we can do as no where for result to go */
     }
@@ -3386,7 +3386,7 @@ NitsTest3(MI_Session_ReferenceInstances_Sync_InvalidParameters,
         NitsCompare(result, MI_RESULT_INVALID_PARAMETER, PAL_T("Operation should succeed"));
         MI_Operation_Close(&operation);
     }
-    {/* no opertion */
+    {/* no operation */
         MI_Session_ReferenceInstances(session, 0, NULL, NULL, testInstance, PAL_T("test"), NULL, MI_FALSE, NULL, NULL);
         /* nothing more we can do as no where for result to go */
     }
@@ -3600,7 +3600,7 @@ NitsTest(MI_Session_GetClass_Sync_InvalidParameters)
 
             session.ft->GetClass(NULL, 0, NULL, PAL_T("namespace"), PAL_T("className"), NULL, &operation);
             MI_Operation_GetClass(&operation, &result, &moreResults, &resultCode, &errorMessage, &extendedInfo);
-            NitsCompare(resultCode, MI_RESULT_INVALID_PARAMETER, PAL_T("GetClass should faul due to NULL session"));
+            NitsCompare(resultCode, MI_RESULT_INVALID_PARAMETER, PAL_T("GetClass should fail due to NULL session"));
             MI_Operation_Close(&operation);
 
             session.ft->GetClass(&session, 0, NULL, PAL_T("namespace"), PAL_T("className"), &callbacks, NULL);
@@ -3771,7 +3771,7 @@ NitsTest(MI_Session_EnumerateClasses_Sync_InvalidParameters)
                 NitsCompare(result, MI_RESULT_OK, PAL_T("Operation should succeed"));
                 MI_Operation_Close(&operation);
             }
-            {/* no opertion */
+            {/* no operation */
                 MI_Session_EnumerateClasses(&session, 0, NULL, PAL_T("namespace"), PAL_T("testClass"), MI_FALSE, NULL, NULL);
                 /* nothing more we can do as no where for result to go */
             }
@@ -4036,7 +4036,7 @@ NitsTest(MI_Session_Subscribe_Sync_InvalidParameters)
                 }
                 MI_Operation_Close(&operation);
             }
-            {/* no opertion */
+            {/* no operation */
                 MI_Session_Subscribe(&session, 0, NULL, PAL_T("namespace"), PAL_T("dialect"), PAL_T("filter"), NULL, NULL, NULL);
                 /* nothing more we can do as no where for result to go */
             }
@@ -4330,7 +4330,7 @@ NitsTest(MI_Session_TestConnection_Sync_InvalidParameters)
 
             session.ft->TestConnection(NULL, 0, NULL, &operation);
             MI_Operation_GetInstance(&operation, &resultInstance, &moreResults, &resultCode, &errorMessage, &extendedInfo);
-            NitsCompare(resultCode, MI_RESULT_INVALID_PARAMETER, PAL_T("GetClass should faul due to NULL session"));
+            NitsCompare(resultCode, MI_RESULT_INVALID_PARAMETER, PAL_T("GetClass should fail due to NULL session"));
             MI_Operation_Close(&operation);
 
             session.ft->TestConnection(&session, 0, NULL, &operation);
@@ -5398,7 +5398,7 @@ static void _setup(_In_ MIAPITestStruct* mts)
 
 NitsSetup0(MIAPITest_Setup, MIAPITestStruct)
     /*
-     * MI_Application_Intialize create global log file handler _os
+     * MI_Application_Initialize create global log file handler _os
      * MI_Application_Close closes it,
      * thus the test case needs to make sure not close _os while
      * there are active MI_Application(s) objects
@@ -5429,7 +5429,7 @@ static void _cleanup(_In_ MIAPITestStruct* mts)
 
 NitsCleanup(MIAPITest_Setup)
     /*
-     * MI_Application_Intialize create global log file handler _os
+     * MI_Application_Initialize create global log file handler _os
      * MI_Application_Close closes it,
      * thus the test case needs to make sure not close _os while
      * there are active MI_Application(s) objects

@@ -284,7 +284,7 @@ static MI_PropertyDecl MI_CONST* MI_CONST Root_props[] =
     &Root_Uint32Property_prop,
 };
 
-static MI_CONST MI_Char* Root_Description_qual_value = MI_T("Root class for the inheritnace hierarchy");
+static MI_CONST MI_Char* Root_Description_qual_value = MI_T("Root class for the inheritance hierarchy");
 
 static MI_CONST MI_Qualifier Root_Description_qual =
 {
@@ -371,7 +371,7 @@ static MI_PropertyDecl MI_CONST* MI_CONST Separate_props[] =
     &Separate_BooleanProperty_prop,
 };
 
-static MI_CONST MI_Char* Separate_Description_qual_value = MI_T("Class outside of the inheritnace hierarchy");
+static MI_CONST MI_Char* Separate_Description_qual_value = MI_T("Class outside of the inheritance hierarchy");
 
 static MI_CONST MI_Qualifier Separate_Description_qual =
 {

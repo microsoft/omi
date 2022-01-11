@@ -47,7 +47,7 @@ typedef struct _HttpClient_SR_SocketData {
      __field_ecount(recvBufferSize) char *recvBuffer;
     size_t recvBufferSize;
     size_t receivedSize;
-    Http_RecvState recvingState;
+    Http_RecvState receivingState;
     HttpClientHeaderField recvHeaderFields[64];
     HttpClientResponseHeader recvHeaders;
     MI_Sint64 contentLength;
@@ -74,7 +74,7 @@ typedef struct _HttpClient_SR_SocketData {
     /* Authorisation state */
     MI_Boolean isAuthorized;    // We don't have to do any more authorising
     MI_Boolean authorizing;     // We are in the middle of the authorising process
-    MI_Boolean encrypting;      // All data transfered is being encrypted.
+    MI_Boolean encrypting;      // All data transferred is being encrypted.
     MI_Boolean readyToSend;     // We can send data now. This may occur before the context is fully established depending on GSS_C_PROT_FLAG (if supported)
 
     AuthMethod authType;
@@ -100,7 +100,7 @@ typedef struct _HttpClient_SR_SocketData {
     MI_Boolean secure;          // This is an SSL connection (https)
     MI_Boolean isPrivate;         // This connection is to be encrypted
 
-    MI_Char *errMsg;           // Has a error mesisage produced in IsAuthorized or other areas 
+    MI_Char *errMsg;           // Has a error message produced in IsAuthorized or other areas 
                                // that have interesting information for CIMerror
 
     /* For the authorisation loop we need to retain the components of the original message */

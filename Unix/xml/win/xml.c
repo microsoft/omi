@@ -155,11 +155,11 @@ INLINE Char* _ToEntityRef(
     /* Note: we collected the following statistics on the frequency of
      * each entity reference in a large body of XML documents:
      *     
-     *     &quot; - 74,480 occurences
-     *     &apos; - 13,877 occurences
-     *     &lt;   -  9,919 occurences
-     *     &gt;   -  9,853 occurences
-     *     &amp;  -    111 occurences
+     *     &quot; - 74,480 occurrences
+     *     &apos; - 13,877 occurrences
+     *     &lt;   -  9,919 occurrences
+     *     &gt;   -  9,853 occurrences
+     *     &amp;  -    111 occurrences
      *
      * The cases below are organized in order of statistical frequency.
      */
@@ -244,8 +244,8 @@ INLINE Char* _ToRef(__inout XML* self, __in_z Char* p, __inout_z Char* ch)
 
 static int _Match1(Char c)
 {
-    /* Matches all but '\0', '\'', '"', and '&'. All matching charcters
-     * yeild 2, except for '\n', which yields 1 
+    /* Matches all but '\0', '\'', '"', and '&'. All matching characters
+     * yield 2, except for '\n', which yields 1 
      */
     static const unsigned char _match[256] =
     {
@@ -420,7 +420,7 @@ INLINE unsigned int _HashCode(__in_ecount_z(n) const Char* s, size_t n)
      * (e.g., URIs) the first character is not unique. Instead the hash 
      * comprises three components:
      *     (1) The length
-     *     (3) The last chacter
+     *     (3) The last character
      */
     return n ? (int)(n ^ s[n-1]) : 0;
 }
@@ -664,7 +664,7 @@ static void _ParseAttr(
         /* Check for attribute array overflow */
         if (elem->attrsSize == XML_MAX_ATTRIBUTES)
         {
-            elem->data.data[elem->data.size] = 0;   //May not have been null termated yet
+            elem->data.data[elem->data.size] = 0;   //May not have been null terminated yet
             XML_Raise(self, ID_MIUTILS_XMLPARSER_TOO_MANY_ATTRIBUTES, elem->data.data, (int)XML_MAX_ATTRIBUTES);
             return;
         }
@@ -715,7 +715,7 @@ static void _ParseProcessingInstruction(
             }
         }
 
-        /* If input exhuasted */
+        /* If input exhausted */
         if (*p == '\0')
         {
             XML_Raise(self, ID_MIUTILS_XMLPARSER_END_OF_XML_INSTRUCTION);
@@ -819,7 +819,7 @@ static void _ParseStartTag(
             }
         }
 
-        /* If input exhuasted */
+        /* If input exhausted */
         if (*p == '\0')
         {
             XML_Raise(self, ID_MIUTILS_XMLPARSER_ELEMENT_NAME_PREMATURE_END);
@@ -1011,7 +1011,7 @@ static void _ParseEndTag(
         }
     }
 
-    /* If input exhuasted */
+    /* If input exhausted */
     if (*p == '\0')
     {
         XML_Raise(self, ID_MIUTILS_XMLPARSER_ELEMENT_NAME_PREMATURE_END_ELEM_END);
@@ -1701,7 +1701,7 @@ void XML_Raise(__inout XML* self, unsigned formatStringId, ...)
         va_end(ap);
     }
 #endif
-    XML_Raise2(self, T("An XML error occured!"));
+    XML_Raise2(self, T("An XML error occurred!"));
 }
 
 void XML_FormatError(__inout XML* self, __out_ecount_z(size) Char* format, size_t size)

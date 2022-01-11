@@ -44,7 +44,7 @@ class CIM_USBRedirectionService : CIM_RedirectionService {
           "CIM_ComputerSystem that has the USB device being "
           "redirection with the new SAP, "
           "EnabledLogicalElementCapabilities that describes the "
-          "capabilities of the new SAP, ElementCapabilties "
+          "capabilities of the new SAP, ElementCapabilities "
           "associating the new EnabledLogicalElementCapabilities "
           "with the new SAP, SAPAvailableForElement associating the "
           "new SAP with the USBDevices specified in the parameters "
@@ -71,7 +71,7 @@ class CIM_USBRedirectionService : CIM_RedirectionService {
              "capability for the newly created SAP. The values "
              "specified for this parameter must be from the set "
              "of values found in the Redirection Service\'s "
-             "CIM_USBRedirectionCapabilities.RequestedStatesSupporteForCreatedSAP "
+             "CIM_USBRedirectionCapabilities.RequestedStatesSupportForCreatedSAP "
              "array." ), 
           ModelCorrespondence { 
              "CIM_USBRedirectionCapabilities.RequestedStatesSupportedForCreatedSAP" }]
@@ -211,7 +211,7 @@ class CIM_USBRedirectionService : CIM_RedirectionService {
       string NewUSBDevice, 
          [IN, Description ( 
              "If not empty, this is a reference to a concrete "
-             "subclasss of CIM_LogicalDevice representing the "
+             "subclass of CIM_LogicalDevice representing the "
              "device to be redirected by the USB Redirection "
              "Service. This might, for example, be a "
              "CIM_CDROMDrive or a CIM_DisketteDrive." )]

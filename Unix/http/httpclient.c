@@ -598,7 +598,7 @@ static Http_CallbackResult _ReadHeader(
     size_t allocSize = 0;
 
     /* are we done with header? */
-    if (handler->recvingState != RECV_STATE_HEADER)
+    if (handler->receivingState != RECV_STATE_HEADER)
     {
         return PRT_CONTINUE;
     }
@@ -729,7 +729,7 @@ static Http_CallbackResult _ReadHeader(
         /* remove consumed header part */
         memmove(handler->recvBuffer, data, handler->receivedSize);
 
-        handler->recvingState = RECV_STATE_CHUNKHEADER;
+        handler->receivingState = RECV_STATE_CHUNKHEADER;
         return PRT_CONTINUE;
     }
 
@@ -779,7 +779,7 @@ static Http_CallbackResult _ReadHeader(
 
     if (handler->receivedSize != 0)
         memcpy(handler->recvPage + 1, data, handler->receivedSize);
-    handler->recvingState = RECV_STATE_CONTENT;
+    handler->receivingState = RECV_STATE_CONTENT;
 
     /* Check the authentication. If we need to recycle, send a response to the response. */
 
@@ -791,13 +791,13 @@ static Http_CallbackResult _ReadHeader(
         switch (rslt) 
         {
         case PRT_RETURN_TRUE:
-            LOGD2((ZT("_ReadHeader - not (yet) authorized. reslt = %d"), rslt));
+            LOGD2((ZT("_ReadHeader - not (yet) authorized. result = %d"), rslt));
             return rslt;
 
         case PRT_RETURN_FALSE:
             if (!handler->authorizing)
             {
-                LOGD2((ZT("_ReadHeader - ACCESS DENIED reslt = %d"), rslt));
+                LOGD2((ZT("_ReadHeader - ACCESS DENIED result = %d"), rslt));
                 r = MI_RESULT_ACCESS_DENIED; 
                 goto Error;
             }
@@ -846,7 +846,7 @@ static Http_CallbackResult _ReadData(
 
 
     /* are we in the right state? */
-    if (handler->recvingState != RECV_STATE_CONTENT)
+    if (handler->receivingState != RECV_STATE_CONTENT)
     {
         LOGD2((ZT("_ReadData - recv state:skip")));
         return PRT_RETURN_FALSE;
@@ -910,13 +910,13 @@ static Http_CallbackResult _ReadData(
 
         if (!HttpClient_DecryptData(handler, &handler->recvHeaders, &handler->recvPage) )
         {
-            // Failed decrypt. No encryption counts as success. So this is an error in the decrpytion, probably 
+            // Failed decrypt. No encryption counts as success. So this is an error in the decryption, probably 
             // bad credential
 
             handler->recvPage = 0;
             handler->receivedSize = 0;
             memset(&handler->recvHeaders, 0, sizeof(handler->recvHeaders));
-            handler->recvingState = RECV_STATE_HEADER;
+            handler->receivingState = RECV_STATE_HEADER;
             goto Error;
         }
         else 
@@ -974,7 +974,7 @@ static Http_CallbackResult _ReadData(
     handler->recvPage = NULL;
     handler->receivedSize = 0;
     memset(&handler->recvHeaders, 0, sizeof(handler->recvHeaders));
-    handler->recvingState = RECV_STATE_HEADER; /* TODO: We are needing to send new headers to server, not get headers from them */
+    handler->receivingState = RECV_STATE_HEADER; /* TODO: We are needing to send new headers to server, not get headers from them */
     LOGD2((ZT("_ReadData - OK exit")));
 
     return PRT_CONTINUE;
@@ -997,7 +997,7 @@ static Http_CallbackResult _ReadChunkHeader(
     MI_Boolean connectionClosed = MI_FALSE;
 
     /* are we done with header? */
-    if (handler->recvingState != RECV_STATE_CHUNKHEADER)
+    if (handler->receivingState != RECV_STATE_CHUNKHEADER)
         return PRT_CONTINUE;
 
     buf = handler->recvBuffer + handler->receivedSize;
@@ -1084,7 +1084,7 @@ static Http_CallbackResult _ReadChunkHeader(
         handler->recvPage = 0;
         handler->receivedSize = 0;
         memset(&handler->recvHeaders, 0, sizeof(handler->recvHeaders));
-        handler->recvingState = RECV_STATE_HEADER;
+        handler->receivingState = RECV_STATE_HEADER;
 
         if (connectionClosed)
         {
@@ -1156,7 +1156,7 @@ static Http_CallbackResult _ReadChunkHeader(
     }
 
     memcpy(handler->recvPage + 1, data, handler->receivedSize);
-    handler->recvingState = RECV_STATE_CHUNKDATA;
+    handler->receivingState = RECV_STATE_CHUNKDATA;
 
     if (connectionClosed)
         return PRT_RETURN_FALSE; /* connection closed */
@@ -1172,7 +1172,7 @@ static Http_CallbackResult _ReadChunkData(
     MI_Result r;
 
     /* are we in the right state? */
-    if (handler->recvingState != RECV_STATE_CHUNKDATA)
+    if (handler->receivingState != RECV_STATE_CHUNKDATA)
         return PRT_RETURN_FALSE;
 
     buf = ((char*)(handler->recvPage + 1)) + handler->receivedSize;
@@ -1216,7 +1216,7 @@ static Http_CallbackResult _ReadChunkData(
     handler->recvPage = 0;
     handler->receivedSize = 0;
     memset(&handler->recvHeaders, 0, sizeof(handler->recvHeaders));
-    handler->recvingState = RECV_STATE_CHUNKHEADER;
+    handler->receivingState = RECV_STATE_CHUNKHEADER;
     return PRT_CONTINUE;
 }
 
@@ -1428,7 +1428,7 @@ static MI_Boolean _RequestCallbackRead(
     case PRT_RETURN_FALSE: return MI_FALSE;
     }
 
-    if (handler->recvingState == RECV_STATE_CONTENT)
+    if (handler->receivingState == RECV_STATE_CONTENT)
     {
         switch (_ReadData(handler))
         {
@@ -1438,7 +1438,7 @@ static MI_Boolean _RequestCallbackRead(
         }
     }
 
-    if (handler->recvingState == RECV_STATE_CHUNKHEADER)
+    if (handler->receivingState == RECV_STATE_CHUNKHEADER)
     {
         switch (_ReadChunkHeader(handler))
         {
@@ -1447,7 +1447,7 @@ static MI_Boolean _RequestCallbackRead(
         case PRT_RETURN_FALSE: return MI_FALSE;
         }
     }
-    if (handler->recvingState == RECV_STATE_CHUNKDATA)
+    if (handler->receivingState == RECV_STATE_CHUNKDATA)
     {
         switch (_ReadChunkData(handler))
         {
@@ -1951,7 +1951,7 @@ static MI_Result _New_Http(
         self->internalSelectorUsed = MI_FALSE;
     }
     else
-    {   /* creaet a new selector */
+    {   /* create a new selector */
         /* Initialize the network */
         Sock_Start();
 
@@ -2591,7 +2591,7 @@ Done:
             private one is created.
     host - host address
     port - port number
-    secure - flag that indicates if http or https conneciton is required
+    secure - flag that indicates if http or https connection is required
 
     The old interface did not do authorisation. It only used SSL and handled 
     authentication outboard via request and response callbacks

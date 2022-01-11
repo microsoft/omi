@@ -21,13 +21,13 @@ the problem. See [Common scenarios for OMI problems](#common-scenarios-for-omi-p
 for additional information that Microsoft may require.
 
 - [Minimum OMI version](#minimum-omi-version)
-- [Caviats](#caviats)
+- [Caveats](#caveats)
 - [Required information when reporting problems](#required-information-when-reporting-problems)
 - [Enabling logging in OMI](#enabling-logging-in-omi)
 - [Log file entries of interest](#log-file-entries-of-interest)
 - [Common scenarios for OMI problems](#common-scenarios-for-omi-problems)
   - [Diagnosing memory problems in OMI itself](#diagnosing-memory-problems-in-omi-itself)
-  - [Diagnosing omiserver or omiengine crashes](#dignosing-omiserver-or-omigngine-crashes)
+  - [Diagnosing omiserver or omiengine crashes](#diagnosing-omiserver-or-omigngine-crashes)
   - [Diagnosing OMI Provider Failures](#diagnosing-omi-provider-failures)
     - [Diagnosing OMI Provider Memory Leaks](#diagnosing-omi-provider-memory-leaks)
     - [Diagnosing Unexpected OMI Provider aborts](#diagnosing-unexpected-omi-provider-aborts)
@@ -50,7 +50,7 @@ jeffcof:~> /opt/omi/bin/omiserver -v
 jeffcof:~>
 ```
 
-## Caviats
+## Caveats
 
 OMI v1.4.1-0 has some issues logged against it regarding logging:
 
@@ -117,7 +117,7 @@ logging entry in the configuration file, add the following lines to
 
 ```
 ##
-## loglevel -- set the loggiing options for MI server
+## loglevel -- set the logging options for MI server
 ##   Valid options are: ERROR, WARNING, INFO, DEBUG, VERBOSE (debug build)
 ##   If commented out, then default value is: WARNING
 ##
@@ -311,7 +311,7 @@ request* message, we receive the namespace and class:
 
 Using this information, we can retrieve the provider registration
 name. In the above message, the namespace is `root/scx` and the class
-is `SCX_Agent`. To retrive the provider registration name, replace `/`
+is `SCX_Agent`. To retrieve the provider registration name, replace `/`
 with `-` in the namespace and issue the following `grep` command
 (substitute `SCX_Agent` with your class and `root-scx` with your
 namespace):
@@ -329,4 +329,4 @@ information:
 
 1. All of the information described in
    [Required information when reporting problems](#required-information-when-reporting-problems),
-2. Provider registration name, retrived as described above.
+2. Provider registration name, retrieved as described above.

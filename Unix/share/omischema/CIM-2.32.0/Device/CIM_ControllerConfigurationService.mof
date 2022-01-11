@@ -438,7 +438,7 @@ class CIM_ControllerConfigurationService : CIM_Service {
           "\n"
           "The disposition of the SPC when the last logical unit, "
           "initiator ID, or target port ID is removed depends upon "
-          "the CIM_ProtocolControllerMaskingCapabilites "
+          "the CIM_ProtocolControllerMaskingCapabilities "
           "SPCAllowsNo* properties. If SPCAllowsNoLUs is false, "
           "then the SPC is automatically deleted when the last "
           "logical unit is removed. If SPCAllowsNoTargets is false, "

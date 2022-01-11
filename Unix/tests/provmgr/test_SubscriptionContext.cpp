@@ -265,7 +265,7 @@ void RequestHandler_LocalInit()
 {
     //
     // Initialize unsubscribe handler
-    // unsubsribe must happen on separate thread
+    // unsubscribe must happen on separate thread
     //
     RequestHandler_Init(&g_requesthandler);
 }
@@ -274,7 +274,7 @@ void RequestHandler_LocalFinalize()
 {
     //
     // Initialize unsubscribe handler
-    // unsubsribe must happen on separate thread
+    // unsubscribe must happen on separate thread
     // wait for that thread to finish the unsubscribe call
     //
     while ( Atomic_Read( &g_requesthandler.running ) == 1 )
@@ -312,7 +312,7 @@ NitsTestWithSetup(TestSubscriptionContext_InitAndClose, TestSubscriptionContextS
 
     SubscrContext_Close( &context );
 
-    /* Verify destoryed */
+    /* Verify destroyed */
     UT_ASSERT_EQUAL((MI_Uint32)0xFFFFFFFF, context.baseCtx.magic );
 }
 NitsEndTest

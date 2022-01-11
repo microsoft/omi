@@ -110,7 +110,7 @@ class CIM_ObjectManagerCommunicationMechanism : CIM_ServiceAccessPoint {
           "access point. . It is used by the advertising services "
           "of the WBEM infrastructure to determine what should be "
           "advertised, via what mechanisms. The property is an "
-          "array so that the communicationMechansim MAY be "
+          "array so that the communicationMechanism MAY be "
           "advertised using several mechanisms. Note: If this "
           "property is null/uninitialized, this is equivalent to "
           "specifying the value 2, \"Not Advertised\"." ), 

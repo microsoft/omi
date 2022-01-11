@@ -52,7 +52,7 @@ MI_Char* CreateFilterIdentifier(_In_ CimBase *self)
     case FILTER_UNARY_TEMP:
         /* TODO: get filter ID thread safely */
         return GetID(g_FilterTempID++, TEMP_FILTER_ID_PREFIX, self->batch);
-    case FILTER_UNIARY_CONFIG:
+    case FILTER_UNARY_CONFIG:
         /* id is the filter instance's name/instanceid property */
         break;
     case FILTER_COLLECTION_CONFIG:

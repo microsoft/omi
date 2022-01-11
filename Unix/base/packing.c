@@ -468,11 +468,11 @@ MI_Result Instance_Pack(
                 pName = ZT("ReturnValue");
         }
 
-        /* Pack the propety name */
+        /* Pack the property name */
         MI_RETURN_ERR(Buf_PackStrLen(
             buf, pName, NameLen(pName, pd->code)));
 
-        /* Pack the propety type */
+        /* Pack the property type */
         MI_RETURN_ERR(Buf_PackU32(buf, pd->type));
 
         /* Pack the value */
@@ -541,13 +541,13 @@ MI_Result Instance_Unpack(
             MI_Boolean exists;
 
             /* ATTN-B: prevent copying of name by Instance_Add */
-            /* Unpack the propety type */
+            /* Unpack the property type */
             MI_RETURN_ERR(Buf_UnpackU32(buf, &prop_flags));
 
-            /* Unpack the propety name */
+            /* Unpack the property name */
             MI_RETURN_ERR(Buf_UnpackStr(buf, &name));
 
-            /* Unpack the propety type */
+            /* Unpack the property type */
             MI_RETURN_ERR(Buf_UnpackU32(buf, &type));
 
             /* Unpack the value */

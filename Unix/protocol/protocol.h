@@ -26,7 +26,7 @@ BEGIN_EXTERNC
 
 typedef enum _Protocol_AuthState
 {
-    /* authentication failed (intentionaly takes value '0')*/
+    /* authentication failed (intentionally takes value '0')*/
     PRT_AUTH_FAILED,
 
     /* listener (server) waits for connect request */
@@ -105,7 +105,7 @@ typedef struct _ProtocolSocket
     Protocol_AuthState  clientAuthState;
     /* Engine auth state */
     Protocol_AuthState  engineAuthState;
-    /* server side - auhtenticated user's ids */
+    /* server side - authenticated user's ids */
     AuthInfo            authInfo;
     Protocol_AuthData*  authData;
 
@@ -113,7 +113,7 @@ typedef struct _ProtocolSocket
     MI_Boolean          isConnected;
     volatile ptrdiff_t  connectEventSent;
 
-    volatile ptrdiff_t refCount; //used by socket listner for lifetimemanagement
+    volatile ptrdiff_t refCount; //used by socket listener for lifetimemanagement
     MI_Boolean          closeOtherScheduled;
 
     /* Whether socket is permanent */
@@ -146,15 +146,15 @@ MI_Result ProtocolBase_New_Listener(
     self - [out] protocol object
     selector - [opt] selector to use for socket monitoring
     locator - server's address (typically domain socket file name)
-    callback - function that protocol calls to inform about new messsages
+    callback - function that protocol calls to inform about new messages
     callbackData -
-    eventCallback - function that protocl calls to inform about socket states
+    eventCallback - function that protocol calls to inform about socket states
         connected/disconnected
     user, password [opt] - credentials for explicit auth. If NULL,
         implicit authentication is used
 
     Returns:
-    'OK' if succefful, error otherwise
+    'OK' if successful, error otherwise
 */
 MI_Result ProtocolSocketAndBase_New_Connector(
     _Out_       ProtocolSocketAndBase** selfOut,

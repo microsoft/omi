@@ -2,7 +2,7 @@
 //  MSFT_IPACL
 // ===============================================================
 	[Description ( "MSFT_IPACL description." 
-	"This class names the IP ACL in a system. It is used as an aggragation class" 
+	"This class names the IP ACL in a system. It is used as an aggregation class" 
 	"for an orderset of rules"), 
 	Version ( "0.70" )]
 class MSFT_ACL : CIM_NetworkPolicyRule
@@ -19,9 +19,9 @@ class MSFT_ACL : CIM_NetworkPolicyRule
 
 [Description ( 
           "Set of policy on an ACL"
-		  "The default Implicited states that all traffic is denied unless there is a"
+		  "The default Implicit states that all traffic is denied unless there is a"
 		  "rule allowing traffic"
-		  "Explicit policy states that an explict rule must be stated for each permit and or allow action"), 
+		  "Explicit policy states that an explicit rule must be stated for each permit and or allow action"), 
        ValueMap { "2", "3"}, 
        Values { "Implicit", "Explicit"}
 

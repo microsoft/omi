@@ -339,7 +339,7 @@ NitsTest(Test_Class_GetElementAt)
             NitsCompareString(name, PAL_T("Key"), PAL_T("param 0 of AllTypes should be Key"));
             NitsCompare(type, MI_UINT32, PAL_T("param 0 of AllTypes should be UINT32"));
             NitsCompare(flags, MI_FLAG_PROPERTY|MI_FLAG_KEY, PAL_T("param 0 of AllTypes should have MI_FLAG_PROPERTY|MI_FLAG_KEY flags"));
-            NitsCompare(MI_Class_GetElementAt(newClass, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL), MI_RESULT_OK, PAL_T("Getting MI_Class_GetElementAt should succeed with only madatory parameters"));
+            NitsCompare(MI_Class_GetElementAt(newClass, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL), MI_RESULT_OK, PAL_T("Getting MI_Class_GetElementAt should succeed with only mandatory parameters"));
             MI_Class_Delete(newClass);
         }
     }
@@ -1226,9 +1226,9 @@ NitsTest(Class_New_NoParent)
         PAL_T("root"),        /* Not needed if parentClass is passed in */
         PAL_T("localhost"),   /* Not needed if parentClass is passed in */
         PAL_T("MyClass"),     /* class name */
-        0,              /* number of extra class qualifiers you want to create.  Allowes us to pre-create array of correct size */
-        0,              /* number of extra properties you want to create.  Allowes us to pre-create array of correct size */
-        0,              /* number of extra methods you want to create. Allowes us to pre-create array of correct size */
+        0,              /* number of extra class qualifiers you want to create.  Allows us to pre-create array of correct size */
+        0,              /* number of extra properties you want to create.  Allows us to pre-create array of correct size */
+        0,              /* number of extra methods you want to create. Allows us to pre-create array of correct size */
         &newClass       /* Object that is ready to receive new qualifiers/properties/methods */
         );
     if (NitsCompare(res, MI_RESULT_OK, PAL_T("RC Class Creation should succeed")))
@@ -1249,9 +1249,9 @@ NitsTest(Class_New_ClassQualifiers_NoParent)
         PAL_T("root"),        /* Not needed if parentClass is passed in */
         PAL_T("localhost"),   /* Not needed if parentClass is passed in */
         PAL_T("MyClass"),     /* class name */
-        2,              /* number of extra class qualifiers you want to create.  Allowes us to pre-create array of correct size */
-        0,              /* number of extra properties you want to create.  Allowes us to pre-create array of correct size */
-        0,              /* number of extra methods you want to create. Allowes us to pre-create array of correct size */
+        2,              /* number of extra class qualifiers you want to create.  Allows us to pre-create array of correct size */
+        0,              /* number of extra properties you want to create.  Allows us to pre-create array of correct size */
+        0,              /* number of extra methods you want to create. Allows us to pre-create array of correct size */
         &newClass       /* Object that is ready to receive new qualifiers/properties/methods */
         );
     if (NitsCompare(res, MI_RESULT_OK, PAL_T("RC Class Creation should succeed")))
@@ -1277,9 +1277,9 @@ NitsTest(Class_New_Methods_NoParent)
         PAL_T("root"),        /* Not needed if parentClass is passed in */
         PAL_T("localhost"),   /* Not needed if parentClass is passed in */
         PAL_T("MyClass"),     /* class name */
-        0,              /* number of extra class qualifiers you want to create.  Allowes us to pre-create array of correct size */
-        0,              /* number of extra properties you want to create.  Allowes us to pre-create array of correct size */
-        1,              /* number of extra methods you want to create. Allowes us to pre-create array of correct size */
+        0,              /* number of extra class qualifiers you want to create.  Allows us to pre-create array of correct size */
+        0,              /* number of extra properties you want to create.  Allows us to pre-create array of correct size */
+        1,              /* number of extra methods you want to create. Allows us to pre-create array of correct size */
         &newClass       /* Object that is ready to receive new qualifiers/properties/methods */
         );
     if (NitsCompare(res, MI_RESULT_OK, PAL_T("RC Class Creation should succeed")))
@@ -1317,9 +1317,9 @@ NitsTest(Class_New_EverythingWithValidation_NoParent)
         PAL_T("root"),        /* Not needed if parentClass is passed in */
         PAL_T("localhost"),   /* Not needed if parentClass is passed in */
         PAL_T("BaseClass"),   /* class name */
-        1,              /* number of extra class qualifiers you want to create.  Allowes us to pre-create array of correct size */
-        1,              /* number of extra properties you want to create.  Allowes us to pre-create array of correct size */
-        1,              /* number of extra methods you want to create. Allowes us to pre-create array of correct size */
+        1,              /* number of extra class qualifiers you want to create.  Allows us to pre-create array of correct size */
+        1,              /* number of extra properties you want to create.  Allows us to pre-create array of correct size */
+        1,              /* number of extra methods you want to create. Allows us to pre-create array of correct size */
         &baseClass       /* Object that is ready to receive new qualifiers/properties/methods */
         );
 
@@ -1390,9 +1390,9 @@ NitsTest(Class_New_ClassElement_NoParent)
         PAL_T("root"),        /* Not needed if parentClass is passed in */
         PAL_T("localhost"),   /* Not needed if parentClass is passed in */
         PAL_T("MyClass"),     /* class name */
-        0,              /* number of extra class qualifiers you want to create.  Allowes us to pre-create array of correct size */
-        1,              /* number of extra properties you want to create.  Allowes us to pre-create array of correct size */
-        0,              /* number of extra methods you want to create. Allowes us to pre-create array of correct size */
+        0,              /* number of extra class qualifiers you want to create.  Allows us to pre-create array of correct size */
+        1,              /* number of extra properties you want to create.  Allows us to pre-create array of correct size */
+        0,              /* number of extra methods you want to create. Allows us to pre-create array of correct size */
         &newClass       /* Object that is ready to receive new qualifiers/properties/methods */
         );
     if (NitsCompare(res, MI_RESULT_OK, PAL_T("RC Class Creation should succeed")))
@@ -1426,9 +1426,9 @@ NitsTest(Class_New_WithParent)
         PAL_T("root"),        /* Not needed if parentClass is passed in */
         PAL_T("localhost"),   /* Not needed if parentClass is passed in */
         PAL_T("BaseClass"),   /* class name */
-        1,              /* number of extra class qualifiers you want to create.  Allowes us to pre-create array of correct size */
-        1,              /* number of extra properties you want to create.  Allowes us to pre-create array of correct size */
-        1,              /* number of extra methods you want to create. Allowes us to pre-create array of correct size */
+        1,              /* number of extra class qualifiers you want to create.  Allows us to pre-create array of correct size */
+        1,              /* number of extra properties you want to create.  Allows us to pre-create array of correct size */
+        1,              /* number of extra methods you want to create. Allows us to pre-create array of correct size */
         &baseClass       /* Object that is ready to receive new qualifiers/properties/methods */
         );
     if (NitsCompare(res, MI_RESULT_OK, PAL_T("RC Class Creation should succeed")) &&
@@ -1452,9 +1452,9 @@ NitsTest(Class_New_WithParent)
             NULL,           /* Not needed if parentClass is passed in */
             NULL,           /* Not needed if parentClass is passed in */
             PAL_T("DerivedClass"),/* class name */
-            1,              /* number of extra class qualifiers you want to create.  Allowes us to pre-create array of correct size */
-            1,              /* number of extra properties you want to create.  Allowes us to pre-create array of correct size */
-            1,              /* number of extra methods you want to create. Allowes us to pre-create array of correct size */
+            1,              /* number of extra class qualifiers you want to create.  Allows us to pre-create array of correct size */
+            1,              /* number of extra properties you want to create.  Allows us to pre-create array of correct size */
+            1,              /* number of extra methods you want to create. Allows us to pre-create array of correct size */
             &derivedClass   /* Object that is ready to receive new qualifiers/properties/methods */
             );
         if (NitsCompare(res, MI_RESULT_OK, PAL_T("RC derived Class Creation should succeed")) &&
@@ -1540,9 +1540,9 @@ NitsTest(Class_New_WithParent_ButOverridden)
         PAL_T("root"),        /* Not needed if parentClass is passed in */
         PAL_T("localhost"),   /* Not needed if parentClass is passed in */
         PAL_T("BaseClass"),   /* class name */
-        1,              /* number of extra class qualifiers you want to create.  Allowes us to pre-create array of correct size */
-        1,              /* number of extra properties you want to create.  Allowes us to pre-create array of correct size */
-        1,              /* number of extra methods you want to create. Allowes us to pre-create array of correct size */
+        1,              /* number of extra class qualifiers you want to create.  Allows us to pre-create array of correct size */
+        1,              /* number of extra properties you want to create.  Allows us to pre-create array of correct size */
+        1,              /* number of extra methods you want to create. Allows us to pre-create array of correct size */
         &baseClass       /* Object that is ready to receive new qualifiers/properties/methods */
         );
     if (NitsCompare(res, MI_RESULT_OK, PAL_T("RC Class Creation should succeed")) &&
@@ -1566,9 +1566,9 @@ NitsTest(Class_New_WithParent_ButOverridden)
             NULL,           /* Not needed if parentClass is passed in */
             NULL,           /* Not needed if parentClass is passed in */
             PAL_T("DerivedClass"),/* class name */
-            1,              /* number of extra class qualifiers you want to create.  Allowes us to pre-create array of correct size */
-            1,              /* number of extra properties you want to create.  Allowes us to pre-create array of correct size */
-            1,              /* number of extra methods you want to create. Allowes us to pre-create array of correct size */
+            1,              /* number of extra class qualifiers you want to create.  Allows us to pre-create array of correct size */
+            1,              /* number of extra properties you want to create.  Allows us to pre-create array of correct size */
+            1,              /* number of extra methods you want to create. Allows us to pre-create array of correct size */
             &derivedClass   /* Object that is ready to receive new qualifiers/properties/methods */
             );
         if (NitsCompare(res, MI_RESULT_OK, PAL_T("RC derived Class Creation should succeed")) &&

@@ -40,7 +40,7 @@ struct _ThunkHandle
         void *object; /* When allocated, object points to real session/operation/etc */
     } u;
 
-    /* Handle version number.  When accessing handle this is comapred with generic handle version to make sure it matches */
+    /* Handle version number.  When accessing handle this is compared with generic handle version to make sure it matches */
     volatile ptrdiff_t version; 
 
     ThunkHandleManager *handleManager; /* So we know where this object goes when freed */

@@ -288,7 +288,7 @@ NitsTestWithSetup(TestWSMAN_EnumPull, Wsman_Inproc_Setup)
 
     StartWSManInproc( _callback, (void*)MI_RESULT_OK);
 
-    // send enum request, expect enum context back (since no OptimzeEnum tag specified)
+    // send enum request, expect enum context back (since no OptimizeEnum tag specified)
     Sock s = SockConnectLocal(PORT);
     string r_b, r_h;
 
@@ -315,7 +315,7 @@ NitsTestWithSetup(TestWSMAN_EnumRelease, Wsman_Inproc_Setup)
 
     StartWSManInproc( _callback, (void*)MI_RESULT_OK);
 
-    // send enum request, expect enum context back (since no OptimzeEnum tag specified)
+    // send enum request, expect enum context back (since no OptimizeEnum tag specified)
     Sock s = SockConnectLocal(PORT);
     string r_b, r_h;
 
@@ -348,7 +348,7 @@ NitsTestWithSetup(TestWSMAN_PullWithInvalidCtxID, Wsman_Inproc_Setup)
 
     StartWSManInproc( _callback, (void*)MI_RESULT_OK);
 
-    // send enum request, expect enum context back (since no OptimzeEnum tag specified)
+    // send enum request, expect enum context back (since no OptimizeEnum tag specified)
     Sock s = SockConnectLocal(PORT);
     string r_b, r_h;
 

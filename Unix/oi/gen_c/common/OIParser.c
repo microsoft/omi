@@ -174,7 +174,7 @@ static int _StartsWith(_In_z_ char * line, _In_z_ char * str)
     return 0;
 }
 
-/* Strip away paranthesis ( ); modifies string in-place */
+/* Strip away parentheses ( ); modifies string in-place */
 static char * _GetArgsAsString(_In_z_ char * line)
 {
     char * pos;
@@ -410,7 +410,7 @@ static MI_Boolean _ParseOIDefault(_In_z_ char * line, _In_ OIDefaults * defaults
     ignore = Strtok(line, "()", &next_token);    
     if(!ignore)
     {
-        OIERROR1("Expected OI_SETDEFAULT(X(Y)) but found no paranthesis characters at all! %s", line);
+        OIERROR1("Expected OI_SETDEFAULT(X(Y)) but found no parentheses characters at all! %s", line);
         return MI_FALSE;
     }
 
@@ -621,7 +621,7 @@ static MI_Boolean _ParseFunctionDecl(_In_z_ char * line, _In_ OIDefaults * defau
     line2 = _Trim(line);
     if (_StartsWith(line2, "void") == 0)
     {
-        OIERROR1("Trace declaration function didnt start with void! [%s]", line2);
+        OIERROR1("Trace declaration function didn't start with void! [%s]", line2);
         goto error;
     }
 
@@ -629,7 +629,7 @@ static MI_Boolean _ParseFunctionDecl(_In_z_ char * line, _In_ OIDefaults * defau
     pos = strchr(line2, '(');
     if (!pos)
     {
-        OIERROR1("Trace declaration function didnt have a name! [%s] Expected void func(...);", line2);
+        OIERROR1("Trace declaration function didn't have a name! [%s] Expected void func(...);", line2);
         goto error;
     }
 

@@ -27,7 +27,7 @@ class CIM_ElementSoftwareIdentity : CIM_Dependency {
           "the software is on the element and is upgradeable by the owner.\n"
           "\'FactoryUpgradeable\' (4),indicates the persistence of "
           "the software is on the element and is upgradeable by the manufacturer.\n"
-          "\'Not Upgradeable\' (5), indicates the presistence of "
+          "\'Not Upgradeable\' (5), indicates the persistence of "
           "the software is on the element and is not upgradeable. "
           "(i.e. burned into a non replaceable ROM chip." ), 
        ValueMap { "0", "1", "2", "3", "4", "5", "..", 

@@ -2513,8 +2513,8 @@ typedef void (MI_CALL *MI_ProviderFT_GetInstance)(
 
 /**
  *  The server calls EnumerateInstances to enumerate instances of a CIM class
- *  in the target namespace. Note that the enumeration is not polymoprhic; the
- *  implementaiton should provide instances of the exact class given by the
+ *  in the target namespace. Note that the enumeration is not polymorphic; the
+ *  implementation should provide instances of the exact class given by the
  *  'className' input parameter, and should not include instances of any
  *  derived classes.
  *
@@ -2526,13 +2526,13 @@ typedef void (MI_CALL *MI_ProviderFT_GetInstance)(
  *  parameter is an empty set, no properties are included in the response. If
  *  the 'propertySet' input parameter is null, no properties shall be filtered.
  *
- *  If the 'keysOnly' input parameter is true, then the implementaiton should
+ *  If the 'keysOnly' input parameter is true, then the implementation should
  *  provide only key properties.
  *
  *  If not null, the 'filter' input parameter defines a query filter that all
  *  provided instances must match. If the MI_Module.flags field contains
  *  MI_MODULE_FLAG_FILTER_SUPPORT (set by the MI_Main() entry point), this
- *  filter may be non-null. Otherwise, the 'filter' input paramerter is null.
+ *  filter may be non-null. Otherwise, the 'filter' input parameter is null.
  *
  *  If EnumerateInstances is successful, the method returns zero or more
  *  instances.
@@ -2628,7 +2628,7 @@ typedef void (MI_CALL *MI_ProviderFT_CreateInstance)(
  *  If the propertySet input parameter is not null, the elements of the set
  *  define zero or more property names. Only properties specified in this set
  *  are modified. Properties of the modifiedInstance that are missing from the
- *  set shall be ingored. If the set is empty, no properties are modified. If
+ *  set shall be ignored. If the set is empty, no properties are modified. If
  *  propertySet is null, the set of properties to be modified consists of those
  *  of modifiedInstance that are not null and whose values are different from
  *  the current values of the instance to be modified.
@@ -4929,7 +4929,7 @@ MI_INLINE MI_Result MI_CALL MI_Context_WriteDebug(
  * This function works if and only if within <Class>_Load function
  *
  * param: context           The context passed to provider
- * param: lifecycleContext  The lifecyleContext used to generate lifecycle indication(s)
+ * param: lifecycleContext  The lifecycleContext used to generate lifecycle indication(s)
  *                          for current class
  *
  * return: MI_RESULT_OK if success, otherwise failed
@@ -5270,7 +5270,7 @@ typedef struct _MI_Operation MI_Operation;
 ** Members
 **
 **      ft          -   This is the function table for unregistering the
-**                      hosted provder from the server.
+**                      hosted provider from the server.
 **
 **      reserved    -   Used internally and must not be changed.
 **=============================================================================
@@ -5282,7 +5282,7 @@ typedef struct _MI_HostedProvider MI_HostedProvider;
 **
 ** typedef const struct _MI_DestinationOptions MI_DestinationOptions
 **
-** The object represents a set of destionation options.  The options can be
+** The object represents a set of destination options.  The options can be
 ** used on a session or for discovering destination capabilities.  The object
 ** can be used multiple times is required.
 **
@@ -5481,7 +5481,7 @@ typedef void (MI_CALL *MI_OperationCallback_Instance)(
 **
 ** (*MI_OperationCallback_StreamedParameter)()
 **
-** Registering this async callback is necessary if an outbound paramter is
+** Registering this async callback is necessary if an outbound parameter is
 ** marked as streamed.  This callback will be called as streamed parameter data
 ** is available.  Streaming can only happen on array parameters.  Call the
 ** resultAcknowledgement to acknowledge the result.  Not doing so will stop
@@ -5618,7 +5618,7 @@ typedef struct _MI_SessionCallbacks
     void *callbackContext;
 
     /*=========================================================================
-    ** CIM Extension callback for recieving logging from the session creation.
+    ** CIM Extension callback for receiving logging from the session creation.
     ** All parameters are valid only for the lifetime of the callback.
     **=========================================================================
     */
@@ -5746,11 +5746,11 @@ MI_UserCredentials;
 **
 ** enum MI_SubscriptionDeliveryType
 **
-** Subsciption type.
+** Subscription type.
 **
 ** A Pull subscription polls the destination for indications.  If the
 ** subscription can get through the firewall of the destination machine then
-** pulling events from the machine is more lifely to work.
+** pulling events from the machine is more likely to work.
 **
 ** Push subscriptions has the destination machine push the indication to the
 ** client machine.  This is more efficient as it does not need to keep a
@@ -5962,7 +5962,7 @@ typedef MI_Result (MI_CALL *MI_Deserializer_ClassObjectNeeded)(
 **
 ** MI_DeserializerFT
 **
-** Deserialier function table.
+** Deserializer function table.
 **
 **=============================================================================
 */
@@ -6887,7 +6887,7 @@ MI_INLINE MI_Result MI_Application_NewDestinationOptions(
 **
 ** Creates an MI_OperationOptions object.  It represents configuration needed
 ** to carry out an operation.
-** The operaton options must be closed through MI_OperationOptions_Delete.
+** The operation options must be closed through MI_OperationOptions_Delete.
 **
 ** application: Handle returned from MI_Application_Initialize.
 ** options:     Resultant options handle for which options can be set
@@ -7086,7 +7086,7 @@ MI_INLINE MI_Result MI_HostedProvider_GetApplication(
 ** MI_Session_Close()
 **
 ** Closes the session and frees up all memory associated with it.  If there
-** are unfinished operations, those operatons will be cancelled.  All
+** are unfinished operations, those operations will be cancelled.  All
 ** operations must have their handles closed before the session finishes closing.
 **
 ** This can be called from inside an asynchronous callback only if the callback
@@ -7633,7 +7633,7 @@ MI_INLINE void MI_Session_TestConnection(
 **
 ** MI_Operation_GetInstance()
 **
-** This method is called to get a syncronous result for all operations except
+** This method is called to get a synchronous result for all operations except
 ** subscriptions, where MI_Operation_GetIndication should be used.
 ** It is an error to call this function if a result callback is registered.
 ** This method will block until a result is available.  If this is an
@@ -7666,7 +7666,7 @@ MI_INLINE MI_Result MI_Operation_GetInstance(
 **
 ** MI_Operation_GetIndication()
 **
-** This method is called to get a syncronous result for a subscription.
+** This method is called to get a synchronous result for a subscription.
 ** It is an error to call this function if a Indication callback is registered.
 ** This method will block until a result is available.  This function should be
 ** called until a returnCode object is returned.
@@ -8155,7 +8155,7 @@ MI_INLINE MI_Result MI_DestinationOptions_GetPacketEncoding(
 **      By default the data locale of the calling thread is used and this
 **      method will override with the specified locale.
 **      Data locale is used  to determine string formats for things like
-**      decimal nunbers in string format and date/time formats.
+**      decimal numbers in string format and date/time formats.
 **
 ** Parameters
 **    Option:  Valid MI_DestinationOptions created through
@@ -10246,7 +10246,7 @@ MI_INLINE MI_Result MI_SubscriptionDeliveryOptions_GetExpirationTime(
  * To indicate you want the indication events to start delivering from the
  * oldest possible event that is available use MI_SUBSCRIBE_BOOKMARK_OLDEST.
  * To start delivering from the latest events only specify MI_SUBSCRIBE_BOOKMARK_NEWEST.
- * To start delivering from a previously sent bookmark (if possible) pass in the boookmark
+ * To start delivering from a previously sent bookmark (if possible) pass in the bookmark
  * value that was delivered with the last event.
  * If no bookmark is set then the providers may not deliver bookmarks with the events.
  */
@@ -10756,7 +10756,7 @@ MI_INLINE MI_Result MI_CALL MI_SubscriptionDeliveryOptions_Clone(
  * Provider could define a callback function to receive
  * active lifecycle indication types (being subscribed by client)
  *
- * param: types  The comibinations of following flags OR 0,
+ * param: types  The combinations of following flags OR 0,
  *
  *   MI_LIFECYCLE_INDICATION_CREATE
  *   MI_LIFECYCLE_INDICATION_MODIFY
@@ -10773,7 +10773,7 @@ MI_INLINE MI_Result MI_CALL MI_SubscriptionDeliveryOptions_Clone(
  * For example, if the types = MI_LIFECYCLE_INDICATION_CREATE, then
  * provider only needs to call MI_LifecycleIndicationContext_PostCreate
  * since all of the other type of lifecycle indication are not being subscribed,
- * thus will be droped.
+ * thus will be dropped.
 */
 typedef void (MI_CALL *MI_LifecycleIndicationCallback)(
     _In_ MI_Uint32 types,
@@ -10799,12 +10799,12 @@ struct _MI_LifecycleIndicationContextFT
 
     MI_Result (MI_CALL *PostModify)(
         _In_ MI_LifecycleIndicationContext* context,
-        _In_ const MI_Instance* orginalInstance,
+        _In_ const MI_Instance* originalInstance,
         _In_ const MI_Instance* instance);
 
     MI_Result (MI_CALL *PostDelete)(
         _In_ MI_LifecycleIndicationContext* context,
-        _In_ const MI_Instance* orginalInstance);
+        _In_ const MI_Instance* originalInstance);
 
     MI_Result (MI_CALL *PostRead)(
         _In_ MI_LifecycleIndicationContext* context,
@@ -10914,7 +10914,7 @@ MI_INLINE MI_Result MI_CALL MI_LifecycleIndicationContext_PostCreate(
  * Providers call this function to raise a CIM_InstModification indication
  *
  * param: context   The lifecycle context
- * param: orginalInstance  The instance before modification
+ * param: originalInstance  The instance before modification
  * param: instance  The instance after modification
  *
  * return: MI_RESULT_OK if success, otherwise failed
@@ -10922,12 +10922,12 @@ MI_INLINE MI_Result MI_CALL MI_LifecycleIndicationContext_PostCreate(
  */
 MI_INLINE MI_Result MI_CALL MI_LifecycleIndicationContext_PostModify(
     _In_ MI_LifecycleIndicationContext* context,
-    _In_ const MI_Instance* orginalInstance,
+    _In_ const MI_Instance* originalInstance,
     _In_ const MI_Instance* instance)
 {
     if (context && context->ft)
     {
-        return context->ft->PostModify(context, orginalInstance, instance);
+        return context->ft->PostModify(context, originalInstance, instance);
     }
     else
     {
@@ -10939,18 +10939,18 @@ MI_INLINE MI_Result MI_CALL MI_LifecycleIndicationContext_PostModify(
  * Providers call this function to raise a CIM_InstDeletion indication
  *
  * param: context   The lifecycle context
- * param: orginalInstance  The deleted instance
+ * param: originalInstance  The deleted instance
  *
  * return: MI_RESULT_OK if success, otherwise failed
  *
  */
 MI_INLINE MI_Result MI_CALL MI_LifecycleIndicationContext_PostDelete(
         _In_ MI_LifecycleIndicationContext* context,
-        _In_ const MI_Instance* orginalInstance)
+        _In_ const MI_Instance* originalInstance)
 {
     if (context && context->ft)
     {
-        return context->ft->PostDelete(context, orginalInstance);
+        return context->ft->PostDelete(context, originalInstance);
     }
     else
     {
@@ -11073,7 +11073,7 @@ MI_INLINE MI_Result MI_CALL MI_LifecycleIndicationContext_PostResult(
  *
  * param: context   The lifecycle context
  * param: types     The lifecycle indication types;
- *                  the types value is arbitrary comibinations of following
+ *                  the types value is arbitrary combinations of following
  *                  flags
  *
  *   MI_LIFECYCLE_INDICATION_CREATE
@@ -11085,7 +11085,7 @@ MI_INLINE MI_Result MI_CALL MI_LifecycleIndicationContext_PostResult(
  *
  * NOTE: Lifecycle indication subscription may fail if target class(es) does
  * not support the type; If provider does not call this function, by default,
- * it is assumed suporrting MI_LIFECYCLE_INDICATION_ALL.
+ * it is assumed supporting MI_LIFECYCLE_INDICATION_ALL.
  *
  * FOR EXAMPLE: Assume there is an class called MY_Class, and it call this function with
  * types = MI_LIFECYCLE_INDICATION_CREATE, and then following lifecycle subscription
@@ -11115,7 +11115,7 @@ MI_INLINE MI_Result MI_CALL MI_LifecycleIndicationContext_SetSupportedTypes(
  *
  * param: context   The lifecycle context
  * param: types     The lifecycle indication types;
- *                  the types value is arbitrary comibinations of following
+ *                  the types value is arbitrary combinations of following
  *                  flags, including 0:
  *
  *   MI_LIFECYCLE_INDICATION_CREATE
@@ -11130,7 +11130,7 @@ MI_INLINE MI_Result MI_CALL MI_LifecycleIndicationContext_SetSupportedTypes(
  * For example, if the types = MI_LIFECYCLE_INDICATION_CREATE, then
  * provider only needs to call MI_LifecycleIndicationContext_PostCreate
  * since all other types lifecycle indication are not being subscribed,
- * thus will get droped by server.
+ * thus will get dropped by server.
  *
  * return: MI_RESULT_OK if success, otherwise failed
  *

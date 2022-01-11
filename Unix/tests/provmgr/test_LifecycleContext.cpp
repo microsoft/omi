@@ -52,7 +52,7 @@ Sem unsubscribeLifeCtxCompletedSem;
 void _InitializeTestLifeCtxSemaphore()
 {
     NitsAssert( NULL != lifeContext, PAL_T("Expected initialization in setup function") );
-    NitsAssert( Sem_Init(&unsubscribeLifeCtxCompletedSem, SEM_USER_ACCESS_ALLOW_ALL, 0) == 0, PAL_T("Unable to intialize unsubscribe semaphore") );
+    NitsAssert( Sem_Init(&unsubscribeLifeCtxCompletedSem, SEM_USER_ACCESS_ALLOW_ALL, 0) == 0, PAL_T("Unable to initialize unsubscribe semaphore") );
     unsubscribeLifeCtxCompletedSemActive = MI_TRUE;
 }
 
@@ -397,7 +397,7 @@ NitsSetup1(Test_LifecycleContext_Setup_ForFtVerification, Test_LifecycleContext_
 
     //
     // Initialize unsubscribe handler
-    // single threaded platform require that unsubsribe happen on a separate thread
+    // single threaded platform require that unsubscribe happen on a separate thread
     //
     RequestHandler_Init(&g_requesthandler);
 
@@ -484,7 +484,7 @@ NitsCleanup(Test_LifecycleContext_Setup_ForFtVerification)
 
     //
     // Wait for the unsubscribe handler to complete.
-    // Single threaded platform require that unsubsribe happen on a separate thread
+    // Single threaded platform require that unsubscribe happen on a separate thread
     // wait for that thread to finish the unsubscribe call
     //
     while ( Atomic_Read( &g_requesthandler.running ) == 1 )

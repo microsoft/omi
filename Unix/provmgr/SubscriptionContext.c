@@ -63,7 +63,7 @@ void SubscrContext_Close(
 {
     if (subCtx)
     {
-        /* SubsriptionContext was allocated from the SubscribeReq Batch,
+        /* SubscriptionContext was allocated from the SubscribeReq Batch,
          * so it will be freed when the message's batch is freed. */
         subCtx->subscription = NULL;
         Context_Close(&subCtx->baseCtx);

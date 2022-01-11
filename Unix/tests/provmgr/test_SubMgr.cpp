@@ -375,7 +375,7 @@ void Verify_SubMgrSubscription_New_Input(
 
 NitsTest(TestSubMgrSubscription_New_Fails_if_FilterError)
 {
-    // NULL filter and lanugage will trigger a failure
+    // NULL filter and language will trigger a failure
     Verify_SubMgrSubscription_New_Input( NULL, NULL, MI_FALSE );
 }
 NitsEndTest

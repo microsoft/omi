@@ -327,7 +327,7 @@ int _ValidateLookup(
             return 0;
         case MI_INSTANCE:
             /* Use WQL_TYPE_ANY since the type of the embedded instance property
-             * cannot be deterined.
+             * cannot be determined.
              */
             symbol->type = WQL_TYPE_ANY;
             return 0;
@@ -804,7 +804,7 @@ int WQL_LookupInstanceProperty(
     if (r != MI_RESULT_OK)
         return -1;
 
-    /* Handle ISA opeartion and ISA check for gets on embedded properties:
+    /* Handle ISA operation and ISA check for gets on embedded properties:
      * For example: SourceInstance.CIM_StorageVolume.OperationalStatus
      */
     if (embeddedClassName)
@@ -835,7 +835,7 @@ int WQL_LookupInstanceProperty(
             return 0;
         }
 
-        /* If lookup was called to get an embedded intance property */
+        /* If lookup was called to get an embedded instance property */
 
         if (embeddedPropertyName && !isa)
         {

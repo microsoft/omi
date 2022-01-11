@@ -80,7 +80,7 @@ typedef struct _MOF_Buffer
     /* Current Line no */
     MI_Uint32 lineNo;
 
-    /* Char postion of current line */
+    /* Char position of current line */
     MI_Uint32 charPosOfLine;
 
     /* Encoding of buffer */
@@ -130,7 +130,7 @@ typedef struct _MOF_YACC_STATE
 **
 **     This structure was used for temporary data exchange purpose.
 **     (1) FinalizeInstance function might want to know if the classdecl
-**          of the instance come from input parameter or from deserialzed
+**          of the instance come from input parameter or from deserialized
 **          buffer;
 **
 **==============================================================================
@@ -148,7 +148,7 @@ typedef struct _MOF_State_InternalState
 **
 **     This structure maintains the static parser state for the current parser
 **     invocation. It maintains the heap, errors, warnings, instance declarations,
-**     class declarations, and qulifier declarations.
+**     class declarations, and qualifier declarations.
 **
 **==============================================================================
 */

@@ -80,7 +80,7 @@ class CIM_BaseMetricValue : CIM_ManagedElement {
           "when the instance is created. For a given "
           "CIM_BaseMetricValue instance, the TimeStamp changes "
           "whenever a new measurement snapshot is taken if Volatile "
-          "is true. A managmenet application may establish a time "
+          "is true. A management application may establish a time "
           "series of metric data by retrieving the instances of "
           "CIM_BaseMetricValue and sorting them according to their "
           "TimeStamp." ), 

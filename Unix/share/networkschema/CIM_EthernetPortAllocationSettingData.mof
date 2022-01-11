@@ -96,7 +96,7 @@ class CIM_EthernetPortAllocationSettingData : CIM_ResourceAllocationSettingData 
       [Description ( 
           "The GroupID is an identifier that refers to the VLAN "
           "associated with the VSI specified in the VDP TLV as "
-          "definded in IEEE 802.1Qbg." )]
+          "defined in IEEE 802.1Qbg." )]
    uint32 GroupID;
 
       [Description ( 
@@ -150,7 +150,7 @@ class CIM_EthernetPortAllocationSettingData : CIM_ResourceAllocationSettingData 
    boolean Promiscuous;
 
       [Description ( 
-          "This property specifes the upper bounds or maximum "
+          "This property specifies the upper bounds or maximum "
           "amount of receive bandwidth allowed through this port. "
           "The value of the ReceiveBandwidthLimit property is "
           "expressed in the unit specified by the value of the "

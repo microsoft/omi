@@ -194,7 +194,7 @@ class CIM_Processor : CIM_LogicalDevice {
           // 200                     
           "S/390 and zSeries Family", 
           "ESA/390 G4", "ESA/390 G5", "ESA/390 G6", 
-          "z/Architectur base", 
+          "z/Architecture base", 
           // 205
           "Intel(R) Core(TM) i5 processor", 
           "Intel(R) Core(TM) i3 processor", 
@@ -346,7 +346,7 @@ class CIM_Processor : CIM_LogicalDevice {
           "to a feature of the processor, than the feature either "
           "is not that some of the features of the processor may "
           "exist but may not be enabled. To find the the currently "
-          "enabled features the processor, reffer to the "
+          "enabled features the processor, refer to the "
           "EnabledProcessorCharacteristics property. Values "
           "specified in the enumeration may be obtained from SMBIOS "
           "v2.5 Type 4 offset 26h (Processor Characteristics Word). "

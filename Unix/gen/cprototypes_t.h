@@ -1,6 +1,6 @@
 //==============================================================================
 //
-// cprotypes.h - define source code tempalte for provider function prototypes.
+// cprotypes.h - define source code template for provider function prototypes.
 //
 //==============================================================================
 #ifndef _migen_cprototypes_t_h

@@ -13,7 +13,7 @@
        "\n"
        "When first establishing or bringing up a Cluster, only one "
        "ComputerSystem may be defined as participating in it. "
-       "Therfore, the cardinality of the association for the "
+       "Therefore, the cardinality of the association for the "
        "ComputerSystem reference is Min (1)." )]
 class CIM_ParticipatingCS : CIM_Dependency {
 

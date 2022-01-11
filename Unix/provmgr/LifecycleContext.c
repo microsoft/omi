@@ -636,7 +636,7 @@ MI_Uint32 LifeContext_ConvertSupportedType(
         case SUBSCRIP_TARGET_LIFECYCLE_ALL:
             miType = MI_LIFECYCLE_INDICATION_ALL;
             break;
-        /* Fallthorugh intentional */
+        /* Fallthrough intentional */
         case SUBSCRIP_TARGET_UNSUPPORTED:
         case SUBSCRIP_TARGET_DEFAULT:
         default:

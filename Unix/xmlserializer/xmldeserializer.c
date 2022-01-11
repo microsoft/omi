@@ -55,7 +55,7 @@ typedef struct _DeserializationData
         } classData;
         struct _instanceData
         {
-            //When encoding class/instance, this is what XmlDeserialzier_GetInstanceClass needs
+            //When encoding class/instance, this is what XmlDeserializer_GetInstanceClass needs
             XMLDOM_Elem *declgroupElement;
 
             //Client passed in client list and count
@@ -86,7 +86,7 @@ _Check_return_ static MI_Result _StringToMiValue(_In_opt_ const DeserializationD
 //Deserialize a class or instance
 _Check_return_ MI_Result XmlDeserializer_DoDeserializeClass(_In_ const XMLDOM_Elem *classNode, MI_Uint32 flags, _In_opt_ const MI_Class *parentClass, _In_opt_z_ const MI_Char *namespaceName, _In_opt_z_ const MI_Char *serverName, _In_opt_ MI_Deserializer_ClassObjectNeeded classObjectNeeded, _In_opt_ void *classObjectNeededContext, _Outptr_ MI_Class **resultClass, _Outptr_opt_result_maybenull_ MI_Instance **errorObject);
 _Check_return_ static MI_Result XmlDeserializer_DoDeserialization(_Inout_ DeserializationData *state, MI_Uint32 flags, _In_ const XMLDOM_Elem *elementNode);
-_Check_return_ MI_Result XmlDeserialzier_GetInstanceClass(_In_ const DeserializationData *state, _In_ XMLDOM_Elem *firstElement, MI_Uint32 flags, _In_z_ const MI_Char *instanceClassName, _In_opt_z_ const MI_Char *namespaceName, _In_opt_z_ const MI_Char *serverName, _Outptr_ MI_Class **resultClass);
+_Check_return_ MI_Result XmlDeserializer_GetInstanceClass(_In_ const DeserializationData *state, _In_ XMLDOM_Elem *firstElement, MI_Uint32 flags, _In_z_ const MI_Char *instanceClassName, _In_opt_z_ const MI_Char *namespaceName, _In_opt_z_ const MI_Char *serverName, _Outptr_ MI_Class **resultClass);
 MI_Result MI_CALL XmlDeserializer_DoDeserializeInstance(_Inout_ DeserializationData *stateData, XMLDOM_Elem *instanceElement);
 
 //Class specific deserializer functions
@@ -99,7 +99,7 @@ _Check_return_ MI_Result XmlDeserializer_AddPropertyArray(_In_ const Deserializa
 _Check_return_ MI_Result XmlDeserializer_AddPropertyReference(_In_ const DeserializationData *state, _In_ const XMLDOM_Elem *propertyRefElem);
 
 _Check_return_ static MI_Result _Extract_NAMESPACEPATH(_In_ const DeserializationData *state, _In_ XMLDOM_Elem *namespacePathElem, _Outptr_result_z_ const MI_Char **serverName, _Outptr_result_z_ const MI_Char **namespacePath);
-_Check_return_ static MI_Result _Extract_LOCALNAMESPACEPATH(_In_ const DeserializationData *state, _In_ XMLDOM_Elem *localNmespacePathElem, _Outptr_result_z_ const MI_Char **namespacePath);
+_Check_return_ static MI_Result _Extract_LOCALNAMESPACEPATH(_In_ const DeserializationData *state, _In_ XMLDOM_Elem *localNamespacePathElem, _Outptr_result_z_ const MI_Char **namespacePath);
 
 _Check_return_ static MI_Result _Extract_INSTANCEPATH(_In_ const DeserializationData *state, _In_ XMLDOM_Elem *refChildElem, _Outptr_ MI_Instance **instanceRef);
 _Check_return_ static MI_Result _Extract_LOCALINSTANCEPATH(_In_ const DeserializationData *state, _In_ XMLDOM_Elem *refChildElem, _Outptr_ MI_Instance **instanceRef);
@@ -499,7 +499,7 @@ MI_Result MI_CALL XmlDeserializer_DoDeserializeInstance(
         if (stateData->u.instanceData.instanceClass == NULL)
         {
             MI_Class *instanceClass = NULL;
-            result = XmlDeserialzier_GetInstanceClass(stateData, stateData->u.instanceData.declgroupElement, 0, instanceClassName, stateData->u.instanceData.namespaceName, stateData->u.instanceData.serverName, &instanceClass);
+            result = XmlDeserializer_GetInstanceClass(stateData, stateData->u.instanceData.declgroupElement, 0, instanceClassName, stateData->u.instanceData.namespaceName, stateData->u.instanceData.serverName, &instanceClass);
             if ((result != MI_RESULT_OK) && (result != MI_RESULT_NOT_FOUND))
             {
                 goto cleanup;
@@ -593,7 +593,7 @@ MI_Result MI_CALL XmlDeserializer_Instance_GetClassName(
     return MI_RESULT_NOT_SUPPORTED;
 }
 
-_Check_return_ MI_Result XmlDeserialzier_GetInstanceClass(
+_Check_return_ MI_Result XmlDeserializer_GetInstanceClass(
     _In_ const DeserializationData *state,
     _In_ XMLDOM_Elem *declgroupElem, 
     MI_Uint32 flags, 
@@ -644,7 +644,7 @@ _Check_return_ MI_Result XmlDeserialzier_GetInstanceClass(
                 if (superclassName)
                 {
                     //We need to get the superclass class object to pass through to this guy
-                    result = XmlDeserialzier_GetInstanceClass(state, declgroupElem, flags, superclassName, namespaceName, serverName, &parentClass);
+                    result = XmlDeserializer_GetInstanceClass(state, declgroupElem, flags, superclassName, namespaceName, serverName, &parentClass);
                     if (result != MI_RESULT_OK)
                     {
                         _CreateErrorObject(state->errorObject,  result, ID_MI_DES_XML_INST_CANNOT_FIND_CLASS, superclassName);
@@ -756,8 +756,8 @@ _Check_return_ MI_Result XmlDeserializer_DoDeserializeClass(
     }
     else if (!superClassName && parentClass)
     {
-        //We have no supercalss but a parent class was passed in
-        _CreateErrorObject(stateData.errorObject, MI_RESULT_INVALID_PARAMETER, ID_MI_DES_XML_CLASS_SUPERCLASS_PARENT_MISSMATCH);
+        //We have no superclass but a parent class was passed in
+        _CreateErrorObject(stateData.errorObject, MI_RESULT_INVALID_PARAMETER, ID_MI_DES_XML_CLASS_SUPERCLASS_PARENT_MISMATCH);
         result = MI_RESULT_INVALID_PARAMETER;
         goto cleanup;
     }
@@ -765,7 +765,7 @@ _Check_return_ MI_Result XmlDeserializer_DoDeserializeClass(
     {
         //superclass does not match parent class
         result = MI_RESULT_INVALID_PARAMETER;
-        _CreateErrorObject(stateData.errorObject, MI_RESULT_INVALID_PARAMETER, ID_MI_DES_XML_CLASS_SUPERCLASS_PARENT_MISSMATCH);
+        _CreateErrorObject(stateData.errorObject, MI_RESULT_INVALID_PARAMETER, ID_MI_DES_XML_CLASS_SUPERCLASS_PARENT_MISMATCH);
         goto cleanup;
     }
 
@@ -962,7 +962,7 @@ _Check_return_ static MI_Result _ExtractQualifierAttributes(
             result = _StringToMiType(attrList->value, type);
             if (result != MI_RESULT_OK)
             {
-                _CreateErrorObject(state->errorObject, result, ID_MI_DES_XML_ATTR_VAL_CONVERTION_FAILED, PAL_T("QUALIFIER"), attrList->name);
+                _CreateErrorObject(state->errorObject, result, ID_MI_DES_XML_ATTR_VAL_CONVERSION_FAILED, PAL_T("QUALIFIER"), attrList->name);
                 return result;
             }
             foundType = MI_TRUE;
@@ -973,7 +973,7 @@ _Check_return_ static MI_Result _ExtractQualifierAttributes(
             result = _StringToMiBool(attrList->value, &tmpBool);
             if (result != MI_RESULT_OK)
             {
-                _CreateErrorObject(state->errorObject, result, ID_MI_DES_XML_ATTR_VAL_CONVERTION_FAILED, PAL_T("QUALIFIER"), attrList->name);
+                _CreateErrorObject(state->errorObject, result, ID_MI_DES_XML_ATTR_VAL_CONVERSION_FAILED, PAL_T("QUALIFIER"), attrList->name);
                 return MI_RESULT_INVALID_PARAMETER;
             }
             if (tmpBool == MI_TRUE)
@@ -993,7 +993,7 @@ _Check_return_ static MI_Result _ExtractQualifierAttributes(
             result = _StringToMiBool(attrList->value, &tmpBool);
             if (result != MI_RESULT_OK)
             {
-                _CreateErrorObject(state->errorObject, result, ID_MI_DES_XML_ATTR_VAL_CONVERTION_FAILED, PAL_T("QUALIFIER"), attrList->name);
+                _CreateErrorObject(state->errorObject, result, ID_MI_DES_XML_ATTR_VAL_CONVERSION_FAILED, PAL_T("QUALIFIER"), attrList->name);
                 return MI_RESULT_INVALID_PARAMETER;
             }
             if (tmpBool)
@@ -1011,7 +1011,7 @@ _Check_return_ static MI_Result _ExtractQualifierAttributes(
             result = _StringToMiBool(attrList->value, &tmpBool);
             if (result != MI_RESULT_OK)
             {
-                _CreateErrorObject(state->errorObject, result, ID_MI_DES_XML_ATTR_VAL_CONVERTION_FAILED, PAL_T("QUALIFIER"), attrList->name);
+                _CreateErrorObject(state->errorObject, result, ID_MI_DES_XML_ATTR_VAL_CONVERSION_FAILED, PAL_T("QUALIFIER"), attrList->name);
                 return MI_RESULT_INVALID_PARAMETER;
             }
             if (tmpBool)
@@ -1033,7 +1033,7 @@ _Check_return_ static MI_Result _ExtractQualifierAttributes(
             result = _StringToMiBool(attrList->value, &boolValue);
             if (result != MI_RESULT_OK)
             {
-                _CreateErrorObject(state->errorObject, result, ID_MI_DES_XML_ATTR_VAL_CONVERTION_FAILED, PAL_T("QUALIFIER"), attrList->name);
+                _CreateErrorObject(state->errorObject, result, ID_MI_DES_XML_ATTR_VAL_CONVERSION_FAILED, PAL_T("QUALIFIER"), attrList->name);
                 return result;
             }
         }
@@ -1080,7 +1080,7 @@ _Check_return_ static MI_Result _ExtractQualifierAttributes(
             result = _StringToMiValue(NULL, tempValue, *type, value);
             if (result != MI_RESULT_OK)
             {
-                _CreateErrorObject(state->errorObject, MI_RESULT_INVALID_PARAMETER, ID_MI_DES_XML_ELEM_VAL_CONVERTION_FAILED, PAL_T("QUALIFIER"));
+                _CreateErrorObject(state->errorObject, MI_RESULT_INVALID_PARAMETER, ID_MI_DES_XML_ELEM_VAL_CONVERSION_FAILED, PAL_T("QUALIFIER"));
                 return MI_RESULT_INVALID_PARAMETER;
             }
         }
@@ -1144,7 +1144,7 @@ _Check_return_ MI_Result XmlDeserializer_AddClassQualifier(
             result = _StringToMiValue(NULL, cursorElem->value_first->value, type, &value);
             if (result != MI_RESULT_OK)
             {
-                _CreateErrorObject(state->errorObject, result, ID_MI_DES_XML_ELEM_VAL_CONVERTION_FAILED, PAL_T("CLASS QUALIFIER"));
+                _CreateErrorObject(state->errorObject, result, ID_MI_DES_XML_ELEM_VAL_CONVERSION_FAILED, PAL_T("CLASS QUALIFIER"));
                 return MI_RESULT_INVALID_PARAMETER;
             }
 
@@ -1198,7 +1198,7 @@ _Check_return_ static MI_Result _ExtractPropertyAttributes(
             result = _StringToMiType(attrList->value, type);
             if (result != MI_RESULT_OK)
             {
-                _CreateErrorObject(state->errorObject, result, ID_MI_DES_XML_ATTR_VAL_CONVERTION_FAILED, PAL_T("PROPERTY"), attrList->name);
+                _CreateErrorObject(state->errorObject, result, ID_MI_DES_XML_ATTR_VAL_CONVERSION_FAILED, PAL_T("PROPERTY"), attrList->name);
                 return result;
             }
             typeExists = MI_TRUE;
@@ -1212,7 +1212,7 @@ _Check_return_ static MI_Result _ExtractPropertyAttributes(
             result = _StringToMiBool(attrList->value, propagated);
             if (result != MI_RESULT_OK)
             {
-                _CreateErrorObject(state->errorObject, result, ID_MI_DES_XML_ATTR_VAL_CONVERTION_FAILED, PAL_T("PROPERTY"), attrList->name);
+                _CreateErrorObject(state->errorObject, result, ID_MI_DES_XML_ATTR_VAL_CONVERSION_FAILED, PAL_T("PROPERTY"), attrList->name);
                 return result;
             }
         }
@@ -1224,7 +1224,7 @@ _Check_return_ static MI_Result _ExtractPropertyAttributes(
                 *embedded = 2;
             else
             {
-                _CreateErrorObject(state->errorObject, MI_RESULT_INVALID_PARAMETER, ID_MI_DES_XML_ATTR_VAL_CONVERTION_FAILED, PAL_T("PROPERTY"), attrList->name);
+                _CreateErrorObject(state->errorObject, MI_RESULT_INVALID_PARAMETER, ID_MI_DES_XML_ATTR_VAL_CONVERSION_FAILED, PAL_T("PROPERTY"), attrList->name);
                 return MI_RESULT_INVALID_PARAMETER;
             }
         }
@@ -1243,7 +1243,7 @@ _Check_return_ static MI_Result _ExtractPropertyAttributes(
 #pragma prefast(pop)
 #endif
             {
-                _CreateErrorObject(state->errorObject, MI_RESULT_INVALID_PARAMETER, ID_MI_DES_XML_ATTR_VAL_CONVERTION_FAILED, PAL_T("PROPERTY"), attrList->name);
+                _CreateErrorObject(state->errorObject, MI_RESULT_INVALID_PARAMETER, ID_MI_DES_XML_ATTR_VAL_CONVERSION_FAILED, PAL_T("PROPERTY"), attrList->name);
                 return MI_RESULT_INVALID_PARAMETER;
             }
         }
@@ -1256,7 +1256,7 @@ _Check_return_ static MI_Result _ExtractPropertyAttributes(
             result = _StringToMiBool(attrList->value, modified);
             if (result != MI_RESULT_OK)
             {
-                _CreateErrorObject(state->errorObject, result, ID_MI_DES_XML_ATTR_VAL_CONVERTION_FAILED, PAL_T("PROPERTY"), attrList->name);
+                _CreateErrorObject(state->errorObject, result, ID_MI_DES_XML_ATTR_VAL_CONVERSION_FAILED, PAL_T("PROPERTY"), attrList->name);
                 return result;
             }
         }
@@ -1327,7 +1327,7 @@ _Check_return_ static MI_Result _ExtractPropertyReferenceAttributes(
             result = _StringToMiBool(attrList->value, propagated);
             if (result != MI_RESULT_OK)
             {
-                return _CreateErrorObject(state->errorObject, result, ID_MI_DES_XML_ATTR_VAL_CONVERTION_FAILED, PAL_T("PROPERTY.REFERENCE"), attrList->name);
+                return _CreateErrorObject(state->errorObject, result, ID_MI_DES_XML_ATTR_VAL_CONVERSION_FAILED, PAL_T("PROPERTY.REFERENCE"), attrList->name);
             }
         }
         else if (Tcscmp(attrList->name, PAL_T("MODIFIED")) == 0)
@@ -1335,7 +1335,7 @@ _Check_return_ static MI_Result _ExtractPropertyReferenceAttributes(
             result = _StringToMiBool(attrList->value, modified);
             if (result != MI_RESULT_OK)
             {
-                return _CreateErrorObject(state->errorObject, result, ID_MI_DES_XML_ATTR_VAL_CONVERTION_FAILED, PAL_T("PROPERTY.REFERENCE"), attrList->name);
+                return _CreateErrorObject(state->errorObject, result, ID_MI_DES_XML_ATTR_VAL_CONVERSION_FAILED, PAL_T("PROPERTY.REFERENCE"), attrList->name);
             }
         }
         else
@@ -1396,7 +1396,7 @@ _Check_return_ MI_Result XmlDeserializer_AddPropertyQualifier(
                 return result;
             result = _StringToMiValue(NULL, tempValue, type, &value);
             if (result != MI_RESULT_OK)
-                return _CreateErrorObject(state->errorObject, MI_RESULT_INVALID_PARAMETER, ID_MI_DES_XML_ELEM_VAL_CONVERTION_FAILED, PAL_T("PROPERTY QUALIFIER"));
+                return _CreateErrorObject(state->errorObject, MI_RESULT_INVALID_PARAMETER, ID_MI_DES_XML_ELEM_VAL_CONVERSION_FAILED, PAL_T("PROPERTY QUALIFIER"));
 
             result = Class_AddElementQualifierArrayItem(finalClass, elementId, qualifierIndex, value);
             if (result != MI_RESULT_OK)
@@ -1466,11 +1466,11 @@ static MI_Result ProcessOverrideQualifier(_In_ const DeserializationData *state,
         {
             result = _StringToMiBool(currentElem->child_first->value_first->value, overridden);
             if (result != MI_RESULT_OK)
-                return _CreateErrorObject(state->errorObject, result, ID_MI_DES_XML_ATTR_VAL_CONVERTION_FAILED, elementBeingProcessed, PAL_T("Overridden"));
+                return _CreateErrorObject(state->errorObject, result, ID_MI_DES_XML_ATTR_VAL_CONVERSION_FAILED, elementBeingProcessed, PAL_T("Overridden"));
         }
         else
         {
-            return _CreateErrorObject(state->errorObject, MI_RESULT_INVALID_PARAMETER, ID_MI_DES_XML_ELEM_VAL_CONVERTION_FAILED, PAL_T("QUALIFIER"));
+            return _CreateErrorObject(state->errorObject, MI_RESULT_INVALID_PARAMETER, ID_MI_DES_XML_ELEM_VAL_CONVERSION_FAILED, PAL_T("QUALIFIER"));
         }        
     }
 
@@ -1526,7 +1526,7 @@ _Check_return_ MI_Result XmlDeserializer_AddProperty(_In_ const DeserializationD
                     }
                     else
                     {
-                        return _CreateErrorObject(state->errorObject, MI_RESULT_INVALID_PARAMETER, ID_MI_DES_XML_ELEM_VAL_CONVERTION_FAILED, PAL_T("QUALIFIER"));
+                        return _CreateErrorObject(state->errorObject, MI_RESULT_INVALID_PARAMETER, ID_MI_DES_XML_ELEM_VAL_CONVERSION_FAILED, PAL_T("QUALIFIER"));
                     }
                 }
                 else if (Tcscasecmp(currentElem->attr_first->value, PAL_T("EMBEDDEDOBJECT"))==0)
@@ -1567,7 +1567,7 @@ _Check_return_ MI_Result XmlDeserializer_AddProperty(_In_ const DeserializationD
                 return result;
             result = _StringToMiValue(state, firstElemValue, type, &value);
             if (result != MI_RESULT_OK)
-                return _CreateErrorObject(state->errorObject, MI_RESULT_INVALID_PARAMETER, ID_MI_DES_XML_ELEM_VAL_CONVERTION_FAILED, PAL_T("PROPERTY"));
+                return _CreateErrorObject(state->errorObject, MI_RESULT_INVALID_PARAMETER, ID_MI_DES_XML_ELEM_VAL_CONVERSION_FAILED, PAL_T("PROPERTY"));
             valueExists = MI_TRUE;
         }
         else if (Tcscmp(currentElem->name, PAL_T("VALUE.OBJECT")) == 0)
@@ -1598,13 +1598,13 @@ _Check_return_ MI_Result XmlDeserializer_AddProperty(_In_ const DeserializationD
 
             if ((currentElem->child_first == NULL) || (Tcscmp(currentElem->child_first->name, PAL_T("INSTANCE")) != 0))
             {
-                return _CreateErrorObject(state->errorObject, MI_RESULT_INVALID_PARAMETER, ID_MI_DES_XML_ELEM_VAL_CONVERTION_FAILED, PAL_T("PROPERTY"));
+                return _CreateErrorObject(state->errorObject, MI_RESULT_INVALID_PARAMETER, ID_MI_DES_XML_ELEM_VAL_CONVERSION_FAILED, PAL_T("PROPERTY"));
             }
 
             result = XmlDeserializer_DoDeserializeInstance(&embeddedState, currentElem->child_first);
             FreeNamespaceBuffer(&embeddedState);
             if (result != MI_RESULT_OK)
-                return _CreateErrorObject(state->errorObject, MI_RESULT_INVALID_PARAMETER, ID_MI_DES_XML_ELEM_VAL_CONVERTION_FAILED, PAL_T("PROPERTY"));
+                return _CreateErrorObject(state->errorObject, MI_RESULT_INVALID_PARAMETER, ID_MI_DES_XML_ELEM_VAL_CONVERSION_FAILED, PAL_T("PROPERTY"));
 
             type = MI_INSTANCE;
             value.instance = embeddedState.u.instanceData.instanceResult;
@@ -1731,7 +1731,7 @@ _Check_return_ MI_Result XmlDeserializer_AddPropertyArray(_In_ const Deserializa
                 }
                 else
                 {
-                    return _CreateErrorObject(state->errorObject, MI_RESULT_INVALID_PARAMETER, ID_MI_DES_XML_ELEM_VAL_CONVERTION_FAILED, PAL_T("QUALIFIER"));
+                    return _CreateErrorObject(state->errorObject, MI_RESULT_INVALID_PARAMETER, ID_MI_DES_XML_ELEM_VAL_CONVERSION_FAILED, PAL_T("QUALIFIER"));
                 }
             }        
             else if (currentElem->attr_first &&
@@ -1839,7 +1839,7 @@ _Check_return_ MI_Result XmlDeserializer_AddPropertyArray(_In_ const Deserializa
                     }
                     result = _StringToMiValue(state, valueString, type, &value);
                     if (result != MI_RESULT_OK)
-                        return _CreateErrorObject(state->errorObject, MI_RESULT_INVALID_PARAMETER, ID_MI_DES_XML_ELEM_VAL_CONVERTION_FAILED, PAL_T("PROPERTY.ARRAY"));
+                        return _CreateErrorObject(state->errorObject, MI_RESULT_INVALID_PARAMETER, ID_MI_DES_XML_ELEM_VAL_CONVERSION_FAILED, PAL_T("PROPERTY.ARRAY"));
 
                     if (state->type == DeserializingClass)
                     {
@@ -2034,11 +2034,11 @@ _Check_return_ MI_Result XmlDeserializer_AddMethodQualifier(
             if ((cursorElem->value_first == NULL) || 
                 (cursorElem->value_first->value == NULL))
             {
-                return _CreateErrorObject(state->errorObject, MI_RESULT_INVALID_PARAMETER, ID_MI_DES_XML_ELEM_VAL_CONVERTION_FAILED, PAL_T("METHOD QUALIFIER"));
+                return _CreateErrorObject(state->errorObject, MI_RESULT_INVALID_PARAMETER, ID_MI_DES_XML_ELEM_VAL_CONVERSION_FAILED, PAL_T("METHOD QUALIFIER"));
             }
             result = _StringToMiValue(NULL, cursorElem->value_first->value, type, &value);
             if (result != MI_RESULT_OK)
-                return _CreateErrorObject(state->errorObject, MI_RESULT_INVALID_PARAMETER, ID_MI_DES_XML_ELEM_VAL_CONVERTION_FAILED, PAL_T("METHOD QUALIFIER"));
+                return _CreateErrorObject(state->errorObject, MI_RESULT_INVALID_PARAMETER, ID_MI_DES_XML_ELEM_VAL_CONVERSION_FAILED, PAL_T("METHOD QUALIFIER"));
 
             result = Class_AddMethodQualifierArrayItem(finalClass, methodId, qualifierId, value);
             if (result != MI_RESULT_OK)
@@ -2077,7 +2077,7 @@ _Check_return_ static MI_Result _ExtractMethodAttributes(
         {
             result = _StringToMiType(attrList->value, type);
             if (result != MI_RESULT_OK)
-                return _CreateErrorObject(state->errorObject, result, ID_MI_DES_XML_ATTR_VAL_CONVERTION_FAILED, PAL_T("METHOD"), attrList->name);
+                return _CreateErrorObject(state->errorObject, result, ID_MI_DES_XML_ATTR_VAL_CONVERSION_FAILED, PAL_T("METHOD"), attrList->name);
             typeExists = MI_TRUE;
         }
         else if (Tcscmp(attrList->name, PAL_T("CLASSORIGIN")) == 0)
@@ -2090,7 +2090,7 @@ _Check_return_ static MI_Result _ExtractMethodAttributes(
             MI_Boolean boolValue;
             result = _StringToMiBool(attrList->value, &boolValue);
             if (result != MI_RESULT_OK)
-                return _CreateErrorObject(state->errorObject, result, ID_MI_DES_XML_ATTR_VAL_CONVERTION_FAILED, PAL_T("METHOD"), attrList->name);
+                return _CreateErrorObject(state->errorObject, result, ID_MI_DES_XML_ATTR_VAL_CONVERSION_FAILED, PAL_T("METHOD"), attrList->name);
         }
         else
         {
@@ -2130,7 +2130,7 @@ _Check_return_ static MI_Result _ExtractMethodParameterAttribute(
         {
             result = _StringToMiType(attrList->value, type);
             if (result != MI_RESULT_OK)
-                return _CreateErrorObject(state->errorObject, result, ID_MI_DES_XML_ATTR_VAL_CONVERTION_FAILED, PAL_T("PARAMETER"), PAL_T("TYPE"));
+                return _CreateErrorObject(state->errorObject, result, ID_MI_DES_XML_ATTR_VAL_CONVERSION_FAILED, PAL_T("PARAMETER"), PAL_T("TYPE"));
             typeExists = MI_TRUE;
         }
         else
@@ -2172,7 +2172,7 @@ _Check_return_ static MI_Result _ExtractMethodParameterArrayAttribute(
         {
             result = _StringToMiType(attrList->value, type);
             if (result != MI_RESULT_OK)
-                return _CreateErrorObject(state->errorObject, MI_RESULT_INVALID_PARAMETER, ID_MI_DES_XML_ATTR_VAL_CONVERTION_FAILED, PAL_T("PARAMETER.ARRAY"), PAL_T("TYPE"));
+                return _CreateErrorObject(state->errorObject, MI_RESULT_INVALID_PARAMETER, ID_MI_DES_XML_ATTR_VAL_CONVERSION_FAILED, PAL_T("PARAMETER.ARRAY"), PAL_T("TYPE"));
             typeFound = MI_TRUE;
         }
         else if (Tcscmp(attrList->name, PAL_T("ARRAYSIZE")) == 0)
@@ -2189,7 +2189,7 @@ _Check_return_ static MI_Result _ExtractMethodParameterArrayAttribute(
 #ifdef _PREFAST_
 #pragma prefast(pop)
 #endif
-                return _CreateErrorObject(state->errorObject, MI_RESULT_INVALID_PARAMETER, ID_MI_DES_XML_ATTR_VAL_CONVERTION_FAILED, PAL_T("PARAMETER.ARRAY"), PAL_T("ARRAYSIZE"));
+                return _CreateErrorObject(state->errorObject, MI_RESULT_INVALID_PARAMETER, ID_MI_DES_XML_ATTR_VAL_CONVERSION_FAILED, PAL_T("PARAMETER.ARRAY"), PAL_T("ARRAYSIZE"));
         }
         else
         {
@@ -2247,7 +2247,7 @@ _Check_return_ static MI_Result _ExtractMethodParameterReferenceAttribute(
 #ifdef _PREFAST_
 #pragma prefast(pop)
 #endif
-                return _CreateErrorObject(state->errorObject, MI_RESULT_INVALID_PARAMETER, ID_MI_DES_XML_ATTR_VAL_CONVERTION_FAILED, PAL_T("PARAMETER.REFERENCE"), PAL_T("ARRAYSIZE"));
+                return _CreateErrorObject(state->errorObject, MI_RESULT_INVALID_PARAMETER, ID_MI_DES_XML_ATTR_VAL_CONVERSION_FAILED, PAL_T("PARAMETER.REFERENCE"), PAL_T("ARRAYSIZE"));
         }
         else
         {
@@ -2325,7 +2325,7 @@ _Check_return_ MI_Result XmlDeserializer_AddMethodParameterQualifier(
             {
                 result = _StringToMiValue(NULL, cursorElem->value_first->value, type, &value);
                 if (result != MI_RESULT_OK)
-                    return _CreateErrorObject(state->errorObject, MI_RESULT_INVALID_PARAMETER, ID_MI_DES_XML_ELEM_VAL_CONVERTION_FAILED, PAL_T("PARAMETER QUALIFIER"));;
+                    return _CreateErrorObject(state->errorObject, MI_RESULT_INVALID_PARAMETER, ID_MI_DES_XML_ELEM_VAL_CONVERSION_FAILED, PAL_T("PARAMETER QUALIFIER"));;
             }
             result = Class_AddMethodParameterQualifierArrayItem(finalClass, methodId, parameterId, qualifierId, value);
             if (result != MI_RESULT_OK)
@@ -2871,7 +2871,7 @@ _Check_return_ static MI_Result _Extract_NAMESPACEPATH(
 //Extract the namespace from a LOCALNAMESPACEPATH node
 _Check_return_ static MI_Result _Extract_LOCALNAMESPACEPATH(
     _In_ const DeserializationData *state,
-    _In_ XMLDOM_Elem *localNmespacePathElem, 
+    _In_ XMLDOM_Elem *localNamespacePathElem, 
     _Outptr_result_z_ const MI_Char **namespacePath)
 {
     // LOCALNAMESPACEPATH could be like following, need to concat all elements to form the namespace
@@ -2880,7 +2880,7 @@ _Check_return_ static MI_Result _Extract_LOCALNAMESPACEPATH(
     //      <NAMESPACE NAME="root"/>
     //      <NAMESPACE NAME="interop"/>
     //  </LOCALNAMESPACEPATH>
-    XMLDOM_Elem * namespaceElem = localNmespacePathElem->child_first;
+    XMLDOM_Elem * namespaceElem = localNamespacePathElem->child_first;
     MI_Result r = MI_RESULT_INVALID_PARAMETER;
     MI_Char * pCurrentNamespace;
     MI_Uint32 namespaceBufferLength = 0;
@@ -2937,7 +2937,7 @@ _Check_return_ static MI_Result _Extract_LOCALNAMESPACEPATH(
         pCurrentNamespace = bufferData->pNamespaceBuffer;
         *pCurrentNamespace = PAL_T('\0');
 
-        namespaceElem = localNmespacePathElem->child_first;
+        namespaceElem = localNamespacePathElem->child_first;
         while (namespaceElem != NULL)
         {
             const MI_Char * tNamespace = namespaceElem->attr_first->value;
@@ -2959,9 +2959,9 @@ _Check_return_ static MI_Result _Extract_LOCALNAMESPACEPATH(
         return r;
     }
 
-    if (localNmespacePathElem->child_first)
+    if (localNamespacePathElem->child_first)
     {
-        return _CreateErrorObject(state->errorObject, MI_RESULT_INVALID_PARAMETER, ID_MI_DES_XML_ELEM_CHILD_UNK, PAL_T("LOCALNAMESPACEPATH"), localNmespacePathElem->child_first->name);
+        return _CreateErrorObject(state->errorObject, MI_RESULT_INVALID_PARAMETER, ID_MI_DES_XML_ELEM_CHILD_UNK, PAL_T("LOCALNAMESPACEPATH"), localNamespacePathElem->child_first->name);
     }
     else
     {
@@ -3202,10 +3202,10 @@ _Check_return_ static MI_Result _Extract_KEYVALUE(
         MI_Type validateType;
         result = _StringToMiType(cimType, &validateType);
         if (result != MI_RESULT_OK)
-            return _CreateErrorObject(state->errorObject, result, ID_MI_DES_XML_ATTR_VAL_CONVERTION_FAILED, PAL_T("KEYVALUE"), PAL_T("TYPE"));
+            return _CreateErrorObject(state->errorObject, result, ID_MI_DES_XML_ATTR_VAL_CONVERSION_FAILED, PAL_T("KEYVALUE"), PAL_T("TYPE"));
 
         if (!Instance_IsDynamic(instanceObject) && (validateType != type))
-            return _CreateErrorObject(state->errorObject, MI_RESULT_INVALID_PARAMETER, ID_MI_DES_XML_KEYVALUE_TYPE_MISSMATCH);
+            return _CreateErrorObject(state->errorObject, MI_RESULT_INVALID_PARAMETER, ID_MI_DES_XML_KEYVALUE_TYPE_MISMATCH);
     }
     if (Tcscmp(valueType, PAL_T("boolean"))==0)
     {
@@ -3214,7 +3214,7 @@ _Check_return_ static MI_Result _Extract_KEYVALUE(
             type = MI_BOOLEAN;
         }
         else if (type != MI_BOOLEAN)
-            return _CreateErrorObject(state->errorObject, MI_RESULT_INVALID_PARAMETER, ID_MI_DES_XML_KEYVALUE_TYPE_MISSMATCH);
+            return _CreateErrorObject(state->errorObject, MI_RESULT_INVALID_PARAMETER, ID_MI_DES_XML_KEYVALUE_TYPE_MISMATCH);
     }
     else if (Tcscmp(valueType, PAL_T("string"))==0)
     {
@@ -3223,7 +3223,7 @@ _Check_return_ static MI_Result _Extract_KEYVALUE(
             type = MI_STRING;
         }
         else if ((type != MI_STRING) && (type != MI_CHAR16) && (type != MI_DATETIME))
-            return _CreateErrorObject(state->errorObject, MI_RESULT_INVALID_PARAMETER, ID_MI_DES_XML_KEYVALUE_TYPE_MISSMATCH);
+            return _CreateErrorObject(state->errorObject, MI_RESULT_INVALID_PARAMETER, ID_MI_DES_XML_KEYVALUE_TYPE_MISMATCH);
     }
     else if (Tcscmp(valueType, PAL_T("numeric"))==0)
     {
@@ -3235,17 +3235,17 @@ _Check_return_ static MI_Result _Extract_KEYVALUE(
             (type != MI_UINT32) && (type != MI_SINT32) && (type != MI_UINT64) && (type != MI_SINT64) && 
             (type != MI_REAL32) && (type != MI_REAL64))
         {
-            return _CreateErrorObject(state->errorObject, MI_RESULT_INVALID_PARAMETER, ID_MI_DES_XML_KEYVALUE_TYPE_MISSMATCH);
+            return _CreateErrorObject(state->errorObject, MI_RESULT_INVALID_PARAMETER, ID_MI_DES_XML_KEYVALUE_TYPE_MISMATCH);
         }
     }
     else
     {
-        return _CreateErrorObject(state->errorObject, MI_RESULT_INVALID_PARAMETER, ID_MI_DES_XML_ATTR_VAL_CONVERTION_FAILED, PAL_T("KEYVALUE"), PAL_T("VALUETYPE"));
+        return _CreateErrorObject(state->errorObject, MI_RESULT_INVALID_PARAMETER, ID_MI_DES_XML_ATTR_VAL_CONVERSION_FAILED, PAL_T("KEYVALUE"), PAL_T("VALUETYPE"));
     }
 
     result = _StringToMiValue(state, value, type, &miValue);
     if (result != MI_RESULT_OK)
-        return _CreateErrorObject(state->errorObject, result, ID_MI_DES_XML_ELEM_VAL_CONVERTION_FAILED, PAL_T("KEYVALUE"));
+        return _CreateErrorObject(state->errorObject, result, ID_MI_DES_XML_ELEM_VAL_CONVERSION_FAILED, PAL_T("KEYVALUE"));
 
     if (Instance_IsDynamic(instanceObject))
     {
@@ -3329,7 +3329,7 @@ _Check_return_ static MI_Result _Extract_INSTANCENAME(
     if (state->type == DeserializingInstance)
     {
         //Can we find the class?
-        result = XmlDeserialzier_GetInstanceClass(state, state->u.instanceData.declgroupElement, 0, className, namespaceName, serverName, &refClass);
+        result = XmlDeserializer_GetInstanceClass(state, state->u.instanceData.declgroupElement, 0, className, namespaceName, serverName, &refClass);
         if ((result != MI_RESULT_OK) && (result != MI_RESULT_NOT_FOUND))
         {
             return result;

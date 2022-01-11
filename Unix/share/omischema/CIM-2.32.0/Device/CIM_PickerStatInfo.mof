@@ -45,7 +45,7 @@ class CIM_PickerStatInfo : CIM_DeviceStatisticalInformation {
           "returns 0 if successful, 1 if not supported, and any "
           "other value if an error occurred. A method is specified "
           "so that the Device\'s instrumentation can also reset its "
-          "internal pocessing and counters. \n"
+          "internal processing and counters. \n"
           "In a subclass, the set of possible return codes should "
           "be specified in a ValueMap qualifier on the method. The "
           "strings to which the ValueMap contents are \'translated\' "

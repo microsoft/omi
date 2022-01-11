@@ -8,7 +8,7 @@ class CIM_ProtocolControllerMaskingCapabilities : CIM_Capabilities {
 
       [Description ( 
           "A list of the valid values for "
-          "StrorageHardwareID.IDType. iSCSI IDs MAY use one of "
+          "StorageHardwareID.IDType. iSCSI IDs MAY use one of "
           "three iSCSI formats - iqn, eui, or naa. This three "
           "letter format is the name prefix; so a single iSCSI type "
           "is provided here, the prefix can be used to further "
@@ -69,7 +69,7 @@ class CIM_ProtocolControllerMaskingCapabilities : CIM_Capabilities {
    boolean OneHardwareIDPerView = false;
 
       [Description ( 
-          "When set to false, different ProtocolContollers attached "
+          "When set to false, different ProtocolControllers attached "
           "to a LogicalPort can expose the same unit numbers. If "
           "true, then this storage system requires unique unit "
           "numbers across all the ProtocolControllers connected to "
@@ -92,7 +92,7 @@ class CIM_ProtocolControllerMaskingCapabilities : CIM_Capabilities {
 
       [Description ( 
           "If true, this property indicates that the Identity "
-          "parameter of CreateProtocolConntrollerWithPorts() MUST "
+          "parameter of CreateProtocolControllerWithPorts() MUST "
           "contain a reference to a CIM_Collection (or subclass) or "
           "to a CIM_Identity (or subclass). If ExposePathsSupported "
           "is true, this property indicates the storage system "
@@ -118,21 +118,21 @@ class CIM_ProtocolControllerMaskingCapabilities : CIM_Capabilities {
    uint16 MaximumMapCount = 0;
 
       [Description ( 
-          "Set to true if the instumentation allows a client to "
+          "Set to true if the instrumentation allows a client to "
           "create a configuration where an SPC has no "
           "LogicalDevices associated via "
           "CIM_ProtocolControllerForUnit associations." )]
    boolean SPCAllowsNoLUs = false;
 
       [Description ( 
-          "Set to true if the instumentation allows a client to "
+          "Set to true if the instrumentation allows a client to "
           "create a configuration where an SPC has no target "
           "SCSIProtocolEndpoints associated via "
           "CIM_SAPAvailableForELement associations." )]
    boolean SPCAllowsNoTargets = false;
 
       [Description ( 
-          "Set to true if the instumentation allows a client to "
+          "Set to true if the instrumentation allows a client to "
           "create a configuration where an SPC has no "
           "StorageHardwareIDs associated via "
           "CIM_AuthorizedTarget/CIM_AuthorizedPrivilege/CIM_AuthorizedSubject."

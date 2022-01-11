@@ -7,7 +7,7 @@
    [Version ( "2.6.0" ), 
     UMLPackagePath ( "CIM::Device::StorageDevices" ), 
     Description ( 
-       "Capabilities and managment of a DiskDrive, a subtype of "
+       "Capabilities and management of a DiskDrive, a subtype of "
        "MediaAccessDevice." )]
 class CIM_DiskDrive : CIM_MediaAccessDevice {
 

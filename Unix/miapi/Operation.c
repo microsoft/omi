@@ -32,16 +32,16 @@ typedef enum
     OPERATION_INSTANCE,
     OPERATION_CLASS,
     OPERATION_INDICATION
-} OPERATATION_TYPE;
+} OPERATION_TYPE;
 
 typedef struct _OperationObject OperationObject;
 struct _OperationObject
 {
-    /* Linked list for child session operatons.  Includes clients operation handle */
+    /* Linked list for child session operations.  Includes clients operation handle */
     ChildListNode operationNode;
 
     /* Type of operation */
-    OPERATATION_TYPE operationType;
+    OPERATION_TYPE operationType;
 
     /* Copy of parent session so we can copy it */
     MI_Session clientSession;
@@ -185,7 +185,7 @@ MI_Result MI_CALL Operation_OperationCallback_PromptUser_Callback(
 
             operationObject->ph_promptUserResult_callback(&operationObject->protocolHandlerOperation, response);
 
-            /* Relesing twice, once for the reference added in callback and other for reference added in this completion callback */
+            /* Releasing twice, once for the reference added in callback and other for reference added in this completion callback */
             ThunkHandle_Release(genericHandle->thunkHandle);
             ThunkHandle_Release(genericHandle->thunkHandle);
 
@@ -219,7 +219,7 @@ void MI_CALL Operation_OperationCallback_PromptUser(
     {
         OperationObject *operationObject = (OperationObject *) callbackContext;
         GenericHandle *genericHandle = &operationObject->operationNode.clientHandle;
-        MI_OperationCallback_ResponseType autoResonse =  operationObject->promptUserModeAckMode == MI_TRUE ?
+        MI_OperationCallback_ResponseType autoResponse =  operationObject->promptUserModeAckMode == MI_TRUE ?
                                     MI_OperationCallback_ResponseType_Yes : MI_OperationCallback_ResponseType_No;
 
         ThunkHandle *thunkHandle;
@@ -246,7 +246,7 @@ void MI_CALL Operation_OperationCallback_PromptUser(
                             TerminateProcess(GetCurrentProcess(), -1);
                         }
                         //Do auto ack based on client's preference
-                        promptUserResult(&operationObject->protocolHandlerOperation, autoResonse);
+                        promptUserResult(&operationObject->protocolHandlerOperation, autoResponse);
                     }
                     else
                     {
@@ -261,7 +261,7 @@ void MI_CALL Operation_OperationCallback_PromptUser(
                 {
                     //Do auto ack based on client's preference
                     bExecutePromptUser = MI_FALSE;
-                    promptUserResult(&operationObject->protocolHandlerOperation, autoResonse);
+                    promptUserResult(&operationObject->protocolHandlerOperation, autoResponse);
 
                     ThunkHandle_Release(thunkHandle);
                 }
@@ -287,7 +287,7 @@ void MI_CALL Operation_OperationCallback_PromptUser(
                 }
                 else
                 {
-                    //TODO: Set interal state to BROKEN so MI_Operation_Close will succeed
+                    //TODO: Set internal state to BROKEN so MI_Operation_Close will succeed
                     operationObject->currentState = Broken;
                 }
             }
@@ -330,7 +330,7 @@ MI_Result MI_CALL Operation_OperationCallback_WriteError_Callback(_In_ MI_Operat
 
             operationObject->ph_writeErrorResult_callback(&operationObject->protocolHandlerOperation, response);
 
-            /* Relesing twice, once for the reference added in callback and other for reference added in this completion callback */
+            /* Releasing twice, once for the reference added in callback and other for reference added in this completion callback */
             ThunkHandle_Release(genericHandle->thunkHandle);
             ThunkHandle_Release(genericHandle->thunkHandle);
 
@@ -395,7 +395,7 @@ void MI_CALL Operation_OperationCallback_WriteError(
             }
             else
             {
-                //TODO: Set interal state to BROKEN so MI_Operation_Close will succeed
+                //TODO: Set internal state to BROKEN so MI_Operation_Close will succeed
                 operationObject->currentState = Broken;
             }
         }
@@ -433,7 +433,7 @@ MI_Result MI_CALL Operation_OperationCallback_StreamedParameter_Callback(
 
             operationObject->ph_streamedParameterResult_callback(&operationObject->protocolHandlerOperation);
 
-            /* Relesing twice, once for the reference added in callback and other for reference added in this completion callback */
+            /* Releasing twice, once for the reference added in callback and other for reference added in this completion callback */
             ThunkHandle_Release(genericHandle->thunkHandle);
             ThunkHandle_Release(genericHandle->thunkHandle);
 
@@ -506,7 +506,7 @@ void MI_CALL Operation_OperationCallback_StreamedParameter(
                 }
                 else
                 {
-                    //TODO: Set interal state to BROKEN so MI_Operation_Close needs to succeed
+                    //TODO: Set internal state to BROKEN so MI_Operation_Close needs to succeed
                     operationObject->currentState = Broken;
                 }
 
@@ -555,7 +555,7 @@ void MI_CALL Operation_OperationCallback_WriteMessage(
             }
             else
             {
-                //TODO: Set interal state to BROKEN so MI_Operation_Close needs to succeed
+                //TODO: Set internal state to BROKEN so MI_Operation_Close needs to succeed
                 operationObject->currentState = Broken;
             }
 
@@ -601,7 +601,7 @@ void MI_CALL Operation_OperationCallback_WriteProgress(
             }
             else
             {
-                //TODO: Set interal state to BROKEN so MI_Operation_Close needs to succeed
+                //TODO: Set internal state to BROKEN so MI_Operation_Close needs to succeed
                 operationObject->currentState = Broken;
             }
 
@@ -973,7 +973,7 @@ void MI_CALL Operation_OperationCallback_Instance(
             }
             else
             {
-                //TODO: Set interal state to BROKEN so MI_Operation_Close needs to succeed
+                //TODO: Set internal state to BROKEN so MI_Operation_Close needs to succeed
                 //operationObject->currentState = Broken;
             }
             if (!manualAck || (impersonationResult != MI_RESULT_OK))
@@ -1063,7 +1063,7 @@ void MI_CALL Operation_OperationCallback_Class(
             }
             else
             {
-                //TODO: Set interal state to BROKEN so MI_Operation_Close needs to succeed
+                //TODO: Set internal state to BROKEN so MI_Operation_Close needs to succeed
                 operationObject->currentState = Broken;
             }
 
@@ -1155,7 +1155,7 @@ void MI_CALL Operation_OperationCallback_Indication(
             }
             else
             {
-                //TODO: Set interal state to BROKEN so MI_Operation_Close needs to succeed
+                //TODO: Set internal state to BROKEN so MI_Operation_Close needs to succeed
                 operationObject->currentState = Broken;
             }
 
@@ -1276,7 +1276,7 @@ MI_Result MI_CALL Operation_Close(
                 }
             }
 
-            /* ack last data if present in case of syncrhonous */
+            /* ack last data if present in case of synchronous */
             if (tmpResultAcknowledgement)
             {
                 operationObject->instanceResult = NULL;
@@ -1420,7 +1420,7 @@ MI_Result MI_CALL Operation_GetParentSession(
  * a special error reporting function table that extracts error from the handle.
  */
 void Operation_Execute_SetupFailure(
-    OPERATATION_TYPE operationType,
+    OPERATION_TYPE operationType,
     MI_Result failureCode,
     _In_opt_ MI_OperationCallbacks *callbacks,
     _In_opt_     MI_Session *parentSession,
@@ -1529,7 +1529,7 @@ void Operation_Execute_SetupFailure(
 MI_Result Operation_Execute_SetupOperation(
     _In_        MI_Session *session,
                 MI_Uint32 flags,
-                OPERATATION_TYPE operationType,
+                OPERATION_TYPE operationType,
     _In_opt_    MI_OperationOptions *options,
     _In_opt_    MI_OperationCallbacks *callbacks,
     _In_opt_z_ const MI_Char *operationName,
@@ -2896,8 +2896,8 @@ MI_Result MI_CALL Operation_GetInstance_Result(
                         operationObject->ph_instance_resultAcknowledgement = NULL; /* Calling ack so clear it out */
                         operationObject->instanceResult = NULL; /* Ack-ing result so wipe it out */
                         operationObject->consumedResult = MI_FALSE; /* Reset consumped result as we have not consumed the one we have not got yet */
-                        operationObject->instanceCallbackReceived = 0; /* Reset the callback receieved as we need to get the next one */
-                        tmpResultAcknowledgement(&operationObject->protocolHandlerOperation); /* Ack, we can get callback imediately on this thread, unwind and process next imediately */
+                        operationObject->instanceCallbackReceived = 0; /* Reset the callback received as we need to get the next one */
+                        tmpResultAcknowledgement(&operationObject->protocolHandlerOperation); /* Ack, we can get callback immediately on this thread, unwind and process next immediately */
 
                         /* Now we are ready to get more results */
                     }
@@ -2945,7 +2945,7 @@ MI_Result MI_CALL Operation_GetInstance_Result(
                         ThunkHandle_Release(thunkHandle);
                     }
 
-                    trace_MIClient_OperationInstancResultSync(operationObject->clientSessionPtr, operationObject->clientOperationPtr, operationObject, operationObject->resultCode, operationObject->moreResults?MI_T("TRUE"):MI_T("FALSE"));
+                    trace_MIClient_OperationInstanceResultSync(operationObject->clientSessionPtr, operationObject->clientOperationPtr, operationObject, operationObject->resultCode, operationObject->moreResults?MI_T("TRUE"):MI_T("FALSE"));
                 }
                 else
                 {
@@ -3078,8 +3078,8 @@ MI_Result MI_CALL Operation_GetIndication_Result(
                         operationObject->bookmark = NULL;
                         operationObject->machineID = NULL;
                         operationObject->consumedResult = MI_FALSE; /* Reset consumped result as we have not consumed the one we have not got yet */
-                        operationObject->instanceCallbackReceived = 0; /* Reset the callback receieved as we need to get the next one */
-                        tmpResultAcknowledgement(&operationObject->protocolHandlerOperation); /* Ack, we can get callback imediately on this thread, unwind and process next imediately */
+                        operationObject->instanceCallbackReceived = 0; /* Reset the callback received as we need to get the next one */
+                        tmpResultAcknowledgement(&operationObject->protocolHandlerOperation); /* Ack, we can get callback immediately on this thread, unwind and process next immediately */
 
                         /* Now we are ready to get more results */
                     }
@@ -3179,7 +3179,7 @@ MI_Result MI_CALL Operation_GetClass_Result(
     _Outptr_opt_result_maybenull_z_ const MI_Char **errorMessage,
     _Outptr_opt_result_maybenull_ const MI_Instance **completionDetails)
 {
-    /* valudate parameters */
+    /* validate parameters */
     if ((operation == NULL) || (classResult == NULL))
     {
         if (result)
@@ -3250,8 +3250,8 @@ MI_Result MI_CALL Operation_GetClass_Result(
                         operationObject->ph_instance_resultAcknowledgement = NULL; /* Calling ack so clear it out */
                         operationObject->classResult = NULL; /* Ack-ing result so wipe it out */
                         operationObject->consumedResult = MI_FALSE; /* Reset consumped result as we have not consumed the one we have not got yet */
-                        operationObject->instanceCallbackReceived = 0; /* Reset the callback receieved as we need to get the next one */
-                        tmpResultAcknowledgement(&operationObject->protocolHandlerOperation); /* Ack, we can get callback imediately on this thread, unwind and process next imediately */
+                        operationObject->instanceCallbackReceived = 0; /* Reset the callback received as we need to get the next one */
+                        tmpResultAcknowledgement(&operationObject->protocolHandlerOperation); /* Ack, we can get callback immediately on this thread, unwind and process next immediately */
 
                         /* Now we are ready to get more results */
                     }

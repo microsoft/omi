@@ -578,7 +578,7 @@ int servermain(int argc, const char* argv[], const char *envp[])
 
     if (ntlm_user_file)
     {
-        /* We do NOT accept the NTLM_USER_FILE environement variable for the server */
+        /* We do NOT accept the NTLM_USER_FILE environment variable for the server */
         trace_NtlmEnvIgnored(ntlm_user_file);
         unsetenv("NTLM_USER_FILE");
     }

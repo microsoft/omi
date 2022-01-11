@@ -700,10 +700,10 @@ if [ "$arg1" = "size" ]; then
             ;;
         SUNOS_I86PC_SUNPRO|SUNOS_SPARC_SUNPRO)
 
-            # the size utiltiy is not available on solaris unless you install gnu binutils
+            # the size utility is not available on solaris unless you install gnu binutils
             # separately
 
-            echo "echo \'size not avaliable\'"
+            echo "echo \'size not available\'"
             ;;
         AIX_PPC_IBM|LINUX_PPC_GNU)
             echo size
@@ -715,7 +715,7 @@ if [ "$arg1" = "size" ]; then
             echo size
             ;;
 	*)
-	    echo "echo \'Unsuported platform: $platform\'"
+	    echo "echo \'Unsupported platform: $platform\'"
 	    exit 1
 	    ;;
     esac
@@ -856,7 +856,7 @@ if [ "$arg1" = "cflags" -o "$arg1" = "cxxflags" ]; then
             ## display brief message tag for each warning message.
             r="$r -errtags=yes"
 
-            ## use standar pthread funciton declarations
+            ## use standard pthread function declarations
             r="$r -D_POSIX_PTHREAD_SEMANTICS"
 
             r="$r -D_XOPEN_SOURCE=500"
@@ -1678,7 +1678,7 @@ fi
 
 ##==============================================================================
 ##
-## 'shmnamelocalprefix' command (determine the prefix for a shmaphore)
+## 'shmnamelocalprefix' command (determine the prefix for a semaphore)
 ##
 ##==============================================================================
 
@@ -1728,7 +1728,7 @@ fi
 
 ##==============================================================================
 ##
-## 'shmnameglobalprefix' command (determine the prefix for a shmaphore)
+## 'shmnameglobalprefix' command (determine the prefix for a semaphore)
 ##
 ##==============================================================================
 

@@ -30,7 +30,7 @@ class CIM_NonVolatileStorage : CIM_Memory {
        Description ( 
           "When at least some portion of the NonVolatileStorage is "
           "writeable (ApplicationWriteable property = TRUE), "
-          "StartAddress forApplcationWrite indicates the starting "
+          "StartAddress forApplicationWrite indicates the starting "
           "address for application data. If the "
           "ApplicationWriteable property is FALSE, this property is "
           "undefined." ), 

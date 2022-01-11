@@ -16,7 +16,7 @@
        "the difference of two snapshots of a counter at the beginning "
        "and end of a measurement interval should get the correct "
        "result, even if there was a wrap-around in between obtaining "
-       "the two snapshots. (Two or more wrap arounds will result in "
+       "the two snapshots. (Two or more wraparounds will result in "
        "wrong data being calculated.) The gathering of the data can be "
        "controlled through the property, "
        "CIM_ObjectManager.GatherStatisticalData. The time interval to "

@@ -20,9 +20,9 @@ extern "C" {
 **==============================================================================
 **
 ** String Hash table
-**  Why? - Parse has to serach list of classes, instance alias already defined
+**  Why? - Parse has to search list of classes, instance alias already defined
 **  in the mof buffer to detect re-definition of class and instance alias.
-**  Linear search will end up with O(N^2) and unaccpetable if processing 
+**  Linear search will end up with O(N^2) and unacceptable if processing 
 **  large number of class/aliases, say 1M. So introduce hashtable here to
 **  reduce the search time to O(1), while it will take O(N) to build up the
 **  hashtable. Whenever the search target size is bigger than HASH_THRESHOLD,
@@ -36,7 +36,7 @@ extern "C" {
 #define HASH_TABLE_SIZE 1000003
 /* Fallback to hash search beyond this threshold */
 #define HASH_THRESHOLD 128
-/* A number used to caculate hash value */
+/* A number used to calculate hash value */
 #define HASH_SEED_PRIME_NUMBER 1313038763
 /* Defines hash node */
 typedef struct _HashNode *HashNodePtr;
@@ -47,7 +47,7 @@ typedef struct _HashNode
                    /* another separate array, such as MOF_ClassDeclList */
     const MI_Char* source; /* source string of the node */
     MI_Uint32 code; /* Another hash code of the string to */
-                    /* fastern search on collision entry*/
+                    /* accelerate search on collision entry*/
     HashNodePtr next; /* Next node with same hash value */
 }
 HashNode;

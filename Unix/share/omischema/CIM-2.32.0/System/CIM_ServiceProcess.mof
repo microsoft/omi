@@ -38,7 +38,7 @@ class CIM_ServiceProcess {
           "Process\" indicates that the Service is hosted in a "
           "Process that already exists in the system. The lifecycle "
           "of the Service is separate from that of the Process. "
-          "\"Exeutes as Independent Process\" indicates that the "
+          "\"Executes as Independent Process\" indicates that the "
           "Service is responsible for the lifecycle of the Process. "
           "When the Service is started, the Process is created. For "
           "example, ServletEngines can run \"InProcess\" within the "

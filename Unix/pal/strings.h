@@ -12,7 +12,7 @@
 **
 ** strings.h:
 **
-**     This file defines string-manipluation functions. For each string 
+**     This file defines string-manipulation functions. For each string 
 **     operation, there are three implementations:
 **
 **         - Single-character - char

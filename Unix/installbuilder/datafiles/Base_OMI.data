@@ -96,7 +96,7 @@ GetNewPAMConfig_file() {
         # Check to see if "other" is configured
         other_conf=`egrep "^[# ]*other[ 	]+(auth|account)" ${{PAM_CONF_FILE}}`
         if [ $? -eq 0 ]; then
-            # "other" was found - use that (do not write any sort of new PAM configuraton)
+            # "other" was found - use that (do not write any sort of new PAM configuration)
             return 0
         fi
         # Use passwd
@@ -524,7 +524,7 @@ else
 
     WriteSSLconfig "$hostname" "$longhostname"
 
-    # When the FQDN is not RFC compliant, openssl fails to generate a cerificate.
+    # When the FQDN is not RFC compliant, openssl fails to generate a certificate.
     # We will try a fallback for the FQDN.
     GenerateKeyCert
     if [ $? -ne 0 ]; then
@@ -563,7 +563,7 @@ chown omi:omi /etc/opt/omi/conf/sockets
 chmod 700 /etc/opt/omi/conf/sockets
 
 
-# Fix potential permissons issue on /etc/opt/omi directory
+# Fix potential permissions issue on /etc/opt/omi directory
 chown root:${{ROOT_GROUP_NAME}} /etc/opt/omi
 
 %Preuninstall_100

@@ -132,9 +132,9 @@ OI_EVENT("MuxIn_Open: cannot allocate ConnectionIn")
 void trace_MuxInOpen_AllocFailed();
 
 OI_EVENT("_StrandEntryOperation_Add: Canceled %d entries %p(%s): %p(%s)")
-void trace_StrandEntryOperation_AddCanceled(unsigned int numEntries, StrandMany * self, const char * selfTrand, Strand * entry, const char * entryStrandName);
+void trace_StrandEntryOperation_AddCanceled(unsigned int numEntries, StrandMany * self, const char * selfStrand, Strand * entry, const char * entryStrandName);
 OI_EVENT("_StrandEntryOperation_Add: Failed %d entries %p(%s): %p(%s)")
-void trace_StrandEntryOperation_AddFailed(unsigned int numEntries, StrandMany * self, const char * selfTrand, Strand * entry, const char * entryStrandName);
+void trace_StrandEntryOperation_AddFailed(unsigned int numEntries, StrandMany * self, const char * selfStrand, Strand * entry, const char * entryStrandName);
 OI_EVENT("Strand %p(%s), cannot delete entry %p(%s)")
 void trace_Strand_CannotDelete(Strand * selfStrand, const char * selfStrandName, Strand * entryStrand, const char * entryStrandName);
 OI_EVENT("_Strand_Schedule: %p(%s) FAILED Taking over opening, state %x(%s), methodBit: %x")
@@ -369,7 +369,7 @@ OI_EVENT("Out of memory error, session %p")
 void trace_MI_OutOfMemoryInSession(void * session);
 OI_EVENT("InteractionProtocolHandler_Session_Connect failed, session %p, result %d")
 void trace_MI_SessionConnectFailed(void * session, MI_Result miResult);
-OI_EVENT("InstantchToBatch failed in MI session, session %p, result %d")
+OI_EVENT("InstanceToBatch failed in MI session, session %p, result %d")
 void trace_MI_InstanceToBatch_Failed(void * session, MI_Result miResult);
 
 OI_EVENT("(%c)Socket connect failed, locator %s")
@@ -615,13 +615,13 @@ void trace_InstanceConversionFailed(const TChar * name, MI_Result r);
 OI_EVENT("invalid query expression: %T")
 void trace_InvalidQueryExpression(const TChar * filter);
 OI_EVENT("library unload did not call post result")
-void trace_LibraryUnload_DidnotPostResult();
+void trace_LibraryUnload_DidNotPostResult();
 OI_EVENT("module load failed to call post result")
 void trace_ModuleLoad_FailedPostResult();
 OI_EVENT("no digest available")
 void trace_NoDigestAvailable();
 OI_EVENT("provider load did not call post result")
-void trace_ProviderLoad_DidnotPostResult();
+void trace_ProviderLoad_DidNotPostResult();
 OI_EVENT("query validation failed: %T")
 void trace_QueryValidationFailed(const TChar * text);
 OI_EVENT("query/enumeration class name mismatch: %T/%T")
@@ -1105,7 +1105,7 @@ void trace_DispHandleInteractionRequest(void * self, Interaction * interaction, 
 OI_EVENT("Disp_HandleInteractionRequest: self (%p), interaction(%p), Unsupported msg(%p:%d:%T:%x)")
 void trace_DispUnsupportedMessage(void * self, Interaction * interaction, Message * msg, MI_Uint32 msgTag, const TChar * messageName, MI_Uint64 operationId);
 OI_EVENT("Disp_HandleRequest")
-void trace_DispHandlRequest();
+void trace_DispHandleRequest();
 
 OI_EVENT("HttpSocket: Posting message for interaction [%p]<-%p")
 void trace_HttpSocketPosting(Interaction * interaction, Interaction * other);
@@ -1415,7 +1415,7 @@ void trace_InitIndicationWithNullInput();
 OI_EVENT("Multiple indication initialization of provider for class %T")
 void trace_MultipleIndication_InitOfProviderForClass(const TChar * className);
 
-OI_EVENT("_Provider_InvokeSubscribe: Start  Thread %x: provider (%p), msg (%p) with tag (%d), subcription (%p)")
+OI_EVENT("_Provider_InvokeSubscribe: Start  Thread %x: provider (%p), msg (%p) with tag (%d), subscription (%p)")
 void trace_ProviderInvokeSubscribe_Begin(unsigned int threadid, void * provider, void * message, MI_Uint32 tag, void* subs);
 OI_EVENT("_Provider_InvokeSubscribe: Complete Thread %x: provider (%p), result (%d)")
 void trace_ProviderInvokeSubscribe_End(unsigned int threadid, void * provider, MI_Result result);
@@ -1503,7 +1503,7 @@ void trace_ProcessSubscribeResponseEnumerationContext(void * selfEC);
 OI_EVENT("_ProcessSubscribeResponseEnumerationContext: selfEC (%p) sent success subscribe response")
 void trace_ProcessSubscribeResponseEnumerationContext_Success(void * selfEC);
 
-OI_EVENT("WsmanEnum: %p _ProcessInstanceEnumerationContext: compeleted: %d, totalResponses: %d, totalResponseSize: %d")
+OI_EVENT("WsmanEnum: %p _ProcessInstanceEnumerationContext: completed: %d, totalResponses: %d, totalResponseSize: %d")
 void trace_WsmanEnum(void * self, MI_Boolean expired, MI_Uint32 totalResp, MI_Uint32 totalRespSize);
 OI_EVENT("WsmanConnection: Posting msg(%p:%d:%T:%x) on interaction %p<-[%p]<-%p")
 void trace_WsmanConnection_PostingMsg(Message * message, MI_Uint32 tag, const TChar * messageName, MI_Uint64 operationId, Interaction * left, Strand * self, Interaction * right);
@@ -1721,7 +1721,7 @@ void trace_MIClient_EnumerateInstance(void * session, void * operation, void * o
 OI_EVENT("MI_Client Operation Query Instances: session=%p, operation=%p, internal-operation=%p, namespace=%T, queryDialect=%T, queryExpression=%T")
 void trace_MIClient_QueryInstances(void * session, void * operation, void * operationObject, const MI_Char * namespaceName, const MI_Char * queryDialect, const MI_Char * queryExpression);
 OI_EVENT("MI_Client Operation Instance Result (sync): session=%p, operation=%p, internal-operation=%p, resultCode=%u, moreResults=%T")
-void trace_MIClient_OperationInstancResultSync(void * session, void * operation, void * internalOperation, MI_Result code, const MI_Char * moreResults);
+void trace_MIClient_OperationInstanceResultSync(void * session, void * operation, void * internalOperation, MI_Result code, const MI_Char * moreResults);
 OI_EVENT("MI_Client Operation Indication Result (sync): session=%p, operation=%p, internal-operation=%p, resultCode=%u, moreResults=%T")
 void trace_MIClient_IndicationResultSync(void * session, void * operation, void * internalOperation, MI_Result code, const MI_Char * moreResults);
 OI_EVENT("MI_Client Operation Class Result (sync): session=%p, operation=%p, internal-operation=%p, resultCode=%u, moreResults=%T")
@@ -1834,9 +1834,9 @@ void trace_TrackerHashMapRemove(int socket);
 OI_EVENT("Tracker hash map found (%p, %d)")
 void trace_TrackerHashMapFind(void* handle, int socket);
 OI_EVENT("Engine: Client Credentials Verified (%p)")
-void trace_ClientCredentialsVerfied(void* handle);
+void trace_ClientCredentialsVerified(void* handle);
 OI_EVENT("Client: Client Credentials Verified")
-void trace_ClientCredentialsVerfied2();
+void trace_ClientCredentialsVerified2();
 OI_EVENT("(%c)Handle:(%p), ClientAuthState = %d, EngineAuthState = %d")
 void trace_AuthStates(char type, void* handle, int client, int engine);
 OI_EVENT("Asking Server to PAM authenticate")
@@ -1898,7 +1898,7 @@ void trace_HTTP_GssFunctionNotPresent(const char * msg);
 OI_EVENT("HTTP: Authorization Malloc Failed:(%s)")
 void trace_HTTP_AuthMallocFailed(const char * msg);
 
-OI_EVENT("HTTP: Http_Encrypt/Decrpyt invalid arg:(%s %s)")
+OI_EVENT("HTTP: Http_Encrypt/Decrypt invalid arg:(%s %s)")
 void trace_HTTP_CryptInvalidArg(const char * location, const char * msg);
 
 OI_EVENT("HTTP: User Authorization failed. (%s)")
@@ -1919,8 +1919,8 @@ void trace_HTTP_SendNextAuthReply();
 OI_EVENT("HTTP Auth: Input Token Invalid.")
 void trace_HTTP_InvalidAuthToken();
 
-OI_EVENT("HTTP Auth: SupplimentaryInfo: (%s).")
-void trace_HTTP_SupplimentaryInfo(const char * msg);
+OI_EVENT("HTTP Auth: SupplementaryInfo: (%s).")
+void trace_HTTP_SupplementaryInfo(const char * msg);
 
 OI_EVENT("HTTP Auth: Cannot build response.")
 void trace_HTTP_CannotBuildAuthResponse();
@@ -2020,13 +2020,13 @@ void trace_SubMgrSubscription_ReleasePostLock(unsigned int threadid, void * self
 
 OI_EVENT("SubscriptionManager_AcquireEnableLock: Thread %x: SubscriptionManager (%p), operation type (%T) started")
 void trace_SubscriptionManager_AcquireEnableLock_Start(unsigned int threadid, void * self, const TChar * optype);
-OI_EVENT("SubscriptionManager_AcquireEnableLock: Thread %x: SubscriptionManager (%p), agggregation context terminated, acquire lock failed")
+OI_EVENT("SubscriptionManager_AcquireEnableLock: Thread %x: SubscriptionManager (%p), aggregation context terminated, acquire lock failed")
 void trace_SubscriptionManager_AcquireEnableLock_AlreadyTerminated(unsigned int threadid, void * self);
 OI_EVENT("SubscriptionManager_AcquireEnableLock: Thread %x: SubscriptionManager (%p); ignore disable call since there are still active subscriptions")
 void trace_SubscriptionManager_AcquireEnableLock_IgnoreDisableCall(unsigned int threadid, void * self);
 OI_EVENT("SubscriptionManager_AcquireEnableLock: Thread %x: SubscriptionManager (%p); cancel all subscriptions")
 void trace_SubscriptionManager_AcquireEnableLock_CancelAll(unsigned int threadid, void * self);
-OI_EVENT("SubscriptionManager_AcquireEnableLock: Thread %x: SubscriptionManager (%p); aggregation context active, found new subsription(s), release lock")
+OI_EVENT("SubscriptionManager_AcquireEnableLock: Thread %x: SubscriptionManager (%p); aggregation context active, found new subscription(s), release lock")
 void trace_SubscriptionManager_AcquireEnableLock_ReleaseLock(unsigned int threadid, void * self);
 OI_EVENT("SubscriptionManager_AcquireEnableLock: Thread %x: SubscriptionManager (%p), operation type (%T), acquired enablelock")
 void trace_SubscriptionManager_AcquireEnableLock_Complete(unsigned int threadid, void * self, const TChar * optype);

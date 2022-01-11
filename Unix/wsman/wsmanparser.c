@@ -641,7 +641,7 @@ static int _GetReference(
 **
 ** _GetSingleProperty()
 **
-**     This function gets a instance property. The caller has already counsumed
+**     This function gets a instance property. The caller has already consumed
 **     the start property element. This function reads the value and the
 **     closing property element.
 **
@@ -727,7 +727,7 @@ static int _GetSingleProperty(
         }
         else if ('a' == e.data.namespaceId)
         {
-            /* Reference as </adddress></ReferenceParameters>*/
+            /* Reference as </address></ReferenceParameters>*/
             value->instance = 0;
             if (0 != _GetReference(xml, &e, dynamicBatch, &value->instance, MI_FALSE))
                 RETURN(-1);
@@ -1269,7 +1269,7 @@ int WS_ParseWSHeader(
                 }
                 else if(resourceUriHash == WSMAN_RESOURCE_URI_WS_CIM_SCHEMA)
                 {
-                    wsheader->schemaRequestType = WS_CIM_SCHEMA_REQEUST;
+                    wsheader->schemaRequestType = WS_CIM_SCHEMA_REQUEST;
                 }
                 wsheader->rqtResourceUri = e.data.data;
 
@@ -1519,7 +1519,7 @@ int WS_ParseWSHeader(
                 {
                     wsheader->unknownMandatoryTag = e.data.data;
                     trace_Wsman_UnknownMandatoryTag(tcs(e.data.data));
-                    /* validate header will send correct repsonse to the client */
+                    /* validate header will send correct response to the client */
                 }
 
                 if (XML_Skip(xml) != 0)
@@ -1731,12 +1731,12 @@ static int _ParseAssociationFilter(
     if (PAL_T('b') == e.data.namespaceId &&
         Tcscmp(e.data.data, PAL_T("AssociatedInstances")) == 0)
     {
-        filter->isAssosiatorOperation = MI_TRUE;
+        filter->isAssociatorOperation = MI_TRUE;
     }
     else if (PAL_T('b') == e.data.namespaceId &&
         Tcscmp(e.data.data, PAL_T("AssociationInstances")) == 0)
     {
-        filter->isAssosiatorOperation = MI_FALSE;
+        filter->isAssociatorOperation = MI_FALSE;
     }
     else
         RETURN(-1);
@@ -1814,7 +1814,7 @@ static int _ParseAssociationFilter(
         }
     }
 
-    if(filter->isAssosiatorOperation == MI_TRUE)
+    if(filter->isAssociatorOperation == MI_TRUE)
     {
         /* Expect </AssociatedInstances> */
         if (XML_Expect(xml, &e, XML_END, PAL_T('b'), PAL_T("AssociatedInstances")) != 0)
@@ -2258,7 +2258,7 @@ int WS_ParseReceiveBody(
 
     r = Instance_NewDynamic(
                     dynamicInstanceParams,
-                    PAL_T("ReceiveParamaters"),
+                    PAL_T("ReceiveParameters"),
                     MI_FLAG_CLASS,
                     dynamicBatch);
     if (MI_RESULT_OK != r)
@@ -2393,7 +2393,7 @@ int WS_ParseSendBody(
 
     r = Instance_NewDynamic(
                     dynamicInstanceParams,
-                    PAL_T("SendParamaters"),
+                    PAL_T("SendParameters"),
                     MI_FLAG_CLASS,
                     dynamicBatch);
     if (MI_RESULT_OK != r)
@@ -2502,7 +2502,7 @@ int WS_ParseSignalBody(
 
     r = Instance_NewDynamic(
                     dynamicInstanceParams,
-                    PAL_T("SignalParamaters"),
+                    PAL_T("SignalParameters"),
                     MI_FLAG_CLASS,
                     dynamicBatch);
     if (MI_RESULT_OK != r)
@@ -3252,7 +3252,7 @@ int WS_ParseFaultBody(
                             </f:Message>
                     </f:WSManFault>
                     
-                    Normal ProviderFault respones:
+                    Normal ProviderFault response:
                     ERROR_INTERNAL_ERROR case:
                     <f:WSManFault>
                             <f:Message>
@@ -3612,7 +3612,7 @@ int WS_ParseSubscribeBody(
     return 0;
 }
 
-/* Unsubcribe message sample:
+/* Unsubscribe message sample:
 <s:Envelope xmlns:s="http://www.w3.org/2003/05/soap-envelope" xmlns:a="http://schemas.xmlsoap.org/ws/2004/08/addressing" xmlns:e="http://schemas.xmlsoap.org/ws/2004/08/eventing" xmlns:n="http://schemas.xmlsoap.org/ws/2004/09/enumeration" xmlns:w="http://schemas.dmtf.org/wbem/wsman/1/wsman.xsd" xmlns:p="http://schemas.microsoft.com/wbem/wsman/1/wsman.xsd">
     <s:Header>
         <a:To>http://localhost:5985/wsman</a:To>

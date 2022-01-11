@@ -7,7 +7,7 @@ class MSFT_SwitchService : CIM_Service
 
 {
 [Description ( 
-          "Defines and assigns a protcol endpoint subclass to a physical or virtual port or interface,"
+          "Defines and assigns a protocol endpoint subclass to a physical or virtual port or interface,"
 		 "for example an instance of CIM_EthernetPort or MSFT_Subinterface\n"
           "Input that is not completely specified may be filled out "
           "with default values." ),
@@ -56,7 +56,7 @@ class MSFT_SwitchService : CIM_Service
       CIM_ConcreteJob REF Job);
 
 	     [Description ( 
-          "removes a protcol endpoint subclass from a physical or virtual port or interface,"
+          "removes a protocol endpoint subclass from a physical or virtual port or interface,"
 		 "for example an instance of CIM_EthernetPort or MSFT_Subinterface\n"
            ), 
        ValueMap { "0",  "4096", 
@@ -181,11 +181,11 @@ class MSFT_SwitchService : CIM_Service
          [Description ( 
              "A string an containing an embedded "
              "instance of class subclass of "
-             "LinkAggragation that describes "
+             "LinkAggregation that describes "
              "the aspects of the Link aggregation. " ), 
           EmbeddedInstance ( "MSFT_LinkAggregation" ) 
          ]
-      string LinkAggragation[], 
+      string LinkAggregation[], 
 
 	     [Description ( 
              "An array of references to instance of CIM_EthernetPort that "

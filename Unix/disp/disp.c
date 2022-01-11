@@ -103,7 +103,7 @@ struct _EnumEntry
     const ZChar*            className;
     EnumEntry*              next;       // Links the entries that are about to be dispatched
                                         // We cannot use list on StrandMany as that one can get modify in the meantime
-                                        // as the interactions are being dinamically closed themselves
+                                        // as the interactions are being dynamically closed themselves
                                         // (that is why that list requires to be in the strand to use it)
 };
 
@@ -206,7 +206,7 @@ static void _DispEnumParent_EnumDone( _In_ Strand* self_)
 /*
     This object manages a a "Parent" enumeration on the dispatcher level.
     Enumerations in this context include also Associations and References.
-    The dispatcher converts that parent enumertion coming from the client
+    The dispatcher converts that parent enumeration coming from the client
     into several actual child enumerations that can go to the same or different providers
     for each of those child enumerations a "EnumEntry" object (see more info below) will be
     created and attached to this Parent enumeration using the one-to-many
@@ -215,7 +215,7 @@ static void _DispEnumParent_EnumDone( _In_ Strand* self_)
     Behavior:
     - Post and PostControl are not used yet as no secondary messages after
        initial request are issued currently
-    - Cancel is also not implememented as Cancelation e2e is not implemented
+    - Cancel is also not implemented as Cancelation e2e is not implemented
     - Shutdown:
        once all the child enumerations have been issued DISPENUMPARENT_STRANDAUX_ENUMDONE
        is scheduled on the parent, what in turn set the done flag to true and sends the last response
@@ -323,7 +323,7 @@ static void _DispEnumParent_Entry_Post( _In_ StrandMany* self_, _In_ Message* ms
     }
 }
 
-// used for enums, associators, references and subcriptions
+// used for enums, associators, references and subscriptions
 static StrandManyInternalFT _DispEnumParent_InternalFT = {
     NULL,
     _DispEnumParent_Entry_Deleted,
@@ -628,7 +628,7 @@ static MI_Result _HandleGetClassReq(
             if(MI_RESULT_INVALID_CLASS == r)
             {
                 /* Checking if the requested class is an extraclass (Class without key property or Class with key property but not part of any
-                    class heirarchy of an implemented class.)
+                    class hierarchy of an implemented class.)
                     Class with valid providerFT is called as an implemented class */
 
                 /* In extra classes inheritance tree a namespace node is created only if there is at least one extra class in the namespace.
@@ -1698,7 +1698,7 @@ MI_Result Disp_HandleInteractionRequest(
 
         default:
         {
-            /* Unsupported mesage type */
+            /* Unsupported message type */
             trace_DispUnsupportedMessage( self,
                 params->interaction,
                 msg,

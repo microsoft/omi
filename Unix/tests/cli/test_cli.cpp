@@ -2811,7 +2811,7 @@ NitsTestWithSetup(TestOMICLI_PreExec1, TestCliSetupSudo)
 
     NitsResult rslt = NitsTrue;
 
-    // We have a knonw provider, which produces a file named "cli_preexec.txt" when the preexec is run.
+    // We have a known provider, which produces a file named "cli_preexec.txt" when the preexec is run.
     // The first request to the agent should cause the preexec to be run. The second should not produce the file
     struct passwd *root_pw_info = getpwuid(0);
     string out;
@@ -2824,7 +2824,7 @@ NitsTestWithSetup(TestOMICLI_PreExec1, TestCliSetupSudo)
     removeIfExist(resultFile); // remove cli_preexec.txt is case there is one laying around
     string str;
 
-    // Verify that the preexec gets called the firrst request to a provider with a defined preexec.
+    // Verify that the preexec gets called the first request to a provider with a defined preexec.
     string expect;
     char resultids[100];
     sprintf(resultids, "%u %u 0 %d\n", (unsigned) getuid(), (unsigned) getgid(), root_pw_info->pw_gid);
@@ -2861,7 +2861,7 @@ NitsTestWithSetup(TestOMICLI_PreExec1, TestCliSetupSudo)
         goto Done;
     }
 
-    // Verify that the preexec does not get called after the firrst request to a provider with a defined preexec.
+    // Verify that the preexec does not get called after the first request to a provider with a defined preexec.
     removeIfExist(resultFile); // remove cli_preexec.txt
          
     // Execute the request, but we should not see the file produced by the preexec.

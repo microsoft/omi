@@ -260,7 +260,7 @@ static int _StrToDatetime(const char* str, MI_Datetime* result)
            means use the local time zone. In this implementation, this
            is only useful for the year, month, and day fields, because
            the asterisk fields are returned as 0, which is a valid hour,
-           minute, second, micorosecond and time zone ("+***" becomes
+           minute, second, microsecond and time zone ("+***" becomes
            "+000", which is UTC). If support for repetitive times
            in these fields is needed, perhaps the non time zone
            fields in MI_DateTime::u.timestamp can be made signed
@@ -2648,7 +2648,7 @@ MI_Boolean Identical(const void* v1, const void* v2, MI_Type type)
 **     Next non-restricted inherited qualifiers are appended to this list.
 **     Finally derived qualifiers are applied to the list. Qualifiers not
 **     already in the list are appended. Qualifiers already in the list are
-**     overriden.
+**     overridden.
 **
 **     Propagation is performed using the MI_Qualifier.flavor whose bits may be
 **     masked by these macros.

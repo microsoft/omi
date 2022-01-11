@@ -14,7 +14,7 @@
 **
 **     The pre-exec feature allows a user-defined program to be executed
 **     immediately before invoking an out-of-process provider. Providers may
-**     use this feature by adding the following line in their provdier
+**     use this feature by adding the following line in their provider
 **     registration file:
 **
 **         PREEXEC=<PROGRAMNAME>
@@ -80,7 +80,7 @@
 **
 **         (2) It is the administrators responsibility to be certain that
 **             the OMI directory tree is secure. For example, the binary
-**             and registration directories shoujld only be writable by root.
+**             and registration directories should only be writable by root.
 **
 **         (3) Execution of pre-exec programs is as secure as loading of
 **             providers as root. The security is determined by correct

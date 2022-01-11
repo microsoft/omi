@@ -79,7 +79,7 @@ MI_Result Selector_ContainsHandler(
     self - selector
     timeoutUsec - time to run 
     
-    Retunrs:
+    Returns:
     OK - was stopped by StopRunning call
     FAILED - system call 'select' failed or no more sockets to monitor
     TIMEOUT - timeout reached 
@@ -91,8 +91,8 @@ MI_Result Selector_Run(
 
 int Selector_IsSelectorThread(Selector* self, ThreadID *id);
 
-/* Informs selector's Run method that it should exit normaly.
-    Funciton is safe for calling from signal hanlder */
+/* Informs selector's Run method that it should exit normally.
+    Function is safe for calling from signal handler */
 MI_Result Selector_StopRunning(
     Selector* self);
 MI_Result Selector_StopRunningNoReadsMode(
@@ -107,7 +107,7 @@ MI_Result Selector_Wakeup(
 
 /* 
     * This function guaranties that callback is called in 'Run'/'IO' thread context,
-    * so no locking is required for accessing sokcet objects, updating buffers etc
+    * so no locking is required for accessing socket objects, updating buffers etc
 */
 MI_Result Selector_CallInIOThread(
     Selector* self,

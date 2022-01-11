@@ -313,7 +313,7 @@ static string _CreateCDATARequestXML(
               "</env:Header>"
               "<env:Body>"
                 "<wsen:Enumerate>"
-                  "<wsen:Filter Dialect=\"http://schemas.microsoft.com/win/2004/08/events/eventquery\">/node/node[@attribue='']</wsen:Filter>"
+                  "<wsen:Filter Dialect=\"http://schemas.microsoft.com/win/2004/08/events/eventquery\">/node/node[@attribute='']</wsen:Filter>"
                   "<wsen:Enumerate>"
                     "<wsman:OptimizeEnumeration />"
                     "<wsman:MaxElements>32000</wsman:MaxElements>"
@@ -478,7 +478,7 @@ NitsEndTest
 NitsTestWithSetup(TestWSMAN_Fault_invalidNamespace, TestWsmanSetup)
 {
     string r_b, r_h;
-    SockSendRecvHTTP(s, false, _CreateRequestXML("X_number", "invlaid/namespace").c_str(), r_h, r_b );
+    SockSendRecvHTTP(s, false, _CreateRequestXML("X_number", "invalid/namespace").c_str(), r_h, r_b );
 
     //cout << "resp header: " << r_h << endl << endl << "body: " << r_b << endl;
 
@@ -568,7 +568,7 @@ NitsTestWithSetup(TestWSMAN_Enumerate_XProfile_EPR_Only, TestWsmanSetup)
     UT_ASSERT(r_b.find("Name=\"InstanceID\">world<") != string::npos);
     UT_ASSERT(r_b.find("Name=\"InstanceID\">number<") != string::npos);
 
-    /* regular properties shuld not be specified */
+    /* regular properties should not be specified */
     UT_ASSERT(r_b.find("World") == string::npos);
     UT_ASSERT(r_b.find("Huge Numbers") == string::npos);
 }
@@ -1166,7 +1166,7 @@ NitsEndTest
 
 NitsTestWithSetup(TestWSMAN_Invoke_TestAllTypesStringArray, TestWsmanSetup)
 {
-    /* unit-test expects exactly two strings and retunr 3 strings: substrings form first two plus '*'*/
+    /* unit-test expects exactly two strings and return 3 strings: substrings form first two plus '*'*/
 const char* c_Params = 
 "\
   <p:sA>123456</p:sA>\

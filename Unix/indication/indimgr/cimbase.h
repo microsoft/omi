@@ -52,7 +52,7 @@ typedef struct _CimBaseFT
 /*
 **==============================================================================
 **
-** Represents a base strucutre for filter, hanlder, and subscription.
+** Represents a base structure for filter, handler, and subscription.
 **
 **==============================================================================
 */

@@ -703,7 +703,7 @@ NitsTestWithSetup(TestSelectorTimeoutEvent, TestSelectorSetup)
 
     r = Selector_Run(&sel, 1000*1000, MI_FALSE);
     TEST_ASSERT(s_timeout_called);
-    // 'timeout' event on socekt is triggered na dremoves socket, so 
+    // 'timeout' event on socket is triggered na dremoves socket, so 
     // selector returns 'failed'
     TEST_ASSERT(r == MI_RESULT_FAILED);
 
@@ -752,7 +752,7 @@ NitsTestWithSetup(TestSelectorTimeoutWithNoSocketHandler, TestSelectorSetup)
     s_timeout_called = false;
     r = Selector_Run(&sel, 1000*1000, MI_FALSE);
     TEST_ASSERT(s_timeout_called);
-    // 'timeout' event on socekt is triggered na dremoves socket, so 
+    // 'timeout' event on socket is triggered na dremoves socket, so 
     // selector returns 'failed'
     TEST_ASSERT(r == MI_RESULT_FAILED);
 TestEnd:

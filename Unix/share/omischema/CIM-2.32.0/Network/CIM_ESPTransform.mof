@@ -41,7 +41,7 @@ class CIM_ESPTransform : CIM_SATransform {
 
       [Description ( 
           "CipherTransformId is an enumeration that specifies the "
-          "ESP encrypion algorithm to be used. The list of values "
+          "ESP encryption algorithm to be used. The list of values "
           "is defined in RFC2407, Section 4.4.4, where the RFC\'s "
           "NULL value maps to 2-\"None\". Note that the enumeration "
           "is different than the RFC list, since \'Other\' is added "

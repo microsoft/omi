@@ -9,7 +9,7 @@
     UMLPackagePath ( "CIM::Network::SwitchingBridging" ), 
     Description ( 
        "A switch port has a LANEndpoint that is exposed via this "
-       "relationship. The associaiton is deprecated since a binding is "
+       "relationship. The association is deprecated since a binding is "
        "not the correct relationship. The SwitchPort is simply another "
        "aspect of the LANEndpoint - which is indicated by the "
        "EndpointIdentity relationship." )]

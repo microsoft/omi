@@ -711,7 +711,7 @@ static PyObject *Invoke(PyObject *self, PyObject *args, PyObject *kwds)
             if (miResult != MI_RESULT_OK)
             {
 				char error[errorBufferSize];
-				strcpy(error,"Get operation failed to retrive the instance to invoke,error =");
+				strcpy(error,"Get operation failed to retrieve the instance to invoke,error =");
 				strcat(error,MI_Result_To_String(miResult));
 				if(errorMessage != NULL)
 				{

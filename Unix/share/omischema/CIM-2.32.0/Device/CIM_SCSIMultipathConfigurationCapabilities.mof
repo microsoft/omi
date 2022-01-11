@@ -16,8 +16,8 @@
        "\n"
        "An instance of this capabilities class MUST be instantiated "
        "whenever SCSIPathConfigurationService is instantiated and they "
-       "MUST be assocaited one to one using ElementCapabilities. "
-       "Multiple instances of the service/acapabilities pair MAY exist "
+       "MUST be associated one to one using ElementCapabilities. "
+       "Multiple instances of the service/capabilities pair MAY exist "
        "if multiple multipath drivers are installed. Each "
        "LogicalDevice subclass served by the underlying multipath "
        "driver is associated to the associated Service instance via "
@@ -151,34 +151,34 @@ class CIM_SCSIMultipathConfigurationCapabilities : CIM_Capabilities {
 
       [Description ( 
           "Specifies whether the implementation supports "
-          "auto-failback (to re-enable paths that revert to a good "
+          "auto-fallback (to re-enable paths that revert to a good "
           "state) at the plugin level, the multipath logical unit "
-          "level, both levels or whether auto-failback is "
+          "level, both levels or whether auto-fallback is "
           "unsupported." ), 
        ValueMap { "0", "2", "3", "4", "5" }, 
-       Values { "Unknown", "No Autofailback support", 
-          "Autofailback support service-wide", 
-          "Autofailback support per logical unit", 
-          "Autofailback support per service or logical unit" }, 
+       Values { "Unknown", "No Autofallback support", 
+          "Autofallback support service-wide", 
+          "Autofallback support per logical unit", 
+          "Autofallback support per service or logical unit" }, 
        MappingStrings { 
-          "MP_API.SNIA|MP_PLUGIN_PROPERTIES|autofailbackSupport" }, 
+          "MP_API.SNIA|MP_PLUGIN_PROPERTIES|autofallbackSupport" }, 
        ModelCorrespondence { 
-          "CIM_SCSIMultipathConfigurationCapabilities.AutofailbackEnabled", 
-          "CIM_SCSIMultipathSettings.AutofailbackEnabled" }]
-   uint16 AutofailbackSupport;
+          "CIM_SCSIMultipathConfigurationCapabilities.AutofallbackEnabled", 
+          "CIM_SCSIMultipathSettings.AutofallbackEnabled" }]
+   uint16 AutofallbackSupport;
 
       [Description ( 
-          "A Boolean indicating that autofailback is enabled to all "
+          "A Boolean indicating that autofallback is enabled to all "
           "logical units associated to the "
           "CIM_SCSIPathConfigurationService associated with this "
           "capabilities instance (unless overridden by "
-          "CIM_SCSIMultipathSettings AutoFailbackEnabled." ), 
+          "CIM_SCSIMultipathSettings AutoFallbackEnabled." ), 
        MappingStrings { 
-          "MP_API.SNIA|MP_PLUGIN_PROPERTIES|autoFailbackEnabled" }, 
+          "MP_API.SNIA|MP_PLUGIN_PROPERTIES|autoFallbackEnabled" }, 
        ModelCorrespondence { 
-          "CIM_SCSIMultipathConfigurationCapabilities.AutofailbackSupport", 
-          "CIM_SCSIMultipathSettings.AutofailbackEnabled" }]
-   boolean AutoFailbackEnabled;
+          "CIM_SCSIMultipathConfigurationCapabilities.AutofallbackSupport", 
+          "CIM_SCSIMultipathSettings.AutofallbackEnabled" }]
+   boolean AutoFallbackEnabled;
 
       [Description ( 
           "The maximum polling rate (in seconds) supported by the "
@@ -191,7 +191,7 @@ class CIM_SCSIMultipathConfigurationCapabilities : CIM_Capabilities {
 
       [Write, Description ( 
           "The current rate in seconds. Only valid when "
-          "pollingRateMax is greater than 0 and canAutoFailback are "
+          "pollingRateMax is greater than 0 and canAutoFallback are "
           "true." ), 
        MappingStrings { 
           "MP_API.SNIA|MP_PLUGIN_PROPERTIES|currentPollingRate" }]

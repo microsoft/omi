@@ -21,14 +21,14 @@
 **
 ** MOF_ErrorHandler
 **  Contains callbacks handle errors, including callback of lookup localized
-**  string, callbcak of reporting error data.
+**  string, callback of reporting error data.
 **
 **==============================================================================
 */
 #define MSG_SIZE 256
 typedef struct _MOF_ErrorHandler
 {
-    /* error infomation */
+    /* error information */
     _Field_size_(MSG_SIZE) MI_Char errormsg[MSG_SIZE];
 
     /* User callback to invoke to look up string */

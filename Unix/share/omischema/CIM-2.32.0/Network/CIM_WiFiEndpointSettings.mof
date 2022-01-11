@@ -107,7 +107,7 @@ class CIM_WiFiEndpointSettings : CIM_SettingData {
           "\t* WPA2 PSK (6): shall indicate that the desired "
           "authentication method is WPA2 (Wi-Fi Protected Access "
           "Version 2) PSK (Pre-Shared Key). AuthenticationMethod "
-          "should containt 6 only if EncryptionMethod contains 3 "
+          "should contain 6 only if EncryptionMethod contains 3 "
           "(\"TKIP\") or 4 (\"CCMP\").\n"
           "\t* WPA2 IEEE 802.1x (7): shall indicated that the "
           "desired authentication method is WPA2 (Wi-Fi Protected "

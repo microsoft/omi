@@ -166,7 +166,7 @@ public:
     // Parameters:
     //  host - host name (can be ip or dns name)
     //  port
-    //  secure - 'true' if https conneciton required
+    //  secure - 'true' if https connection required
     //  certFile - name of the file containing the client certificate for https, if client authentication is being done
     //  privateKeyFile - name of the file containing the client private key certificate for https
     Result Connect(
@@ -189,7 +189,7 @@ public:
     //  blockUntilCompleted - flag to enforce 'sync' mode of operation.
     //      In some cases user does not need async operation and prefers
     //      to have simpler sync way to handle http request/response.
-    //      Library still uses callbacks to deliver repsonse data and status,
+    //      Library still uses callbacks to deliver response data and status,
     //      but 'StartRequest' call blocks until entire communication is completed.
     //  Return
     //      OKAY if operation was started successfully
@@ -201,18 +201,18 @@ public:
         const std::vector< unsigned char >& data,
         bool blockUntilCompleted);
 
-    // Cancels ongoing asynchronus http request.
+    // Cancels ongoing asynchronous http request.
     // If operation is not completed, library stops waiting
     // for server's response, calls 'OnStatus' callback with 'CANCELED'
     // code.
-    // Library closes connection and frees all resopurces.
+    // Library closes connection and frees all resources.
     // this is the last operation that can be performed on given http object .
     void Cancel();
 
     // Sets timeout for future sessions.
     // User should call before Connect
     //  Parameters:
-    //  timeoutMS - timeout of the sesison in ms
+    //  timeoutMS - timeout of the session in ms
     void SetOperationTimeout(
         int timeoutMS);
 

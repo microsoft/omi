@@ -62,7 +62,7 @@ void ThunkHandleManager_DeInitialize(_Inout_ ThunkHandleManager *manager)
  */
 void ThunkHandleManager_RecycleHandle(_Inout_ ThunkHandle *thunkHandle)
 {
-    /* Invlidate this handle by bumping the thunk handle version */
+    /* Invalidate this handle by bumping the thunk handle version */
     Atomic_Inc(&thunkHandle->version);
 
     /* Add thunk handle to free list */
@@ -83,7 +83,7 @@ MI_Result ThunkHandleManager_GetHandle(_Inout_ ThunkHandleManager *manager, _Out
     *thunkHandle = (ThunkHandle*) SList_PopAtomic(&manager->freeList);
     if (*thunkHandle == NULL)
     {
-        /* Not there, allocate a new one using alligned memory */
+        /* Not there, allocate a new one using aligned memory */
         *thunkHandle = (ThunkHandle *) _aligned_malloc(sizeof(ThunkHandle), MEMORY_ALLOCATION_ALIGNMENT);
         if (*thunkHandle)
         {
@@ -149,7 +149,7 @@ _Check_return_ int ThunkHandle_AddRef(_Inout_ ThunkHandle *thunkHandle)
 _Check_return_ int ThunkHandle_AddRef_ForCompletionCallback(_Inout_ ThunkHandle *thunkHandle)
 {
     ptrdiff_t n;
-    /* Checking for atleast one reference before increasing the refcount, irrespective of acitve bit set or not */
+    /* Checking for atleast one reference before increasing the refcount, irrespective of active bit set or not */
     for (n = thunkHandle->refcount; n & (~ActiveBit); n = thunkHandle->refcount)
     {
         if (Atomic_CompareAndSwap(&thunkHandle->refcount, n, n + 1) == n)

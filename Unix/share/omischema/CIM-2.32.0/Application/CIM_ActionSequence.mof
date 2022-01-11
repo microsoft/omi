@@ -19,7 +19,7 @@
        "must be a continuous sequence. \n"
        "ActionSequence is an association that loops on the Action "
        "classes with roles for the \'prior\' and \'next\' Actions in "
-       "the sequence. The need for a continuous sequence imples: "
+       "the sequence. The need for a continuous sequence implies: "
        "(1)Within the set of next-state or uninstall Actions, there is "
        "one and only one Action that does not have an instance of "
        "ActionSequence referencing it in the \'next\' role. This is "

@@ -25,8 +25,8 @@ Usage: %s property [OPTIONS]\n\
 \n\
 OVERVIEW:\n\
     This program allows for easy modification to the omiserver.conf\n\
-    configuraiton file (and is general enough to be useful to allow\n\
-    for editing of other configuraiton files as well.\n\
+    configuration file (and is general enough to be useful to allow\n\
+    for editing of other configuration files as well.\n\
 \n\
     This program will read from STDIN and write to STDOUT, which will\n\
     allow for multiple properties to be edited via shell piping.\n\

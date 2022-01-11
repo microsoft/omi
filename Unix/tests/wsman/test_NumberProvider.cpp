@@ -809,7 +809,7 @@ NitsTestWithSetup(TestGetInstanceHugeNumberWithEmbeddedInstance, NumberProvTestS
             }
             else
             {
-                UT_ASSERT_FAILED_MSG( (string("unexcpected class name ") + ut::StrToChar(cn)).c_str() );
+                UT_ASSERT_FAILED_MSG( (string("unexpected class name ") + ut::StrToChar(cn)).c_str() );
             }
         }
     }
@@ -960,7 +960,7 @@ NitsEndTest
 
 NitsTestWithSetup(TestGetInstanceInvalidNameSpace, NumberProvTestSetup)
 {
-    //omicli gi non/exisiting/namespace X_SmallNumber.Number=11
+    //omicli gi nonexistent/namespace X_SmallNumber.Number=11
     //PostResultMsg
     //{
     //    tag=4
@@ -969,7 +969,7 @@ NitsTestWithSetup(TestGetInstanceInvalidNameSpace, NumberProvTestSetup)
     //    result=7 [INVALID_NAMESPACE]
     //    request=NULL
     //}
-    if(!TEST_ASSERT(MI_RESULT_OK == _CallGetInstance("non/exisiting/namespace", "X_SmallNumber.Number=11")))
+    if(!TEST_ASSERT(MI_RESULT_OK == _CallGetInstance("nonexistent/namespace", "X_SmallNumber.Number=11")))
         NitsReturn;
 
     // validate response
@@ -1125,7 +1125,7 @@ STATIC void TestEnumerateNumberDeepHelper()
     UT_ASSERT_EQUAL(s_instances.size(), 1003);
 }
 
-// note! provider has two modes of enumeration to excersize both
+// note! provider has two modes of enumeration to exercise both
 // sync and async APIs, so we have to call test twice
 
 NitsTestWithSetup(TestEnumerateNumberDeep, NumberProvTestSetup)
@@ -1206,7 +1206,7 @@ NitsEndTest
 
 NitsTestWithSetup(TestEnumerateInvalidClass, NumberProvTestSetup)
 {
-    //omicli ei test/cpp NonExisitingClass
+    //omicli ei test/cpp NonexistentClass
     //PostResultMsg
     //{
     //    tag=4
@@ -1216,7 +1216,7 @@ NitsTestWithSetup(TestEnumerateInvalidClass, NumberProvTestSetup)
     //    request=NULL
     //}
 
-    if(!TEST_ASSERT(MI_RESULT_OK == _CallEnumerate("test/cpp", "NonExisitingClass", MI_FALSE)))
+    if(!TEST_ASSERT(MI_RESULT_OK == _CallEnumerate("test/cpp", "NonexistentClass", MI_FALSE)))
         NitsReturn;
 
     // validate response
@@ -1336,7 +1336,7 @@ NitsEndTest
 
 NitsTestWithSetup(TestInvokeSmallNumberGetFactors_InvalidParameter, NumberProvTestSetup)
 {
-    // trying to refer to non-static funciton in 'static' way
+    // trying to refer to non-static function in 'static' way
     //omicli iv test/cpp X_SmallNumber GetFactors
     //PostResultMsg
     //{
@@ -1360,8 +1360,8 @@ NitsEndTest
 
 NitsTestWithSetup(TestInvokeSmallNumber_InvalidFn, NumberProvTestSetup)
 {
-    // trying to non-exisiting function
-    //omicli iv test/cpp X_SmallNumber FunciotnThatDoesnotExist
+    // trying to refer to nonexistent function
+    //omicli iv test/cpp X_SmallNumber FunctionThatDoesNotExist
     //PostResultMsg
     //{
     //    tag=4
@@ -1371,7 +1371,7 @@ NitsTestWithSetup(TestInvokeSmallNumber_InvalidFn, NumberProvTestSetup)
     //    request=NULL
     //}
 
-    if(!TEST_ASSERT(MI_RESULT_OK == _CallInvoke("test/cpp", "X_SmallNumber", "FunciotnThatDoesnotExist", 0)))
+    if(!TEST_ASSERT(MI_RESULT_OK == _CallInvoke("test/cpp", "X_SmallNumber", "FunctionThatDoesNotExist", 0)))
         NitsReturn;
 
     // validate response

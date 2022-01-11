@@ -315,7 +315,7 @@ NitsTestWithSetup(Test10, TestXmlCxxSetup)
 {
     XMLReader xml;
     XMLElement e;
-    char data[] = "<!DOCTYPE ingore me><a><!DOCTYPE ingore me></a>";
+    char data[] = "<!DOCTYPE ignore me><a><!DOCTYPE ignore me></a>";
 
     xml.SetText(data);
 

@@ -438,7 +438,7 @@ void MI_CALL TestClass_AllDMTFArrays_EnumerateInstances(
         if(result != MI_RESULT_OK)
         {
             //MI_PostResult(context, result);
-            POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
+            POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not post instance"));
         }
     }
 
@@ -466,7 +466,7 @@ void MI_CALL TestClass_AllDMTFArrays_GetInstance(
 
     if(result != MI_RESULT_OK)
     {
-        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
+        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not post instance"));
     }
 
     MI_PostResult(context, result);
@@ -520,7 +520,7 @@ void MI_CALL TestClass_AllDMTFArrays_CreateInstance(
 
     if(result != MI_RESULT_OK)
     {
-        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
+        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not post instance"));
     }
 
     MI_PostResult(context, result);
@@ -585,7 +585,7 @@ void MI_CALL TestClass_AllDMTFArrays_ModifyInstance(
             if((result = MI_Instance_GetElementAt(&(modifiedInstance->__instance), i, &name, &val, &type, &flags)) != MI_RESULT_OK)
             {
                 //MI_PostResult(context, result);
-                POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot get element of instance"));
+                POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not get element of instance"));
             }
             
             if((flags & MI_FLAG_NULL) == 0)
@@ -596,7 +596,7 @@ void MI_CALL TestClass_AllDMTFArrays_ModifyInstance(
                 if((result = MI_Instance_SetElement( (MI_Instance *) &(test->__instance), (MI_Char *) name, (MI_Value *) &val, (MI_Type) type, (MI_Uint32) validFlags)) != MI_RESULT_OK)
                 {
                     //MI_PostResult(context, result);
-                    POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot set element of instance"));
+                    POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not set element of instance"));
                 }
             }
         }
@@ -661,7 +661,7 @@ void MI_CALL TestClass_AllDMTFArrays_Invoke_GetReal32Array(
     TestClass_AllDMTFArrays_GetReal32Array_Destruct(&real32Array);
 
     if(result != MI_RESULT_OK)
-        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
+        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not post instance"));
 
     MI_PostResult(context, result);
 }
@@ -701,7 +701,7 @@ void MI_CALL TestClass_AllDMTFArrays_Invoke_SetReal32Array(
     TestClass_AllDMTFArrays_SetReal32Array_Destruct(&real32Array);
 
     if(result != MI_RESULT_OK)
-        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
+        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not post instance"));
 
     MI_PostResult(context, result);
 }
@@ -735,7 +735,7 @@ void MI_CALL TestClass_AllDMTFArrays_Invoke_GetReal64Array(
     TestClass_AllDMTFArrays_GetReal64Array_Destruct(&real64Array);
 
     if(result != MI_RESULT_OK)
-        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
+        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not post instance"));
 
     MI_PostResult(context, result);
 }
@@ -775,7 +775,7 @@ void MI_CALL TestClass_AllDMTFArrays_Invoke_SetReal64Array(
     TestClass_AllDMTFArrays_SetReal64Array_Destruct(&real64Array);
 
     if(result != MI_RESULT_OK)
-        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
+        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not post instance"));
 
     MI_PostResult(context, result);
 }
@@ -809,7 +809,7 @@ void MI_CALL TestClass_AllDMTFArrays_Invoke_GetChar16Array(
     TestClass_AllDMTFArrays_GetChar16Array_Destruct(&char16Array);
 
     if(result != MI_RESULT_OK)
-        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
+        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not post instance"));
 
     MI_PostResult(context, result);
 }
@@ -849,7 +849,7 @@ void MI_CALL TestClass_AllDMTFArrays_Invoke_SetChar16Array(
     TestClass_AllDMTFArrays_SetChar16Array_Destruct(&char16Array);
 
     if(result != MI_RESULT_OK)
-        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
+        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not post instance"));
 
     MI_PostResult(context, result);
 }
@@ -883,7 +883,7 @@ void MI_CALL TestClass_AllDMTFArrays_Invoke_GetStringArray(
     TestClass_AllDMTFArrays_GetStringArray_Destruct(&stringArray);
 
     if(result != MI_RESULT_OK)
-        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
+        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not post instance"));
 
     MI_PostResult(context, result);
 }
@@ -923,7 +923,7 @@ void MI_CALL TestClass_AllDMTFArrays_Invoke_SetStringArray(
     TestClass_AllDMTFArrays_SetStringArray_Destruct(&stringArray);
 
     if(result != MI_RESULT_OK)
-        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
+        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not post instance"));
 
     MI_PostResult(context, result);
 }
@@ -957,7 +957,7 @@ void MI_CALL TestClass_AllDMTFArrays_Invoke_GetDateTimeArray(
     TestClass_AllDMTFArrays_GetDateTimeArray_Destruct(&datetimeArray);
 
     if(result != MI_RESULT_OK)
-        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
+        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not post instance"));
 
     MI_PostResult(context, result);
 }
@@ -997,7 +997,7 @@ void MI_CALL TestClass_AllDMTFArrays_Invoke_SetdatetimeArray(
     TestClass_AllDMTFArrays_SetdatetimeArray_Destruct(&dateArray);
 
     if(result != MI_RESULT_OK)
-        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
+        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not post instance"));
 
     MI_PostResult(context, result);
 }
@@ -1031,7 +1031,7 @@ void MI_CALL TestClass_AllDMTFArrays_Invoke_GetReferenceArray(
     TestClass_AllDMTFArrays_GetReferenceArray_Destruct(&refArray);
 
     if(result != MI_RESULT_OK)
-        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
+        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not post instance"));
 
     MI_PostResult(context, result);
 }
@@ -1071,7 +1071,7 @@ void MI_CALL TestClass_AllDMTFArrays_Invoke_SetReferenceArray(
     TestClass_AllDMTFArrays_SetReferenceArray_Destruct(&refArray);
 
     if(result != MI_RESULT_OK)
-        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
+        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not post instance"));
 
     MI_PostResult(context, result);
 }
@@ -1107,7 +1107,7 @@ void MI_CALL TestClass_AllDMTFArrays_Invoke_GetBooleanArray(
     TestClass_AllDMTFArrays_GetBooleanArray_Destruct(&boolArray);
 
     if(result != MI_RESULT_OK)
-        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
+        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not post instance"));
 
     MI_PostResult(context, result);
 }
@@ -1147,7 +1147,7 @@ void MI_CALL TestClass_AllDMTFArrays_Invoke_SetBooleanArray(
     TestClass_AllDMTFArrays_SetBooleanArray_Destruct(&boolArray);
 
     if(result != MI_RESULT_OK)
-        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
+        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not post instance"));
 
     MI_PostResult(context, result);
 }
@@ -1181,7 +1181,7 @@ void MI_CALL TestClass_AllDMTFArrays_Invoke_GetUint8Array(
     TestClass_AllDMTFArrays_GetUint8Array_Destruct(&uint8Array);
 
     if(result != MI_RESULT_OK)
-        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
+        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not post instance"));
 
     MI_PostResult(context, result);
 }
@@ -1222,7 +1222,7 @@ void MI_CALL TestClass_AllDMTFArrays_Invoke_SetUint8Array(
     TestClass_AllDMTFArrays_SetUint8Array_Destruct(&uint8Array);			
 
     if(result != MI_RESULT_OK)
-        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
+        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not post instance"));
 
     MI_PostResult(context, result);
 }
@@ -1258,7 +1258,7 @@ void MI_CALL TestClass_AllDMTFArrays_Invoke_GetSint8Array(
     TestClass_AllDMTFArrays_GetSint8Array_Destruct(&sint8Array);
 
     if(result != MI_RESULT_OK)
-        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
+        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not post instance"));
 
     MI_PostResult(context, result);
 }
@@ -1299,7 +1299,7 @@ void MI_CALL TestClass_AllDMTFArrays_Invoke_SetSint8Array(
     TestClass_AllDMTFArrays_SetSint8Array_Destruct(&sint8Array);
 
     if(result != MI_RESULT_OK)
-        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
+        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not post instance"));
 
     MI_PostResult(context, result);
 }
@@ -1333,7 +1333,7 @@ void MI_CALL TestClass_AllDMTFArrays_Invoke_GetUint16Array(
     TestClass_AllDMTFArrays_GetUint16Array_Destruct(&uint16Array);
 
     if(result != MI_RESULT_OK)
-        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
+        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not post instance"));
 
     MI_PostResult(context, result);
 }
@@ -1374,7 +1374,7 @@ void MI_CALL TestClass_AllDMTFArrays_Invoke_SetUint16Array(
     TestClass_AllDMTFArrays_SetUint16Array_Destruct(&uint16Array);
 
     if(result != MI_RESULT_OK)
-        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
+        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not post instance"));
 
     MI_PostResult(context, result);
 }
@@ -1408,7 +1408,7 @@ void MI_CALL TestClass_AllDMTFArrays_Invoke_GetSint16Array(
     TestClass_AllDMTFArrays_GetSint16Array_Destruct(&sint16Array);
 
     if(result != MI_RESULT_OK)
-        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
+        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not post instance"));
 
     MI_PostResult(context, result);
 }
@@ -1448,7 +1448,7 @@ void MI_CALL TestClass_AllDMTFArrays_Invoke_SetSint16Array(
     TestClass_AllDMTFArrays_SetSint16Array_Destruct(&sint16Array);
 
     if(result != MI_RESULT_OK)
-        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
+        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not post instance"));
 
     MI_PostResult(context, result);
 }
@@ -1482,7 +1482,7 @@ void MI_CALL TestClass_AllDMTFArrays_Invoke_GetUint32Array(
     TestClass_AllDMTFArrays_GetUint32Array_Destruct(&uint32Array);
 
     if(result != MI_RESULT_OK)
-        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
+        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not post instance"));
 
     MI_PostResult(context, result);
 }
@@ -1522,7 +1522,7 @@ void MI_CALL TestClass_AllDMTFArrays_Invoke_SetUint32Array(
     TestClass_AllDMTFArrays_SetUint32Array_Destruct(&uint32Array);
 
     if(result != MI_RESULT_OK)
-        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
+        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not post instance"));
 
     MI_PostResult(context, result);
 }
@@ -1556,7 +1556,7 @@ void MI_CALL TestClass_AllDMTFArrays_Invoke_GetSint32Array(
     TestClass_AllDMTFArrays_GetSint32Array_Destruct(&sint32Array);
 
     if(result != MI_RESULT_OK)
-        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
+        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not post instance"));
 
     MI_PostResult(context, result);
 }
@@ -1596,7 +1596,7 @@ void MI_CALL TestClass_AllDMTFArrays_Invoke_SetSint32Array(
     TestClass_AllDMTFArrays_SetSint32Array_Destruct(&sint32Array);
 
     if(result != MI_RESULT_OK)
-        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
+        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not post instance"));
 
     MI_PostResult(context, result);
 }
@@ -1630,7 +1630,7 @@ void MI_CALL TestClass_AllDMTFArrays_Invoke_GetUint64Array(
     TestClass_AllDMTFArrays_GetUint64Array_Destruct(&uint64Array);
 
     if(result != MI_RESULT_OK)
-        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
+        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not post instance"));
 
     MI_PostResult(context, result);
 }
@@ -1670,7 +1670,7 @@ void MI_CALL TestClass_AllDMTFArrays_Invoke_SetUint64Array(
     TestClass_AllDMTFArrays_SetUint64Array_Destruct(&uint64Array);
 
     if(result != MI_RESULT_OK)
-        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
+        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not post instance"));
 
     MI_PostResult(context, result);
 }
@@ -1704,7 +1704,7 @@ void MI_CALL TestClass_AllDMTFArrays_Invoke_GetSint64Array(
     TestClass_AllDMTFArrays_GetSint64Array_Destruct(&sint64Array);
 
     if(result != MI_RESULT_OK)
-        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
+        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not post instance"));
 
     MI_PostResult(context, result);
 }
@@ -1744,7 +1744,7 @@ void MI_CALL TestClass_AllDMTFArrays_Invoke_SetSint64Array(
     TestClass_AllDMTFArrays_SetSint64Array_Destruct(&sint64Array);
 
     if(result != MI_RESULT_OK)
-        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
+        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not post instance"));
 
     MI_PostResult(context, result);
 }
@@ -1778,7 +1778,7 @@ void MI_CALL TestClass_AllDMTFArrays_Invoke_GetEmbeddedInstanceArray(
     TestClass_AllDMTFArrays_GetEmbeddedInstanceArray_Destruct(&embInstanceArray);
 
     if(result != MI_RESULT_OK)
-        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
+        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not post instance"));
 
     MI_PostResult(context, result);
 }
@@ -1818,7 +1818,7 @@ void MI_CALL TestClass_AllDMTFArrays_Invoke_SetEmbeddedInstanceArray(
     TestClass_AllDMTFArrays_SetEmbeddedInstanceArray_Destruct(&embInstanceArray);	
 
     if(result != MI_RESULT_OK)
-        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
+        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not post instance"));
 
     MI_PostResult(context, result);
 }
@@ -1852,7 +1852,7 @@ void MI_CALL TestClass_AllDMTFArrays_Invoke_GetEmbeddedObjectArray(
     TestClass_AllDMTFArrays_GetEmbeddedObjectArray_Destruct(&embObjectArray);
 
     if(result != MI_RESULT_OK)
-        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
+        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not post instance"));
 
     MI_PostResult(context, result);
 }
@@ -1892,7 +1892,7 @@ void MI_CALL TestClass_AllDMTFArrays_Invoke_SetEmbeddedObjectArray(
     TestClass_AllDMTFArrays_SetEmbeddedObjectArray_Destruct(&embObjectArray);	
 
     if(result != MI_RESULT_OK)
-        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
+        POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not post instance"));
 
     MI_PostResult(context, result);
 }

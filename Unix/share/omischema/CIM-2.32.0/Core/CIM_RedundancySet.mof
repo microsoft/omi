@@ -43,7 +43,7 @@ class CIM_RedundancySet : CIM_SystemSpecificCollection {
           "(=3) indicates all members are active. However, there "
           "functionality is not independent of each other. Their "
           "functioning is determined by some sort of load balancing "
-          "algrothim (implemented in hardware and/or software). "
+          "algorithm (implemented in hardware and/or software). "
           "\'Sparing\' is implied (i.e. each member can be a spare "
           "for the other(s). \n"
           "- Sparing (=4) indicates that all members are active and "
@@ -133,18 +133,18 @@ class CIM_RedundancySet : CIM_SystemSpecificCollection {
           "or be associated with the RedundancySet via an IsSpare "
           "relationship. \n"
           "\n"
-          "Upon sucessful completion: \n"
+          "Upon successful completion: \n"
           "- the FailoverTo element SHOULD be associated to the "
           "RedundancySet via MemberOfCollection. \n"
           "- the FailFrom element SHOULD either still be associated "
-          "to the RedundandySet via MemberOfCollection with a "
+          "to the RedundancySet via MemberOfCollection with a "
           "OperationalStatus or EnableState that indicates it not "
           "active, or it SHOULD be associated to the \'Spared\' "
           "collection via the MemberOfCollection association." ), 
        ValueMap { "0", "1", "2", "3", "4", "..", "32768..65535" }, 
        Values { "Completed with No Error", "Not Supported", 
           "Unknown/Unspecified Error", "Busy/In Use", 
-          "Paramter Error", "DMTF Reserved", "Vendor Reserved" }]
+          "Parameter Error", "DMTF Reserved", "Vendor Reserved" }]
    uint32 Failover(
          [IN, Description ( 
              "The primary ManagedSystemElement that will become "

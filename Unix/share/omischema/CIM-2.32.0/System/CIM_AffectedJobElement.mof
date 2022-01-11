@@ -14,7 +14,7 @@
        "It may not be feasible for the Job to describe all of the "
        "affected elements. The main purpose of this association is to "
        "provide information when a Job requires exclusive use of the "
-       "\'affected\' ManagedElment(s) or when describing that side "
+       "\'affected\' ManagedElement(s) or when describing that side "
        "effects may result." )]
 class CIM_AffectedJobElement {
 

@@ -587,7 +587,7 @@ static void InteractionProtocolHandler_Operation_Strand_Finish( _In_ Strand* sel
     over the binary protocol.
 
     Behavior:
-    - Post implementes different behaviour depending on the type of message
+    - Post implemented different behaviour depending on the type of message
        being posted
        * For PostInstanceMsg stores the instance in a cache var, and if there is
           previous cached instance not yet delivered will deliver that one first
@@ -595,7 +595,7 @@ static void InteractionProtocolHandler_Operation_Strand_Finish( _In_ Strand* sel
        * For PostIndicationMsg always delivers it to the client asynchronously.
        * For PostResultMsg it will delivered it thru the proper callback and
           set callingFinalResult to 1 to indicate final result already sent.
-          Also note that NoOpRsp is another case of inal result.
+          Also note that NoOpRsp is another case of final result.
        * PostSchemaMsg is treated the same as PostInstanceMsg with the same
           cached var mechanism.
        * SubscribeRes is just acked immediately as nothing is needed there
@@ -605,7 +605,7 @@ static void InteractionProtocolHandler_Operation_Strand_Finish( _In_ Strand* sel
     - Ack does nothing as there are no secondary messages to be sent to the
        protocol
     - Post control notified when the connect has succeeded (or failed). If succeeded
-       the request corresponding to the operartion is send there.
+       the request corresponding to the operation is send there.
     - Cancel does nothing at this point.
     - Close sends the final result if not being sent already
        (as indicated by callingFinalResult set on Post)

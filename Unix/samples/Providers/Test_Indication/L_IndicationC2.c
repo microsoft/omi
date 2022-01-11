@@ -89,7 +89,7 @@ void MI_CALL L_IndicationC2_EnableIndications(
     const MI_Char* className)
 {
     /* TODO: store indicationsContext for posting indication usage */
-    /* NOTE:Call one of following functions if and ONLY if encount termination error,
+    /* NOTE:Call one of following functions if and ONLY if encounter termination error,
             which will finalize the indicationsContext, 
             and terminate all active subscriptions to current class,
              MI_Context_PostResult
@@ -122,7 +122,7 @@ void MI_CALL L_IndicationC2_Subscribe(
     void** subscriptionSelf)
 {
     /* TODO: store the context for posting indication usage */
-    /* NOTE:Call one of following functions if and ONLY if encount termination error,
+    /* NOTE:Call one of following functions if and ONLY if encounter termination error,
             which will finalize the context, 
             and Unsubscribe function will not be invoked then,
              MI_Context_PostResult

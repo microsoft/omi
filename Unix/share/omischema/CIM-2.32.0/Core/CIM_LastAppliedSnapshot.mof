@@ -7,7 +7,7 @@
        "virtual system snapshot that was most recently applied to a "
        "virtual system, and the instance of the CIM_ComputerSystem "
        "class representing the related virtual system.\n"
-       "An instance of this assocation indicates that the referenced "
+       "An instance of this association indicates that the referenced "
        "snapshot is the snapshot the was last applied to the virtual "
        "system from the set of snapshots taken from that virtual "
        "system. For each virtual system at any time there is at most "

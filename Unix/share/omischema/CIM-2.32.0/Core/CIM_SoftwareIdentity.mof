@@ -237,7 +237,7 @@ class CIM_SoftwareIdentity : CIM_LogicalElement {
           "the corresponding component of the IdentityInfoValue "
           "array. The elements of this property array describe the "
           "type of the value in the corresponding elements of the "
-          "IndetityInfoValue array. When the IdentityInfoValue "
+          "IdentityInfoValue array. When the IdentityInfoValue "
           "property is implemented, the IdentityInfoType property "
           "MUST be implemented. To insure uniqueness the "
           "IdentityInfoType property SHOULD be formatted using the "
