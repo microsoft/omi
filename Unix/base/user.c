@@ -208,10 +208,10 @@ static int _CreateChildProcess(
         fdLimit = 2500;
     }
 
-    /* ATTN: close first 3 also! Left for debugging only */
+    /* closing FD for stdin,stdout,stderr also i.e. 0,1,2 respectively*/
     {
         int i;
-        for (i = 3; i < fdLimit; ++i)
+        for (i = 0; i < fdLimit; ++i)
         {
             if (i != s[1])
                 close(i);

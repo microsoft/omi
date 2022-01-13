@@ -1253,8 +1253,8 @@ static MI_Boolean _ProcessCreateAgentMsg(
                 fdLimit = 2500;
             }
 
-            /* ATTN: close first 3 also! Left for debugging only */
-            for (fd = 3; fd < fdLimit; ++fd)
+            /* closing FD for stdin,stdout,stderr also i.e. 0,1,2 respectively*/
+            for (fd = 0; fd < fdLimit; ++fd)
             {
                 if (fd != handler->base.sock && fd != logfd)
                     close(fd);

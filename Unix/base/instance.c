@@ -38,6 +38,8 @@ static MI_Uint32 _NUM_PAGES = INFINITE;
 /* The minimum number of reserved properties for a dynamic instance */
 static size_t _CAPACITY = 32;
 
+static size_t MAX_ALLOWED_INSTANCES = 10000;
+
 /* Find capacity (lesser of _CAPACITY or x rounded to power of 2) */
 static size_t _FindCapacity(size_t x)
 {
@@ -866,6 +868,12 @@ MI_Result MI_CALL Instance_InitConvert(
                 MI_Boolean allowKeylessEmbedInst = (pd2->type == MI_INSTANCEA) ? MI_TRUE : MI_FALSE;
 
                 v.instancea.size = ((MI_Value*)field)->instancea.size;
+                if(v.instancea.size > MAX_ALLOWED_INSTANCES)
+                {
+                    r = MI_RESULT_SERVER_LIMITS_EXCEEDED;
+                    goto failed;
+                }
+
                 v.instancea.data = BAlloc(batch,
                     v.instancea.size * sizeof(void*), CALLSITE);
 
