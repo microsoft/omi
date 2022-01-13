@@ -853,8 +853,8 @@ static pid_t _SpawnAgentProcess(
         fdLimit = 2500;
     }
 
-    /* ATTN: close first 3 also! Left for debugging only */
-    for (fd = 3; fd < fdLimit; ++fd)
+    /* closing FD for stdin,stdout,stderr also i.e. 0,1,2 respectively*/
+    for (fd = 0; fd < fdLimit; ++fd)
     {
         if (fd != s && fd != logfd)
             close(fd);

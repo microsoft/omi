@@ -293,8 +293,8 @@ int PreExec_ExecuteOnServer(
                 n = 2500;
             }
     
-            /* Leave stdin(0), stdout(1), stderr(2) open (for debugging) */
-            for (fd = 3; fd < n; ++fd)
+            /* closing FD for stdin,stdout,stderr also i.e. 0,1,2 respectively*/
+            for (fd = 0; fd < n; ++fd)
             {
                 close(fd);
             }

@@ -541,6 +541,10 @@ MI_Boolean Http_DecryptData(_In_ Http_SR_SocketData * handler, _Out_ HttpHeaders
                             while (';' != *linep && linep < linelimit)
                                 linep++;
                             *linep++ = '\0';
+                            
+                            if((linep - original_content_type) >=1024){
+                                return FALSE;
+                            }
                             memcpy(original_content_type_save, original_content_type, linep - original_content_type);
                             original_content_type = original_content_type_save;
                         }
@@ -551,6 +555,10 @@ MI_Boolean Http_DecryptData(_In_ Http_SR_SocketData * handler, _Out_ HttpHeaders
                             while (';' != *linep && linep < linelimit)
                                 linep++;
                             *linep++ = '\0';
+                            
+                            if((linep - original_encoding) >=64){
+                                return FALSE;
+                            }
                             memcpy(original_encoding_save, original_encoding, linep - original_encoding);
                             original_encoding = original_encoding_save;
                         }
