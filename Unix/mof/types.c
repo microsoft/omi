@@ -26,6 +26,8 @@
 #pragma prefast (disable: 28719)
 #endif
 
+#define MI_STRINGMAXLEN 24
+
 /*
 **==============================================================================
 **
@@ -643,10 +645,10 @@ static int _PromoteValue(
                 }
                 case MI_STRING:
                 {
-                    char Buf[24];
+                    char Buf[MI_STRINGMAXLEN];
                     MI_Char* q;
                     MI_Real64 x = *p;
-                    sprintf(Buf, "%f", x);
+                    snprintf(Buf, MI_STRINGMAXLEN, "%g",x);
                     q = MALLOC_T(MI_Char, strlen(Buf) + 1);
                     strcpy(q, Buf);
                     *value = q;
@@ -887,13 +889,13 @@ static int _PromoteValue(
                 }
                 case MI_STRINGA:
                 {
-                    char Buf[24];
+                    char Buf[MI_STRINGMAXLEN];
                     MI_StringA* q;
                     NEW_ARRAY_T(q, MI_String, p->size);
                     for (i = 0; i < p->size; i++)
                     {
                         MI_Real64 x = p->data[i];
-                        sprintf(Buf, "%f", x);
+                        snprintf(Buf, MI_STRINGMAXLEN, "%g",x);
                         strcpy(q->data[i], Buf);
                     }
 
@@ -1181,12 +1183,12 @@ int InitializerToValue(
                     }
                     case MI_STRINGA:
                     {
-                        char Buf[24];
+                        char Buf[MI_STRINGMAXLEN];
                         MI_StringA* p;
                         NEW_ARRAY_T(p, MI_String, self->size);
                         for (i = 0; i < self->size; i++)
                         {
-                            sprintf(Buf, "%f", self->data->value.real);
+                            snprintf(Buf, MI_STRINGMAXLEN, "%g",self->data->value.real);
                             p->data[i] = MALLOC_T(MI_Char, strlen(Buf) + 1);
                             strcpy(p->data[i], Buf);
                        }
@@ -1434,9 +1436,9 @@ int InitializerToValue(
                     }
                     case MI_STRING:
                     {
-                        char Buf[24];
+                        char Buf[MI_STRINGMAXLEN];
                         MI_Char* p;
-                        sprintf(Buf, "%f", self->data->value.real);
+                        snprintf(Buf, MI_STRINGMAXLEN, "%g",self->data->value.real);
                         p = MALLOC_T(MI_Char, strlen(Buf) + 1);
                         strcpy(p, Buf);
                         *value = p;
