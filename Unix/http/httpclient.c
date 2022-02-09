@@ -355,7 +355,7 @@ static MI_Boolean _getRequestLine(
     }
 
     /* skip to end of line */
-    for (index = 1; (*line)[index] && index < handler->receivedSize; index++)
+    for (index = 1; index < handler->receivedSize && (*line)[index]; index++)
     {
         if ((*line)[index-1] == '\r' && (*line)[index] == '\n')
         {
