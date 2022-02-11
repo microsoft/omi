@@ -525,7 +525,10 @@ PAL_INLINE char* Strcat(
     size_t count, 
     _In_z_ const char* src)
 {
-    return strcat(dest, src);
+    if(strlen(dest)+strlen(src) < count)
+        return strcat(dest, src);
+    else
+        return NULL;
 }
 
 PAL_INLINE TChar* Tcscat(
