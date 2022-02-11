@@ -107,6 +107,7 @@ static RequestItem* _CreateUnsubscribeProviderItem(
     UnsubscribeProviderItem* ui = (UnsubscribeProviderItem*)PAL_Malloc(sizeof(UnsubscribeProviderItem));
     if (ui)
     {
+        memset(ui, 0, sizeof(UnsubscribeProviderItem));
         ui->base.type = REQUEST_UNSUBSCRIBE;
         ui->base.next = NULL;
         ui->ctx = ctx;
@@ -128,6 +129,7 @@ static RequestItem* _CreateSubscribeProviderItem(
     SubscribeProviderItem* ui = (SubscribeProviderItem*)PAL_Malloc(sizeof(SubscribeProviderItem));
     if (ui)
     {
+        memset(ui, 0, sizeof(SubscribeProviderItem));
         ui->base.type = REQUEST_SUBSCRIBE;
         ui->base.next = NULL;
         ui->provider = provider;

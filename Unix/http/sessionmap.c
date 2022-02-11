@@ -104,6 +104,7 @@ static SessionBucket* _SessionBucket_New(SessionMap *self, _In_z_ const char* se
             break;
         }
 
+        memset(bucket, 0, size);
         char* clone = (char*) (((unsigned char*) bucket) + sizeof(SessionBucket));
         strcpy(clone, sessionId);
         bucket->sessionId = clone;

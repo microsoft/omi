@@ -2274,6 +2274,7 @@ Strand* _Strand_Create(
     {
         *flags &= (~STRAND_FLAG_NOZEROALLOCATED);    // To indicate Strand*_Init that it does need to zero the strand fields
         self = PAL_Malloc( structSize );
+        if(self) memset(self, 0, structSize);
     }
     else
     {

@@ -2826,6 +2826,7 @@ static void _SendEnumPullResponse(
         GOTO_FAILED;
 
     {
+        memset(responsePageCombined, 0, sizeof(Page) + totalSize + 1);
         char* data = (char*) (responsePageCombined + 1);
         data[totalSize] = 0;
 

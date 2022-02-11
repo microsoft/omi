@@ -743,6 +743,7 @@ Http_EncryptData(_In_ Http_SR_SocketData *handler, int contentLen, int contentTy
         return MI_FALSE;
     }
 
+    memset(pNewData, 0, needed_data_size+sizeof(Page));
     char *buffp = (char *)(pNewData + 1);
 
     memcpy(buffp, ENCRYPTED_BOUNDARY, ENCRYPTED_BOUNDARY_LEN);
