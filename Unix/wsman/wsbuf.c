@@ -612,6 +612,10 @@ MI_Result WSBuf_Init(
     // The buffer is to be guaranteed to be a multiple of 32 bytes
     
     buf->page = (Page*)PAL_Malloc(sizeof(Page)+ PAD_TO_32(initialSize));
+    if(buf->page)
+    {
+        memset(buf->page, 0, sizeof(Page)+ PAD_TO_32(initialSize));
+    }
     buf->position = 0;
 
     if (!buf->page)

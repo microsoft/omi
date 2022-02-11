@@ -1174,6 +1174,7 @@ MI_Result InteractionProtocolHandler_Session_Connect(
         r = MI_RESULT_SERVER_LIMITS_EXCEEDED;
         goto done;
     }
+    memset(operation->protocolConnection, 0, sizeof(*operation->protocolConnection));
     operation->protocolConnection->operation = operation;
     operation->protocolConnection->session = session;
     operation->protocolConnection->type = session->protocolType;

@@ -746,6 +746,10 @@ static Http_CallbackResult _ReadHeader(
     {
         /* Allocate zero-terminated buffer */
         handler->recvPage = (Page*)PAL_Malloc(allocSize);
+        if(handler->recvPage)
+        {
+            memset(handler->recvPage, 0, allocSize);
+        }
     }
     else
     {
@@ -1108,6 +1112,10 @@ static Http_CallbackResult _ReadChunkHeader(
     {
         /* Allocate zero-terminated buffer */
         handler->recvPage = (Page*)PAL_Malloc(allocSize);
+        if(handler->recvPage)
+        {
+            memset(handler->recvPage, 0, allocSize);
+        }
     }
     else
     {

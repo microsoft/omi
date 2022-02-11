@@ -456,6 +456,7 @@ MI_Result MI_CALL Application_Close(
                 }
                 else
                 {
+                    memset(outstandingSessions, 0, outstandingSessionsCount*sizeof(ChildListOutstandingHandles));
                     outstandingSessionsSize = outstandingSessionsCount;
                     r = ChildList_GetCurrentList(&applicationObject->sessionList, outstandingSessions, (MI_Uint32)outstandingSessionsSize, &outstandingSessionsCount);
                 }

@@ -581,6 +581,7 @@ static Http_CallbackResult _ReadHeader(
     if (!handler->recvPage)
         return PRT_RETURN_FALSE;
 
+    memset(handler->recvPage, 0, allocSize);
     ((char*)(handler->recvPage + 1))[handler->recvHeaders.contentLength] = 0;
 
     handler->recvPage->u.s.size = (unsigned int)handler->recvHeaders.contentLength;
