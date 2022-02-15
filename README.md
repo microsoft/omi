@@ -25,7 +25,7 @@ enterprise Linux distributions. To install OMI, download the correct
 package for your Linux computer. Choose from:
 
 - 32-bit (x86) or 64-bit (x64) architecture
-- OpenSSL version 0.9.8, 1.0.x or 1.1.x (to determine your OpenSSL version, run: `openssl version`)
+- OpenSSL version 1.0.x or 1.1.x (to determine your OpenSSL version, run: `openssl version`)
 - RPM or Debian package format
 
 You can download and install OMI from the [Releases] page. While
@@ -36,14 +36,10 @@ Platform | Release | Architecture | SSL   | Filename
 -------- |-------- |------------  | ---   | --------
 Linux    | Debian  | x64          | 1.1.0 | [omi-MAJOR.MINOR.PATCH-BUILD.ssl_110.ulinux.x64.deb](https://github.com/Microsoft/omi/releases/latest)
 Linux    | Debian  | x64          | 1.0.0 | [omi-MAJOR.MINOR.PATCH-BUILD.ssl_100.ulinux.x64.deb](https://github.com/Microsoft/omi/releases/latest)
-Linux    | Debian  | x64          | 0.9.8 | [omi-MAJOR.MINOR.PATCH-BUILD.ssl_098.ulinux.x64.deb](https://github.com/Microsoft/omi/releases/latest)
 Linux    | RPM     | x64          | 1.1.0 | [omi-MAJOR.MINOR.PATCH-BUILD.ssl_110.ulinux.x64.rpm](https://github.com/Microsoft/omi/releases/latest)
 Linux    | RPM     | x64          | 1.0.0 | [omi-MAJOR.MINOR.PATCH-BUILD.ssl_100.ulinux.x64.rpm](https://github.com/Microsoft/omi/releases/latest)
-Linux    | RPM     | x64          | 0.9.8 | [omi-MAJOR.MINOR.PATCH-BUILD.ssl_098.ulinux.x64.rpm](https://github.com/Microsoft/omi/releases/latest)
 Linux    | Debian  | x86          | 1.0.0 | [omi-MAJOR.MINOR.PATCH-BUILD.ssl_100.ulinux.x86.deb](https://github.com/Microsoft/omi/releases/latest)
-Linux    | Debian  | x86          | 0.9.8 | [omi-MAJOR.MINOR.PATCH-BUILD.ssl_098.ulinux.x86.deb](https://github.com/Microsoft/omi/releases/latest)
 Linux    | RPM     | x86          | 1.0.0 | [omi-MAJOR.MINOR.PATCH-BUILD.ssl_100.ulinux.x86.rpm](https://github.com/Microsoft/omi/releases/latest)
-Linux    | RPM     | x86          | 0.9.8 | [omi-MAJOR.MINOR.PATCH-BUILD.ssl_098.ulinux.x86.rpm](https://github.com/Microsoft/omi/releases/latest)
 
 **Note:** MAJOR, MINOR, PATCH, and BUILD refer to the version number information for the specific version of OMI that you wish to install.
 
