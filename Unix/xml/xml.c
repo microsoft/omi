@@ -906,40 +906,44 @@ static void _ParseStartTag(
 
     /* Translate the namespace after parsing xmlns attributes */
     ns = _FindNamespace(self, prefix);
-
-    if (self->status)
-        return;
-
-    /* Now translate the attribute namespaces */
-    /* Unprefixed attributes get a empty namespace */
-    for (attr = 0; attr < elem->attrsSize; attr++)
+    if (ns)
     {
-        static const XML_NameSpace s_empty = {T(""), 0, T(""), 0, '\0', 0};
-        XML_Attr* item = elem->attrs + attr;
-        const XML_NameSpace* itemNS = &s_empty;
+        if (self->status)
+            return;
 
-        if (item->name.namespaceUri[0] != '\0')
+        /* Now translate the attribute namespaces */
+        /* Unprefixed attributes get a empty namespace */
+        for (attr = 0; attr < elem->attrsSize; attr++)
         {
-            /* The namespaceUri field contains the prefix */
-            itemNS = _FindNamespace(self, item->name.namespaceUri);
+            static const XML_NameSpace s_empty = { T(""), 0, T(""), 0, '\0', 0 };
+            XML_Attr* item = elem->attrs + attr;
+            if (item)
+            {
+                const XML_NameSpace* itemNS = &s_empty;
 
-            if (self->status)
-                return;
+                if (item->name.namespaceUri[0] != '\0')
+                {
+                    /* The namespaceUri field contains the prefix */
+                    itemNS = _FindNamespace(self, item->name.namespaceUri);
+
+                    if (self->status)
+                        return;
+                }
+
+                item->name.namespaceUri = itemNS->uri;
+                item->name.namespaceUriSize = itemNS->uriSize;
+                item->name.namespaceId = itemNS->id;
+            }
         }
 
-        item->name.namespaceUri = itemNS->uri;
-        item->name.namespaceUriSize = itemNS->uriSize;
-        item->name.namespaceId = itemNS->id;
+        /* Create the element */
+        elem->type = XML_START;
+        elem->data.data = name;
+        elem->data.size = nameEnd - name;
+        elem->data.namespaceUri = ns->uri;
+        elem->data.namespaceUriSize = ns->uriSize;
+        elem->data.namespaceId = ns->id;
     }
-
-    /* Create the element */
-    elem->type = XML_START;
-    elem->data.data = name;
-    elem->data.size = nameEnd - name;
-    elem->data.namespaceUri = ns->uri;
-    elem->data.namespaceUriSize = ns->uriSize;
-    elem->data.namespaceId = ns->id;
-
     /* Check for empty tag */
     if (*p == '/')
     {
@@ -1094,18 +1098,19 @@ static void _ParseEndTag(
     *nameEnd = '\0';
 
     ns = _FindNamespace(self, prefix);
+    if (ns)
+    {
+        if (self->status)
+            return;
 
-    if (self->status)
-        return;
-
-    /* Return element object */
-    elem->type = XML_END;
-    elem->data.data = name;
-    elem->data.size = nameEnd - name;
-    elem->data.namespaceUri = ns->uri;
-    elem->data.namespaceUriSize = ns->uriSize;
-    elem->data.namespaceId = ns->id;
-
+        /* Return element object */
+        elem->type = XML_END;
+        elem->data.data = name;
+        elem->data.size = nameEnd - name;
+        elem->data.namespaceUri = ns->uri;
+        elem->data.namespaceUriSize = ns->uriSize;
+        elem->data.namespaceId = ns->id;
+    }
     /* Match opening name */
     {
         /* Check for stack underflow */
@@ -1168,7 +1173,7 @@ static void _ParseComment(
     XML_Char* end;
 
     p = _SkipChars(p, 2);
-    if (!*p)
+    if (!p || !*p)
     {
         XML_Raise(self, XML_ERROR_COMMENT_PREMATURE_END);
         return;
@@ -1227,7 +1232,7 @@ static void _ParseCDATA(
     XML_Char* end;
 
     p = _SkipChars(p, 7);
-    if (!*p)
+    if (!p || !*p)
     {
         XML_Raise(self, XML_ERROR_CDATA_PREMATURE_END);
         return;
@@ -1276,7 +1281,7 @@ static void _ParseDOCTYPE(
 
     /* Recognize <!DOCTYPE ...> */
     p = _SkipChars(p, 7);
-    if (!*p)
+    if (!p || !*p)
     {
         XML_Raise(self, XML_ERROR_DOCTYPE_PREMATURE_END);
         return;

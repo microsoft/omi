@@ -1138,8 +1138,14 @@ static MI_Result _CreateSocketConnector(
         user_,
         password_);
 done:
-    PAL_Free(locator_mem);
-    PAL_Free(user_);
+    if (locator_mem)
+    {
+        PAL_Free(locator_mem);
+    }
+    if (user_)
+    {
+        PAL_Free(user_);
+    }
     if (password)
     {
         memset(password, 0, passwordLength * sizeof(MI_Char));
@@ -2407,11 +2413,14 @@ void MI_CALL InteractionProtocolHandler_Session_TestConnection(
          req = NoOpReq_New(_NextOperationId());
     }
 
-    miResult = InteractionProtocolHandler_Session_CommonInstanceCode(_session, flags, NULL, callbacks, (RequestMsg*)req, _operation);
-
-    if ((miResult != MI_RESULT_OK) && req)
+    if (req)
     {
-        NoOpReq_Release(req);
+        miResult = InteractionProtocolHandler_Session_CommonInstanceCode(_session, flags, NULL, callbacks, (RequestMsg*)req, _operation);
+
+        if ((miResult != MI_RESULT_OK) && req)
+        {
+            NoOpReq_Release(req);
+        }
     }
 }
 

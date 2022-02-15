@@ -484,6 +484,11 @@ static MI_Boolean _DispatchAssocReq(
 
     /* Create new request to send to provider */
     msg = AssociationsOfReq_New(req->base.base.operationId, req->base.base.flags, tag);
+    if (!msg)
+    {
+        trace__DispatchAssocReq_OutOfMemory();
+        return MI_FALSE;
+    }
     msg->base.options = req->base.options;
     AuthInfo_Copy( &msg->base.authInfo, &req->base.authInfo );
     /* original request will be kept for the request duration, so perform shallow copy only */

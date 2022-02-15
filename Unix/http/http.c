@@ -844,6 +844,7 @@ _BuildHeader( Http_SR_SocketData* handler, int contentLen,
     needed_size += 2;  // \r\n
                       
     Page *pHeaderPage = (Page*)PAL_Malloc(sizeof(Page) + needed_size + 1); // 1 for a final null
+    if (!pHeaderPage) return NULL;
     char *bufp = (char *)(pHeaderPage+1);
 
     memset(pHeaderPage, 0, sizeof(Page)); // Zero page header fields.

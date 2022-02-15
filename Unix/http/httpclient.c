@@ -2108,8 +2108,11 @@ Page* _CreateHttpHeader(
         int  numstr_len = 0;
         char *pnumstr = int64_to_a(numbuff, sizeof(numbuff), size, &numstr_len);
 
-        memcpy(p, pnumstr, numstr_len);
-        p += numstr_len;
+        if (pnumstr)
+        {
+            memcpy(p, pnumstr, numstr_len);
+            p += numstr_len;
+        }
     }
 
     memcpy(p, "\r\n", 2);
