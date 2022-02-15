@@ -640,57 +640,77 @@ MI_Result MI_CALL Instance_InitConvert(
     /* Get the self pointer from the newly initialized instance */
     self = _SelfOf(self_);
 
-    /* Arrange to release the batch */
-    self->releaseBatch = batch == batch_ ? MI_FALSE : MI_TRUE;
-
-    /* Copy the nameSpace */
-    if (inst->nameSpace)
+    if (self)
     {
-        self->nameSpace = BStrdup(batch, inst->nameSpace, CALLSITE);
-        if (!self->nameSpace)
-        {
-            r = MI_RESULT_SERVER_LIMITS_EXCEEDED;
-            goto failed;
-        }
-    }
+        /* Arrange to release the batch */
+        self->releaseBatch = batch == batch_ ? MI_FALSE : MI_TRUE;
 
-    /* Copy the serverName */
-    if (inst->serverName)
-    {
-        self->serverName = BStrdup(batch, inst->serverName, CALLSITE);
-        if (!self->serverName)
+        /* Copy the nameSpace */
+        if (inst->nameSpace)
         {
-            r = MI_RESULT_SERVER_LIMITS_EXCEEDED;
-            goto failed;
-        }
-    }
-
-    /* Validate that the two instances share the same key structure */
-    if (!allowKeylessInst)
-    {
-        for (i = 0; i < cd1->numProperties; i++)
-        {
-            const MI_PropertyDecl* pd1 = cd1->properties[i];
-
-            if (pd1->flags & MI_FLAG_KEY)
+            self->nameSpace = BStrdup(batch, inst->nameSpace, CALLSITE);
+            if (!self->nameSpace)
             {
-                MI_Uint32 index;
+                r = MI_RESULT_SERVER_LIMITS_EXCEEDED;
+                goto failed;
+            }
+        }
 
-                index = _FindPropertyDecl(cd2, pd1->name);
-                if (index == (MI_Uint32)-1)
+        /* Copy the serverName */
+        if (inst->serverName)
+        {
+            self->serverName = BStrdup(batch, inst->serverName, CALLSITE);
+            if (!self->serverName)
+            {
+                r = MI_RESULT_SERVER_LIMITS_EXCEEDED;
+                goto failed;
+            }
+        }
+
+        /* Validate that the two instances share the same key structure */
+        if (!allowKeylessInst)
+        {
+            for (i = 0; i < cd1->numProperties; i++)
+            {
+                const MI_PropertyDecl* pd1 = cd1->properties[i];
+
+                if (pd1->flags & MI_FLAG_KEY)
                 {
-                    if (pd1->value)
+                    MI_Uint32 index;
+
+                    index = _FindPropertyDecl(cd2, pd1->name);
+                    if (index == (MI_Uint32)-1)
                     {
-                        //add default key value
-                        MI_Value* value = (MI_Value*)pd1->value;
-                        r = MI_Instance_SetElementAt(self_, i, value, pd1->type, MI_FLAG_BORROW);
-                        if (r != MI_RESULT_OK)
+                        if (pd1->value)
                         {
+                            //add default key value
+                            MI_Value* value = (MI_Value*)pd1->value;
+                            r = MI_Instance_SetElementAt(self_, i, value, pd1->type, MI_FLAG_BORROW);
+                            if (r != MI_RESULT_OK)
+                            {
+                                goto failed;
+                            }
+
+                        }
+                        else
+                        {
+                            r = MI_RESULT_NO_SUCH_PROPERTY;
                             goto failed;
                         }
-
                     }
-                    else
+                }
+            }
+
+            for (i = 0; i < cd2->numProperties; i++)
+            {
+                const MI_PropertyDecl* pd2 = cd2->properties[i];
+
+                if (pd2->flags & MI_FLAG_KEY)
+                {
+                    MI_Uint32 index;
+
+                    index = _FindPropertyDecl(cd1, pd2->name);
+                    if (index == (MI_Uint32)-1)
                     {
                         r = MI_RESULT_NO_SUCH_PROPERTY;
                         goto failed;
@@ -699,198 +719,53 @@ MI_Result MI_CALL Instance_InitConvert(
             }
         }
 
+        /* ATTN: ignore unknown properties? */
+
+        /* Set non-null properties */
         for (i = 0; i < cd2->numProperties; i++)
         {
             const MI_PropertyDecl* pd2 = cd2->properties[i];
+            Field* field = (Field*)((char*)inst + pd2->offset);
 
-            if (pd2->flags & MI_FLAG_KEY)
+            /* If requested, ignore non-keys */
+            if (keysOnly && !(pd2->flags & MI_FLAG_KEY))
+                continue;
+
+            /* Set the non-null key values */
+            if (Field_GetExists(field, pd2->type))
             {
-                MI_Uint32 index;
-
-                index = _FindPropertyDecl(cd1, pd2->name);
-                if (index == (MI_Uint32)-1)
+                if (pd2->type == MI_STRING)
                 {
-                    r = MI_RESULT_NO_SUCH_PROPERTY;
-                    goto failed;
-                }
-            }
-        }
-    }
+                    r = Instance_SetElementFromString(self_, pd2->name,
+                        ((MI_Value*)field)->string, flags);
 
-    /* ATTN: ignore unknown properties? */
-
-    /* Set non-null properties */
-    for (i = 0; i < cd2->numProperties; i++)
-    {
-        const MI_PropertyDecl* pd2 = cd2->properties[i];
-        Field* field = (Field*)((char*)inst + pd2->offset);
-
-        /* If requested, ignore non-keys */
-        if (keysOnly && !(pd2->flags & MI_FLAG_KEY))
-            continue;
-
-        /* Set the non-null key values */
-        if (Field_GetExists(field, pd2->type))
-        {
-            if (pd2->type == MI_STRING)
-            {
-                r = Instance_SetElementFromString(self_, pd2->name,
-                    ((MI_Value*)field)->string, flags);
-
-                if (r != MI_RESULT_OK)
-                {
-                    goto failed;
-                }
-            }
-            else if (pd2->type == MI_STRINGA)
-            {
-                r = Instance_SetElementFromStringA(self_, pd2->name,
-                    (const ZChar**)((MI_Value*)field)->stringa.data,
-                    ((MI_Value*)field)->stringa.size,
-                    flags);
-
-                if (r != MI_RESULT_OK)
-                {
-                    goto failed;
-                }
-            }
-            else if (pd2->type == MI_INSTANCE || pd2->type == MI_REFERENCE)
-            {
-                MI_Instance* tmpInst;
-                MI_ClassDecl* tmpCd;
-                MI_Type type;
-                MI_Boolean allowKeylessEmbedInst = (pd2->type == MI_INSTANCE) ? MI_TRUE : MI_FALSE;
-
-                /* Find the class declaration in the schema */
-                tmpCd = SchemaDecl_FindClassDecl(sd1,
-                    _SelfOf(((MI_Value*)field)->instance)->classDecl->name);
-
-                if (!tmpCd)
-                {
-                    r = MI_RESULT_NO_SUCH_PROPERTY;
-                    goto failed;
-                }
-
-                /* Allocate static instance of this class */
-                r = Instance_New(&tmpInst, tmpCd, batch);
-                if (r != MI_RESULT_OK)
-                {
-                    goto failed;
-                }
-
-                /* Convert instance */
-                r = Instance_InitConvert(tmpInst, tmpCd,
-                    ((MI_Value*)field)->instance, keysOnly, allowKeylessEmbedInst, copy,
-                    ((Instance*)tmpInst)->batch, flags);
-
-                if (r != MI_RESULT_OK)
-                {
-                    __MI_Instance_Delete(tmpInst);
-                    goto failed;
-                }
-
-                /* Get the target property type */
-                {
-                    MI_PropertyDecl* pd = _LookupPropertyDecl(cd1, pd2->name);
-
-                    if (!pd)
+                    if (r != MI_RESULT_OK)
                     {
-                        r = MI_RESULT_NO_SUCH_PROPERTY;
                         goto failed;
                     }
-
-                    type = pd->type;
                 }
-
-                /* Reject if not instance or reference */
-
-                switch (type)
+                else if (pd2->type == MI_STRINGA)
                 {
-                    case MI_INSTANCE:
-                    case MI_REFERENCE:
+                    r = Instance_SetElementFromStringA(self_, pd2->name,
+                        (const ZChar**)((MI_Value*)field)->stringa.data,
+                        ((MI_Value*)field)->stringa.size,
+                        flags);
+
+                    if (r != MI_RESULT_OK)
                     {
-                        MI_Value v;
-                        v.instance = tmpInst;
-
-                        r = __MI_Instance_SetElement(
-                            self_,
-                            pd2->name,
-                            &v,
-                            type,
-                            MI_FLAG_ADOPT);
-
-                        break;
-                    }
-                    case MI_INSTANCEA:
-                    case MI_REFERENCEA:
-                    {
-                        MI_Value v;
-                        v.instancea.size = 1;
-                        v.instancea.data =
-                            BAlloc(batch, sizeof(void*), CALLSITE);
-
-                        if (!v.instancea.data)
-                        {
-                            __MI_Instance_Delete(tmpInst);
-                            r = MI_RESULT_FAILED;
-                            goto failed;
-                        }
-
-                        v.instancea.data[0] = tmpInst;
-
-                        r = __MI_Instance_SetElement(
-                            self_,
-                            pd2->name,
-                            &v,
-                            type,
-                            MI_FLAG_ADOPT);
-
-                        break;
-                    }
-                    default:
-                    {
-                        r = MI_RESULT_TYPE_MISMATCH;
-                        break;
+                        goto failed;
                     }
                 }
-
-                if (r != MI_RESULT_OK)
-                {
-                    __MI_Instance_Delete(tmpInst);
-                    r = MI_RESULT_TYPE_MISMATCH;
-                    goto failed;
-                }
-            }
-            else if (pd2->type == MI_INSTANCEA || pd2->type == MI_REFERENCEA)
-            {
-                MI_Value v;
-                MI_Uint32 j;
-                MI_Boolean allowKeylessEmbedInst = (pd2->type == MI_INSTANCEA) ? MI_TRUE : MI_FALSE;
-
-                v.instancea.size = ((MI_Value*)field)->instancea.size;
-                if(v.instancea.size > MAX_ALLOWED_INSTANCES)
-                {
-                    r = MI_RESULT_SERVER_LIMITS_EXCEEDED;
-                    goto failed;
-                }
-
-                v.instancea.data = BAlloc(batch,
-                    v.instancea.size * sizeof(void*), CALLSITE);
-
-                if (!v.instancea.data)
-                {
-                    r = MI_RESULT_SERVER_LIMITS_EXCEEDED;
-                    goto failed;
-                }
-
-                for (j = 0; j < v.instancea.size; j++)
+                else if (pd2->type == MI_INSTANCE || pd2->type == MI_REFERENCE)
                 {
                     MI_Instance* tmpInst;
                     MI_ClassDecl* tmpCd;
+                    MI_Type type;
+                    MI_Boolean allowKeylessEmbedInst = (pd2->type == MI_INSTANCE) ? MI_TRUE : MI_FALSE;
 
-                    /* Find the schema declaration */
-                    tmpCd = SchemaDecl_FindClassDecl(sd1, _SelfOf(((
-                        MI_Value*)field)->instancea.data[j])->classDecl->name);
+                    /* Find the class declaration in the schema */
+                    tmpCd = SchemaDecl_FindClassDecl(sd1,
+                        _SelfOf(((MI_Value*)field)->instance)->classDecl->name);
 
                     if (!tmpCd)
                     {
@@ -898,63 +773,196 @@ MI_Result MI_CALL Instance_InitConvert(
                         goto failed;
                     }
 
-                    /* Allocate the instance for the provider */
-                    r = Instance_New(&tmpInst,tmpCd,batch);
+                    /* Allocate static instance of this class */
+                    r = Instance_New(&tmpInst, tmpCd, batch);
                     if (r != MI_RESULT_OK)
                     {
                         goto failed;
                     }
 
+                    /* Convert instance */
                     r = Instance_InitConvert(tmpInst, tmpCd,
-                        ((MI_Value*)field)->instancea.data[j], keysOnly, allowKeylessEmbedInst, copy,
+                        ((MI_Value*)field)->instance, keysOnly, allowKeylessEmbedInst, copy,
                         ((Instance*)tmpInst)->batch, flags);
 
                     if (r != MI_RESULT_OK)
                     {
-                        MI_Uint32 k;
-
-                        for (k = 0; k < j; k++)
-                            __MI_Instance_Delete(v.instancea.data[k]);
-
+                        __MI_Instance_Delete(tmpInst);
                         goto failed;
                     }
 
-                    v.instancea.data[j] = tmpInst;
+                    /* Get the target property type */
+                    {
+                        MI_PropertyDecl* pd = _LookupPropertyDecl(cd1, pd2->name);
+
+                        if (!pd)
+                        {
+                            r = MI_RESULT_NO_SUCH_PROPERTY;
+                            goto failed;
+                        }
+
+                        type = pd->type;
+                    }
+
+                    /* Reject if not instance or reference */
+
+                    switch (type)
+                    {
+                      case MI_INSTANCE:
+                      case MI_REFERENCE:
+                      {
+                          MI_Value v;
+                          v.instance = tmpInst;
+
+                          r = __MI_Instance_SetElement(
+                              self_,
+                              pd2->name,
+                              &v,
+                              type,
+                              MI_FLAG_ADOPT);
+
+                          break;
+                      }
+                      case MI_INSTANCEA:
+                      case MI_REFERENCEA:
+                      {
+                          MI_Value v;
+                          v.instancea.size = 1;
+                          v.instancea.data =
+                              BAlloc(batch, sizeof(void*), CALLSITE);
+
+                          if (!v.instancea.data)
+                          {
+                              __MI_Instance_Delete(tmpInst);
+                              r = MI_RESULT_FAILED;
+                              goto failed;
+                          }
+
+                          v.instancea.data[0] = tmpInst;
+
+                          r = __MI_Instance_SetElement(
+                              self_,
+                              pd2->name,
+                              &v,
+                              type,
+                              MI_FLAG_ADOPT);
+
+                          break;
+                      }
+                      default:
+                      {
+                          r = MI_RESULT_TYPE_MISMATCH;
+                          break;
+                      }
+                    }
+
+                    if (r != MI_RESULT_OK)
+                    {
+                        __MI_Instance_Delete(tmpInst);
+                        r = MI_RESULT_TYPE_MISMATCH;
+                        goto failed;
+                    }
                 }
-
-                /* Set the value */
-                r = __MI_Instance_SetElement(self_, pd2->name, &v, pd2->type,
-                    MI_FLAG_ADOPT);
-
-                /* Allow conversion from reference array to instance array */
-                if (r == MI_RESULT_TYPE_MISMATCH && pd2->type == MI_INSTANCEA)
+                else if (pd2->type == MI_INSTANCEA || pd2->type == MI_REFERENCEA)
                 {
-                    r = __MI_Instance_SetElement(self_, pd2->name, &v,
-                        MI_REFERENCEA, MI_FLAG_ADOPT);
-                }
+                    MI_Value v;
+                    MI_Uint32 j;
+                    MI_Boolean allowKeylessEmbedInst = (pd2->type == MI_INSTANCEA) ? MI_TRUE : MI_FALSE;
 
-                if (r != MI_RESULT_OK)
-                {
+                    v.instancea.size = ((MI_Value*)field)->instancea.size;
+                    if(v.instancea.size > MAX_ALLOWED_INSTANCES)
+                    {
+                        r = MI_RESULT_SERVER_LIMITS_EXCEEDED;
+                        goto failed;
+                    }
+
+                    v.instancea.data = BAlloc(batch,
+                        v.instancea.size * sizeof(void*), CALLSITE);
+
+                    if (!v.instancea.data)
+                    {
+                        r = MI_RESULT_SERVER_LIMITS_EXCEEDED;
+                        goto failed;
+                    }
+
                     for (j = 0; j < v.instancea.size; j++)
-                        __MI_Instance_Delete(v.instancea.data[j]);
+                    {
+                        MI_Instance* tmpInst;
+                        MI_ClassDecl* tmpCd;
 
-                    goto failed;
+                        /* Find the schema declaration */
+                        tmpCd = SchemaDecl_FindClassDecl(sd1, _SelfOf(((
+                            MI_Value*)field)->instancea.data[j])->classDecl->name);
+
+                        if (!tmpCd)
+                        {
+                            r = MI_RESULT_NO_SUCH_PROPERTY;
+                            goto failed;
+                        }
+
+                        /* Allocate the instance for the provider */
+                        r = Instance_New(&tmpInst, tmpCd, batch);
+                        if (r != MI_RESULT_OK)
+                        {
+                            goto failed;
+                        }
+
+                        r = Instance_InitConvert(tmpInst, tmpCd,
+                            ((MI_Value*)field)->instancea.data[j], keysOnly, allowKeylessEmbedInst, copy,
+                            ((Instance*)tmpInst)->batch, flags);
+
+                        if (r != MI_RESULT_OK)
+                        {
+                            MI_Uint32 k;
+
+                            for (k = 0; k < j; k++)
+                                __MI_Instance_Delete(v.instancea.data[k]);
+
+                            goto failed;
+                        }
+
+                        v.instancea.data[j] = tmpInst;
+                    }
+
+                    /* Set the value */
+                    r = __MI_Instance_SetElement(self_, pd2->name, &v, pd2->type,
+                        MI_FLAG_ADOPT);
+
+                    /* Allow conversion from reference array to instance array */
+                    if (r == MI_RESULT_TYPE_MISMATCH && pd2->type == MI_INSTANCEA)
+                    {
+                        r = __MI_Instance_SetElement(self_, pd2->name, &v,
+                            MI_REFERENCEA, MI_FLAG_ADOPT);
+                    }
+
+                    if (r != MI_RESULT_OK)
+                    {
+                        for (j = 0; j < v.instancea.size; j++)
+                            __MI_Instance_Delete(v.instancea.data[j]);
+
+                        goto failed;
+                    }
                 }
-            }
-            else
-            {
-                MI_Uint32 tmpFlags = copy ? 0 : MI_FLAG_BORROW;
-
-                /* Set the value */
-                r = __MI_Instance_SetElement(self_, pd2->name, (MI_Value*)field,
-                    pd2->type, tmpFlags);
-
-                if (r != MI_RESULT_OK)
+                else
                 {
-                    goto failed;
+                    MI_Uint32 tmpFlags = copy ? 0 : MI_FLAG_BORROW;
+
+                    /* Set the value */
+                    r = __MI_Instance_SetElement(self_, pd2->name, (MI_Value*)field,
+                        pd2->type, tmpFlags);
+
+                    if (r != MI_RESULT_OK)
+                    {
+                        goto failed;
+                    }
                 }
             }
         }
+    }
+    else
+    {
+        r = MI_RESULT_FAILED;
+        goto failed;
     }
 
 failed:
@@ -2082,8 +2090,10 @@ MI_Result MI_CALL __MI_Instance_GetClass(
     _Outptr_ MI_Class** instanceClass)
 {
     Instance* self = _SelfOf(self_);
-
-    return Class_New(self->classDecl, self->nameSpace, self->serverName, instanceClass);
+    if(self)
+        return Class_New(self->classDecl, self->nameSpace, self->serverName, instanceClass);
+    else
+        MI_RETURN(MI_RESULT_FAILED);
 }
 
 MI_Result MI_CALL MI_Instance_GetClassExt(
@@ -2158,23 +2168,30 @@ MI_Result Instance_SetElementArrayItem(
     MI_Value value)
 {
     Instance* self = _SelfOf(self_);
-    MI_ArrayField *fieldValue;
-    MI_Type type;
-    MI_Result result;
+    if(self)
+    {
+        MI_ArrayField *fieldValue;
+        MI_Type type;
+        MI_Result result;
 
-    type = (MI_Type)(self->classDecl->properties[elementId]->type & ~16); //Remove array part of type;
+        type = (MI_Type)(self->classDecl->properties[elementId]->type & ~16); //Remove array part of type;
 
-    fieldValue = (MI_ArrayField*)((char*)self + self->classDecl->properties[elementId]->offset);
+        fieldValue = (MI_ArrayField*)((char*)self + self->classDecl->properties[elementId]->offset);
 
-    result = Class_Clone_ArrayValue(self->batch, type, fieldValue->value.data, fieldValue->value.size, &value);
-    if (result != MI_RESULT_OK)
-        return result;
+        result = Class_Clone_ArrayValue(self->batch, type, fieldValue->value.data, fieldValue->value.size, &value);
+        if (result != MI_RESULT_OK)
+            return result;
 
-    //Bump how many array items we have in value
-    fieldValue->value.size++;
-    fieldValue->exists = MI_TRUE;
+        //Bump how many array items we have in value
+        fieldValue->value.size++;
+        fieldValue->exists = MI_TRUE;
 
-    return MI_RESULT_OK;
+        return MI_RESULT_OK;
+    }
+    else
+    {
+        return MI_RESULT_FAILED;
+    }
 }
 
 MI_Boolean Instance_IsDynamic(

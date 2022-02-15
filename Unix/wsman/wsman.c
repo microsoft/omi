@@ -852,6 +852,8 @@ static void _SendCimFaultResponse(
         selfCD->wsheader.rqtMessageID,
         message);
 
+    if ( NULL == responsePage ) return;
+
     if( NULL == sendOnECStrand )
     {
         STRAND_ASSERTONSTRAND(&selfCD->strand.base);
@@ -904,6 +906,8 @@ static void _CD_SendReleaseResponse(
 {
     Page* responsePage = WSBuf_CreateReleaseResponsePage(
         selfCD->wsheader.rqtMessageID);
+
+    if ( NULL == responsePage ) return;
 
     STRAND_ASSERTONSTRAND(&selfCD->strand.base);
 

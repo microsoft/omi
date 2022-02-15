@@ -945,6 +945,7 @@ static gss_buffer_t _getPrincipalName(gss_ctx_id_t pContext)
     OM_uint32 min_status;
     gss_buffer_t buff = PAL_Malloc(sizeof(gss_buffer_desc));
 
+    if(!buff) goto Done;
     memset(buff, 0, sizeof(gss_buffer_desc));
 
     maj_status = (*_g_gssState.Gss_Inquire_Context)(&min_status, pContext, &srcName,
@@ -1545,10 +1546,12 @@ static char *_BuildAuthResponse(_In_ const char *pProtocol,
             *pResultLen = HEADER_SERVER_ERROR_LEN;
 
             char *pdata = PAL_Malloc(*pResultLen + 1);
+
+            if (!pdata) return NULL;
             memcpy(pdata, HEADER_SERVER_ERROR, *pResultLen);
             pdata[*pResultLen] = '\0';
 
-            header_tail_len  = HEADER_TAIL_LEN;
+            header_tail_len = HEADER_TAIL_LEN;
             return pdata;
         }
         break;

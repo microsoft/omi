@@ -614,11 +614,20 @@ MI_Result InstanceToBatch(
     }
 
     page = Buf_StealPage(&buf);
-    page->u.s.size = buf.size;
 
-    Batch_AttachPage(batch, page);
+    if (page)
+    {
+        page->u.s.size = buf.size;
 
-    *ptrOut = page + 1;
-    *sizeOut = (MI_Uint32)page->u.s.size;
-    return MI_RESULT_OK;
+        Batch_AttachPage(batch, page);
+
+        *ptrOut = page + 1;
+        *sizeOut = (MI_Uint32)page->u.s.size;
+        return MI_RESULT_OK;
+    }
+    else
+    {
+        Buf_Destroy(&buf);
+        return MI_RESULT_FAILED;
+    }
 }

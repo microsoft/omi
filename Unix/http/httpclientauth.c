@@ -2239,6 +2239,7 @@ HttpClient_NextAuthRequest(_In_ struct _HttpClient_SR_SocketData * self, _In_ co
         /* create header page */
 
         char *request_header = PAL_Malloc(POST_HEADER_LEN+header_len+5+strlen(self->hostHeader));
+        if (!request_header) return PRT_RETURN_FALSE;
         char *requestp = request_header;
 
         memcpy(requestp, POST_HEADER, POST_HEADER_LEN);
