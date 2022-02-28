@@ -2695,7 +2695,7 @@ MI_Result HttpClient_New_Connector2(
     char *user_domain = NULL;
     char *password    = NULL;
     MI_Uint32 password_len = 0;
-    SSL_Options sslOptions;
+    SSL_Options sslOptions = 0;
 
     static const Probable_Cause_Data CONNECT_ERROR = {
                      ERROR_WSMAN_DESTINATION_UNREACHABLE,
