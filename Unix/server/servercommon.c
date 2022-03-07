@@ -1406,7 +1406,7 @@ MI_Result RunProtocol()
 
     MI_Result r = MI_RESULT_OK;
     const PAL_Uint64 ONE_SECOND_USEC = 1000 * 1000;
-    PAL_Uint64 start;
+    PAL_Uint64 start = 0;
     PAL_Uint64 finish;
 
     PAL_Time(&start);

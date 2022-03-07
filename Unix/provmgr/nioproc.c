@@ -55,7 +55,7 @@ static void RequestHandler_Shutdown(RequestHandler* handler)
     // wait for unsubscribe thread to exit
     Thread unsubThread;
     ptrdiff_t joined = THREAD_NOT_JOINED;
-    PAL_Uint32 ret;
+    PAL_Uint32 ret = 0;
     Lock_Acquire( &handler->lock );
     if ( handler->running == THREAD_RUNNING )
     {

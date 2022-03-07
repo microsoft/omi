@@ -1682,7 +1682,14 @@ static MI_Result Invoke(MI_Session *miSession, int argc, const MI_Char* argv[])
     if (p != end)
     {
         const MI_Char *className;
-        __MI_Instance_GetClassName(instance, &className);
+        MI_Result getClassNameResult =__MI_Instance_GetClassName(instance, &className);
+        if(getClassNameResult != MI_RESULT_OK)
+        {
+            err(PAL_T("invalid class name specification"));
+            MI_Instance_Delete(instance);
+            return getClassNameResult;
+        }
+
         if (!ArgsToInstance(&p, end, MI_FLAG_METHOD, MI_TRUE, className, &inParams))
         {
             err(PAL_T("invalid instance name specification"));
