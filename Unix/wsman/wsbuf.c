@@ -2302,7 +2302,7 @@ MI_Result WSBuf_InstanceToBuf(
 }
 
 _Use_decl_annotations_
-void WSBuf_GenerateMessageID(
+MI_Result WSBuf_GenerateMessageID(
     ZChar msgID[WS_MSG_ID_SIZE])
 {
     //WS-Management qualifies the use of wsa:MessageID and wsa:RelatesTo as follows:
@@ -2339,7 +2339,10 @@ void WSBuf_GenerateMessageID(
     static MI_Uint64  s1, s2;
 
     if (!s1)
-        PAL_Time(&s1);
+    {
+       PAL_Boolean timeRet = PAL_Time(&s1);
+       if(timeRet == PAL_FALSE) return MI_RESULT_FAILED;
+    }
 
     s2++;
 
@@ -2355,6 +2358,8 @@ void WSBuf_GenerateMessageID(
         (MI_Uint32)((s2 >> 48)& 0xFFFF),
         (MI_Uint32)(s2 & 0xFFFFFFFF),
         (MI_Uint32)((s2 >> 32)& 0xFFFF));
+
+    return MI_RESULT_OK;
 }
 
 MI_Result WSBuf_CreateSoapResponseHeader(
@@ -2397,7 +2402,8 @@ MI_Result WSBuf_CreateSoapResponseHeader(
         goto failed;
 
     /* Generate new uniqueue msg id */
-    WSBuf_GenerateMessageID(msgID);
+    if(MI_RESULT_OK != WSBuf_GenerateMessageID(msgID))
+        goto failed;
 
     if (MI_RESULT_OK != WSBuf_AddLit(buf, msgID, WS_MSG_ID_SIZE - 1))
         goto failed;
