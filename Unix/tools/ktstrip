@@ -47,7 +47,9 @@ fi
 list=$(mktemp)
 delete_list=$(mktemp)
 cmd=$(mktemp)
-tmp_kt="/tmp/tmp.kt"
+# Generate random string.
+rand_str=`cat /dev/urandom | tr -cd 'a-zA-Z0-9' | head -c 10`
+tmp_kt="/tmp/tmp.$rand_str"
 
 # clean temp files
 CleanTempFiles()
@@ -86,11 +88,21 @@ cat $list | awk '/^[ ]*[0-9]/{ print " "$1" " $2" "$3 }' | awk '{ if ( $3 !~ /ho
 
 # Build the final command file adding commands at the front and back
 printf "read_kt $SRC_KT \n" | cat - $delete_list >$cmd
-printf "write_kt $tmp_kt\n"   >>$cmd
+printf "write_kt $tmp_kt\nquit\n"   >>$cmd
 
 # The command file will now ready to delete all unneeded entries.
 printf "Creating $DST_KT\n"
 cat $cmd | ktutil
+
+# Make sure tmp_kt keytab content is valid.
+klist -k $tmp_kt >/dev/null 2>&1
+if  [ $? -ne 0 ]
+then
+   echo "The keytab $tmp_kt is invalid." 2>&1
+   CleanTempFiles
+   rm -f $tmp_kt
+   exit 1
+fi
 
 CleanTempFiles
 
