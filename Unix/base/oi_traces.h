@@ -439,10 +439,8 @@ OI_EVENT("Password exceeds reasonable limit: %d")
 void trace_Password_Error(unsigned int bytes);
 OI_EVENT("Invalid server credentials")
 void trace_InvalidServerCredentials();
-OI_EVENT("Attempt to reset secret string")
-void trace_AttemptToResetSecretString();
-
-
+OI_EVENT("(%c) A malicious attempt is detected. tag:(%d) name:(%T)")
+void trace_MaliciousAttemptDetected(char type, MI_Uint32 msgTag, const TChar * messageName);
 
 /******************************** WARNINGS ***********************************/
 
@@ -1837,8 +1835,8 @@ OI_EVENT("Engine: Client Credentials Verified (%p)")
 void trace_ClientCredentialsVerfied(void* handle);
 OI_EVENT("Client: Client Credentials Verified")
 void trace_ClientCredentialsVerfied2();
-OI_EVENT("(%c)Handle:(%p), ClientAuthState = %d, EngineAuthState = %d")
-void trace_AuthStates(char type, void* handle, int client, int engine);
+OI_EVENT("(%c)Handle:(%p), ClientAuthState = %d, ServerAuthState = %d")
+void trace_AuthStates(char type, void* handle, int client, int server);
 OI_EVENT("Asking Server to PAM authenticate")
 void trace_AskServerToAuthenticate();
 OI_EVENT("AgentMgr_PreExec_RequestStrand_Post: preexecContext (%p), strand (%p)")
@@ -1865,8 +1863,6 @@ OI_EVENT("AgentMgr_PreExec_ResponseStrand_Close: preexecContext (%p), strand (%p
 void trace_AgentMgr_PreExec_ResponseStrand_Close(void* context, void* strand);
 OI_EVENT("AgentMgr_PreExec_ResponseStrand_Finish: preexecContext (%p), strand (%p)")
 void trace_AgentMgr_PreExec_ResponseStrand_Finish(void* context, void* strand);
-OI_EVENT("Server credentials verified (%p)")
-void trace_ServerCredentialsVerified(void* handle);
 
 /******************************** AUTH TRACES ***********************************/
 

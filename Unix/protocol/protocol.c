@@ -61,7 +61,6 @@
 static const MI_Uint32 _MAGIC = 0xC764445E;
 static ProtocolSocket *s_permanentSocket = NULL;
 static char s_socketFile[PAL_MAX_PATH_SIZE];
-static char s_secretString[S_SECRET_STRING_LENGTH];
 static HashMap s_protocolSocketTracker;
 static Lock s_trackerLock;
 static MI_Result (*authenticateCallback)(PamCheckUserResp*);
@@ -674,7 +673,6 @@ static MI_Boolean _SendAuthResponse(
     gid_t gid
     )
 {
-    ProtocolBase* protocolBase = (ProtocolBase*)h->base.data;
     BinProtocolNotification* req;
     MI_Boolean retVal = MI_TRUE;
 
@@ -696,15 +694,6 @@ static MI_Boolean _SendAuthResponse(
         }
     }
 
-    if (protocolBase->expectedSecretString && *protocolBase->expectedSecretString)
-    {
-        req->message = Batch_Strdup(req->base.batch, protocolBase->expectedSecretString);
-        if (!req->message)
-        {
-            BinProtocolNotification_Release(req);
-            return MI_FALSE;
-        }
-    }
 
     req->uid = uid;
     req->gid = gid;
@@ -1050,14 +1039,12 @@ MI_Boolean SendSocketFileRequest(
 
 MI_Boolean SendSocketFileResponse(
     ProtocolSocket* h,
-    const char *socketFile,
-    const char *expectedSecretString)
+    const char *socketFile)
 {
     PostSocketFile* req;
     MI_Boolean retVal = MI_TRUE;
 
     DEBUG_ASSERT(socketFile);
-    DEBUG_ASSERT(expectedSecretString);
 
     s_permanentSocket = h;
     s_type = 'S';
@@ -1076,14 +1063,6 @@ MI_Boolean SendSocketFileResponse(
         }
     }
 
-    {
-        req->secretString = Batch_Strdup(req->base.batch, expectedSecretString);
-        if (!req->secretString)
-        {
-            PostSocketFile_Release(req);
-            return MI_FALSE;
-        }
-    }
 
     /* send message */
     {
@@ -1115,7 +1094,7 @@ static MI_Boolean _ProcessEngineAuthMessage(
     /* server waiting engine's request */
     if (PostSocketFileRequest == sockMsg->type)
     {
-        if (!SendSocketFileResponse(handler, protocolBase->socketFile, protocolBase->expectedSecretString))
+        if (!SendSocketFileResponse(handler, protocolBase->socketFile))
             return MI_FALSE;
 
         return MI_TRUE;
@@ -1124,68 +1103,14 @@ static MI_Boolean _ProcessEngineAuthMessage(
     /* engine waiting for server's response */
     if (PostSocketFileResponse == sockMsg->type)
     {
-        // secret string is mandatory and can be set only during engine start-up
-        if( (sockMsg->secretString == NULL) || 
-            (*s_secretString && Strncmp(sockMsg->secretString, s_secretString, S_SECRET_STRING_LENGTH) != 0) )
-        {
-            trace_AttemptToResetSecretString();
-            return MI_FALSE;
-        }
-
         DEBUG_ASSERT(sockMsg->sockFilePath);
-        DEBUG_ASSERT(sockMsg->secretString);
-
         Strlcpy(s_socketFile, sockMsg->sockFilePath, PAL_MAX_PATH_SIZE);
-        Strlcpy(s_secretString, sockMsg->secretString, S_SECRET_STRING_LENGTH);
         trace_ServerInfoReceived();
 
         return MI_TRUE;
     }
 
     return MI_FALSE;
-}
-
-/* Creates and sends socket maintenance message */
-static MI_Boolean _SendVerifySocketConnMsg(
-    ProtocolSocket* h,
-    VerifySocketConnType type,
-    const char* message,
-    Sock s)
-{
-    VerifySocketConn* req;
-    MI_Boolean retVal = MI_TRUE;
-
-    req = VerifySocketConn_New(type);
-
-    if (!req)
-        return MI_FALSE;
-
-    req->sock = s;
-
-    if (message && *message)
-    {
-        req->message = Batch_Strdup(req->base.batch, message);
-        if (!req->message)
-        {
-            VerifySocketConn_Release(req);
-            return MI_FALSE;
-        }
-    }
-
-    /* send message */
-    {
-        DEBUG_ASSERT(h->message == NULL);
-        h->message = (Message*) req;
-
-        Message_AddRef(&req->base);
-
-        _PrepareMessageForSending(h);
-        retVal = _RequestCallbackWrite(h);
-    }
-
-    VerifySocketConn_Release(req);
-
-    return retVal;
 }
 
 static MI_Boolean _SendCreateAgentMsg(
@@ -1424,7 +1349,6 @@ static MI_Boolean _SendPamCheckUserResp(
     MI_Boolean result
     )
 {
-    ProtocolBase* protocolBase = (ProtocolBase*)h->base.data;
     PamCheckUserResp *req = NULL;
     MI_Boolean retVal = MI_TRUE;
 
@@ -1437,15 +1361,6 @@ static MI_Boolean _SendPamCheckUserResp(
     req->handle = handle;
     req->result = result;
 
-    if (protocolBase->expectedSecretString && *protocolBase->expectedSecretString)
-    {
-        req->message = Batch_Strdup(req->base.batch, protocolBase->expectedSecretString);
-        if (!req->message)
-        {
-            PamCheckUserResp_Release(req);
-            return MI_FALSE;
-        }
-    }
 
     /* send message */
     {
@@ -1503,18 +1418,6 @@ static MI_Boolean _ProcessPamCheckUserResp(
     pamMsg = (PamCheckUserResp*) msg;
 
     // server authentication check
-    if ( (pamMsg->message != NULL) && (*s_secretString) && (Strncmp(pamMsg->message, s_secretString, S_SECRET_STRING_LENGTH) == 0) )
-    {
-        trace_ServerCredentialsVerified(handler);
-    }
-    else
-    {
-        trace_InvalidServerCredentials();
-        return MI_FALSE;
-    }
-    
-    pamMsg->message = NULL;
-
     /* engine waiting server's response */
 
     result = authenticateCallback(pamMsg);
@@ -1663,47 +1566,6 @@ static MI_Boolean _ProcessExecPreexecResp(
 }
 #endif
 
-static MI_Boolean _ProcessVerifySocketConnMessage(
-    ProtocolSocket* handler,
-    Message *msg)
-{
-    ProtocolBase* protocolBase = (ProtocolBase*)handler->base.data;
-    VerifySocketConn* sockMsg;
-
-    if (msg->tag != VerifySocketConnTag)
-        return MI_FALSE;
-
-    sockMsg = (VerifySocketConn*) msg;
-
-    /* server waiting engine's request */
-    if (VerifySocketConnStartup == sockMsg->type)
-    {
-        DEBUG_ASSERT(handler->engineAuthState == PRT_AUTH_WAIT_CONNECTION_REQUEST);
-        if (Strncmp(sockMsg->message, protocolBase->expectedSecretString, S_SECRET_STRING_LENGTH) == 0)
-        {
-            trace_EngineCredentialsVerified(handler);
-            handler->engineAuthState = PRT_AUTH_OK;
-        }
-        else
-        {
-            trace_InvalidEngineCredentials();
-            _SendVerifySocketConnMsg(handler, VerifySocketConnShutdown, "Invalid secret string received", sockMsg->sock);
-
-            _ProtocolSocket_Cleanup(handler);
-        }
-        return MI_TRUE;
-    }
-
-    /* engine waiting for closing request from server*/
-    if (VerifySocketConnShutdown == sockMsg->type)
-    {
-        handler->base.sock = sockMsg->sock;
-        _ProtocolSocket_Cleanup(handler);
-        return MI_TRUE;
-    }
-
-    return MI_FALSE;
-}
 
 static void _PrepareMessageForSending(
     ProtocolSocket *handler)
@@ -1872,6 +1734,57 @@ static MI_Result _CreateConnector(
     return Sock_CreateIPConnector(s, locator);
 }
 
+static MI_Boolean _VerifyMessage(
+    ProtocolSocket* handler,  
+    Message* msg)
+{
+    if(msg->tag == PostSocketFileTag)
+    {
+        PostSocketFile* sockMsg = (PostSocketFile*) msg;
+
+        // s_type is not yet set for server during this check
+        if(sockMsg->type == PostSocketFileRequest)
+            return s_type != 'E';  
+
+        else if(sockMsg->type == PostSocketFileResponse)
+            return s_type == 'E' && handler->serverAuthState == PRT_AUTH_OK;
+
+        else
+            return MI_FALSE;
+    }
+    else if(msg->tag == CreateAgentMsgTag)
+    {
+        CreateAgentMsg* agentMsg = (CreateAgentMsg*) msg;
+
+        if(agentMsg->type == CreateAgentMsgRequest)
+            return s_type == 'S';
+
+        else if(agentMsg->type == CreateAgentMsgResponse)
+            return s_type == 'E' && handler->serverAuthState == PRT_AUTH_OK;
+
+        else
+            return MI_FALSE;
+    }
+    else if (msg->tag == BinProtocolNotificationTag)
+    {
+        BinProtocolNotification* binMsg = (BinProtocolNotification*) msg; 
+
+        if(binMsg->type == BinNotificationConnectResponse)
+            return (s_type == 'U') || (s_type == 'E' && handler->serverAuthState == PRT_AUTH_OK);
+    }
+    else if (msg->tag == PamCheckUserReqTag)
+        return s_type == 'S';
+
+    else if (msg->tag == PamCheckUserRespTag)
+        return s_type == 'E' && handler->serverAuthState == PRT_AUTH_OK;
+    
+    #if defined(CONFIG_ENABLE_PREEXEC)
+    else if (msg->tag == ExecPreexecRespTag)
+        return s_type == 'E' && handler->serverAuthState == PRT_AUTH_OK;  
+    #endif /* CONFIG_ENABLE_PREEXEC */
+    
+    return MI_TRUE;
+}
 /*
     Processes incoming message, including:
         - decoding message from batch
@@ -1921,17 +1834,16 @@ static Protocol_CallbackResult _ProcessReceivedMessage(
             MessageName(msg->tag),
             msg->operationId );
 
-        trace_AuthStates(s_type, handler, handler->clientAuthState, handler->engineAuthState);
+        trace_AuthStates(s_type, handler, handler->clientAuthState, handler->serverAuthState);
+
+        if( !_VerifyMessage(handler,msg) ){
+            trace_MaliciousAttemptDetected(s_type, msg->tag, MessageName(msg->tag) );
+            return PRT_RETURN_FALSE;
+        }
 
         if (msg->tag == PostSocketFileTag)
         {
             if( _ProcessEngineAuthMessage(handler, msg) )
-                ret = PRT_CONTINUE;
-        }
-        else if (msg->tag == VerifySocketConnTag)
-        {
-            trace_ServerEstablishingSocket(handler, handler->base.sock);
-            if( _ProcessVerifySocketConnMessage(handler, msg) )
                 ret = PRT_CONTINUE;
         }
         else if (msg->tag == CreateAgentMsgTag)
@@ -1958,19 +1870,6 @@ static Protocol_CallbackResult _ProcessReceivedMessage(
                 ret = PRT_CONTINUE;
         }
 #endif /* CONFIG_ENABLE_PREEXEC */
-        else if (PRT_AUTH_OK != handler->engineAuthState)
-        {
-            trace_EngineCredentialsNotReceived();
-            if (msg->tag == BinProtocolNotificationTag)
-            {
-                BinProtocolNotification* binMsg = (BinProtocolNotification*) msg;
-                
-                _SendVerifySocketConnMsg(handler, VerifySocketConnShutdown, "Engine credentials not received", binMsg->forwardSock);
-
-                _ProtocolSocket_Cleanup(handler);
-                return PRT_RETURN_FALSE;
-            }
-        }
         else if (msg->tag == BinProtocolNotificationTag && PRT_AUTH_OK != handler->clientAuthState)
         {
             if (protocolBase->forwardRequests == MI_TRUE)
@@ -1995,7 +1894,6 @@ static Protocol_CallbackResult _ProcessReceivedMessage(
                     }
 
                     DEBUG_ASSERT(*s_socketFile);
-                    DEBUG_ASSERT(*s_secretString);
 
                     /* If system supports connection-based auth, use it for
                        implicit auth */
@@ -2032,7 +1930,10 @@ static Protocol_CallbackResult _ProcessReceivedMessage(
 
                         handler->engineHandler = &newSocketAndBase->protocolSocket.base;
                         handler->clientAuthState = PRT_AUTH_WAIT_CONNECTION_RESPONSE;
+                        
                         handler = &newSocketAndBase->protocolSocket;
+                        handler->serverAuthState = PRT_AUTH_OK; 
+                        
                         newSocketAndBase->internalProtocolBase.forwardRequests = MI_TRUE;
 
                         // Note that we are storing (socket, ProtocolSocketAndBase*) here
@@ -2054,17 +1955,6 @@ static Protocol_CallbackResult _ProcessReceivedMessage(
                 }
                 else if (binMsg->type == BinNotificationConnectResponse)
                 {
-                    // server authentication check
-                    if ( (binMsg->message != NULL) && (*s_secretString) && (Strncmp(binMsg->message, s_secretString, S_SECRET_STRING_LENGTH) == 0) )
-                    {
-                        trace_ServerCredentialsVerified(handler);
-                    }
-                    else
-                    {
-                        trace_InvalidServerCredentials();
-                        return PRT_RETURN_FALSE;
-                    }
-                    binMsg->message = NULL;
 
                     // forward to client
 
@@ -2750,8 +2640,7 @@ ProtocolSocket* _ProtocolSocket_Server_New(
         self->base.handlerName = MI_T("BINARY_SERVER_CONNECTION");
 
         /* waiting for connect-request */
-        self->clientAuthState = PRT_AUTH_WAIT_CONNECTION_REQUEST;
-        self->engineAuthState = (protocolBase->expectedSecretString == NULL) ? PRT_AUTH_OK : PRT_AUTH_WAIT_CONNECTION_REQUEST;
+        self->clientAuthState = PRT_AUTH_WAIT_CONNECTION_REQUEST;         
     }
 
     return self;
@@ -2841,7 +2730,6 @@ MI_Result ProtocolSocketAndBase_New_Connector(
         h->base.mask = SELECTOR_READ | SELECTOR_WRITE | SELECTOR_EXCEPTION;
         h->base.handlerName = MI_T("BINARY_CONNECTOR");
         h->clientAuthState = PRT_AUTH_WAIT_CONNECTION_RESPONSE;
-        h->engineAuthState = PRT_AUTH_OK;
 
         /* send connect request */
         if( !_SendAuthRequest(h, user, password, NULL, INVALID_SOCK, INVALID_ID, INVALID_ID) )
@@ -2928,8 +2816,6 @@ MI_Result _ProtocolSocketAndBase_New_From_Socket(
         /* skip authentication for established connections
             (only used in server/agent communication) */
         h->clientAuthState = PRT_AUTH_OK;
-
-        h->engineAuthState = PRT_AUTH_OK;
 
         r = _AddProtocolSocket_Handler(self->internalProtocolBase.selector, h);
 
@@ -3132,7 +3018,6 @@ static MI_Result _ProtocolSocketAndBase_New_Server_Connection(
     h->base.mask = SELECTOR_READ | SELECTOR_WRITE | SELECTOR_EXCEPTION;
     h->base.callback = _RequestCallback;
     h->clientAuthState = PRT_AUTH_OK;
-    h->engineAuthState = PRT_AUTH_OK;
 
     r = _AddProtocolSocket_Handler(selector, h);
 
@@ -3140,12 +3025,6 @@ static MI_Result _ProtocolSocketAndBase_New_Server_Connection(
     {
         Sock_Close(*s);
         return r;
-    }
-
-    if (!_SendVerifySocketConnMsg(h, VerifySocketConnStartup, s_secretString, INVALID_SOCK))
-    {
-        Selector_RemoveHandler(selector, &h->base);
-        return MI_RESULT_FAILED;
     }
 
     return MI_RESULT_OK;

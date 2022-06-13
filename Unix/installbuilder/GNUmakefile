@@ -70,11 +70,17 @@ else
   WITH_SYMBOLS=withsymbols
 endif
 
+ifeq ($(ENABLE_SECURITY_HARDENING),1)
+  SECURITY_FLAG=.s
+else
+  SECURITY_FLAG=
+endif
+
 # New output format for OMI on Linux (avoids ugly renaming since we always build universal)
 ifeq ($(PF),Linux)
   BUILD_SEMODULE = 1
   ifneq ($(PF_ARCH),ppc)
-    OUTPUTFILE_LINE = --OUTPUTFILE=omi-$(CONFIG_VERSION)-$(CONFIG_PATCH_LEVEL).$(PACKAGE_SSL_DECORATION).ulinux.$(PF_ARCH)
+    OUTPUTFILE_LINE = --OUTPUTFILE=omi-$(CONFIG_VERSION)-$(CONFIG_PATCH_LEVEL).$(PACKAGE_SSL_DECORATION).ulinux$(SECURITY_FLAG).$(PF_ARCH)
     OUTPUTFILE_LINE_WITHSYMBOLS = $(OUTPUTFILE_LINE).$(WITH_SYMBOLS)
   else
     ifeq ($(PF_DISTRO),SUSE)

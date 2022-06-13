@@ -4,10 +4,8 @@ LABEL maintainer="Jumping Yang <yzpcreate@qq.com>"
 LABEL readme.md="https://github.com/Microsoft/omi/blob/master/docker/README.md"
 LABEL description="This Dockerfile will install the latest release of OMI."
 
-ARG rootpassword=newpassword
 
 SHELL ["/bin/bash", "-c"] 
-RUN echo root:$rootpassword | chpasswd
 RUN apt-get update -y
 RUN apt-get install -y pkg-config rpm librpm-dev libpam0g-dev libssl-dev libkrb5-dev wget openssl;
 RUN wget http://packages.microsoft.com/config/ubuntu/14.04/packages-microsoft-prod.deb

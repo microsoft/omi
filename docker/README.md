@@ -20,9 +20,9 @@ and finally install the omi package from Microsoft Repo, the command to build ni
 ```
 git clone https://github.com/Microsoft/omi
 cd omi/docker
-docker build --build-arg rootpassword=newpassword -t "microsoft/omi:ubuntu16.04" release/ubuntu16.04/
-docker build --build-arg rootpassword=newpassword -t "microsoft/omi:ubuntu14.04" release/ubuntu14.04/
-docker build --build-arg rootpassword=newpassword -t "microsoft/omi:centos7" release/centos7/
+docker build -t "microsoft/omi:ubuntu16.04" release/ubuntu16.04/
+docker build -t "microsoft/omi:ubuntu14.04" release/ubuntu14.04/
+docker build -t "microsoft/omi:centos7" release/centos7/
 ```
 
 Build Nightly OMI docker
@@ -49,9 +49,6 @@ Variable following with --build-arg:
 
 * `branch`: the branch to checkout in nightly builds (default: `master`)
   * Set `branch=feature-A` after --build-arg to checkout the `feature-A` branch
-  
-* `rootpassword`: container's root password to be set in nightly or release builds (default: `newpassword`)
-  * Set `rootpassword=Pa$$word` after --build-arg to set `Pa$$word` as container's root password
 
 Variable following with -t:
 * `microsoft/omi:ubuntu16.04`: the image tag you want to build out for the omi docker

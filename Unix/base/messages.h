@@ -1191,7 +1191,6 @@ typedef struct _BinProtocolNotification
 
     /* if in nonroot mode, keeps track of which socket to send message back*/
     int             forwardSock;
-    MI_ConstString  message;
 }
 BinProtocolNotification;
 
@@ -1652,7 +1651,6 @@ typedef struct _PostSocketFile
     Message         base;
     MI_Uint32       type;
     MI_ConstString  sockFilePath;
-    MI_ConstString  secretString;
 }
 PostSocketFile;
 
@@ -1800,7 +1798,6 @@ typedef struct _PamCheckUserResp
     Message         base;
     MI_Uint64       handle;
     MI_Boolean      result;
-    MI_ConstString  message;
 }
 PamCheckUserResp;
 

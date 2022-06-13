@@ -46,7 +46,7 @@ OPTIONS:\n\
     --service ACCT              Use ACCT as the service account.\n\
 \n");
 
-static int _StartEngine(int argc, char** argv, char ** envp, const char *engineSockFile, const char *secretString)
+static int _StartEngine(int argc, char** argv, char ** envp, const char *engineSockFile)
 {
     Sock s[2];
     char engineFile[PAL_MAX_PATH_SIZE];
@@ -63,7 +63,7 @@ static int _StartEngine(int argc, char** argv, char ** envp, const char *engineS
     Strlcat(engineFile, "/omiengine", PAL_MAX_PATH_SIZE);
     argv[0] = engineFile;
 
-    r = BinaryProtocolListenFile(engineSockFile, &s_data.mux[0], &s_data.protocol0, secretString);
+    r = BinaryProtocolListenFile(engineSockFile, &s_data.mux[0], &s_data.protocol0);
     if (r != MI_RESULT_OK)
     {
         return -1;
@@ -101,8 +101,7 @@ static int _StartEngine(int argc, char** argv, char ** envp, const char *engineS
         trace_ServerClosingSocket(0, s[1]);
         Sock_Close(s[1]);
         s_data.internalSock = s[0];
-
-        r = BinaryProtocolListenSock(s[0], &s_data.mux[1], &s_data.protocol1, engineSockFile, secretString);
+        r = BinaryProtocolListenSock(s[0], &s_data.mux[1], &s_data.protocol1, engineSockFile);
         if (r != MI_RESULT_OK)
         {
             return -1;
@@ -322,8 +321,8 @@ err:
     return NULL;
 }
 
-
-static int _CreateSockFile(char *sockFileBuf, int sockFileBufSize, char *secretStringBuf, int secretStringBufSize)
+// find all caller to this function
+static int _CreateSockFile(char *sockFileBuf, int sockFileBufSize)
 {
     char sockDir[PAL_MAX_PATH_SIZE];
     char file[PAL_MAX_PATH_SIZE];
@@ -359,12 +358,6 @@ static int _CreateSockFile(char *sockFileBuf, int sockFileBufSize, char *secretS
     {
         trace_Failed_Generate_Socket_File_Name();
         err(PAL_T("Unable to generate socket file name"));
-    }
-
-    if ( GenerateRandomString(secretStringBuf, secretStringBufSize) != 0)
-    {
-        trace_Failed_Generate_Secret_String();
-        err(PAL_T("Unable to generate secretString"));
     }
 
     Strlcpy(sockFileBuf, sockDir, sockFileBufSize);
@@ -480,7 +473,6 @@ int servermain(int argc, const char* argv[], const char *envp[])
     char **engine_argv = NULL;
     char **engine_envp = NULL;
     char socketFile[PAL_MAX_PATH_SIZE];
-    char secretString[S_SECRET_STRING_LENGTH];
     const char* arg0 = argv[0];
     MI_Result result;    
     int r;
@@ -611,13 +603,13 @@ int servermain(int argc, const char* argv[], const char *envp[])
 
         if (s_opts.nonRoot == MI_TRUE)
         {
-            r = _CreateSockFile(socketFile, PAL_MAX_PATH_SIZE, secretString, S_SECRET_STRING_LENGTH);
+            r = _CreateSockFile(socketFile, PAL_MAX_PATH_SIZE);
             if (r != 0)
             {
                 err(ZT("failed to create socket file"));
             }
 
-            r = _StartEngine(engine_argc, engine_argv, engine_envp, socketFile, secretString);
+            r = _StartEngine(engine_argc, engine_argv, engine_envp, socketFile);
             if (r != 0)
             {
                 err(ZT("failed to start omi engine"));
@@ -631,7 +623,7 @@ int servermain(int argc, const char* argv[], const char *envp[])
                 err(ZT("Failed to initialize Wsman"));
             }
 
-            result = BinaryProtocolListenFile(OMI_GetPath(ID_SOCKETFILE), &s_data.mux[0], &s_data.protocol0, NULL);
+            result = BinaryProtocolListenFile(OMI_GetPath(ID_SOCKETFILE), &s_data.mux[0], &s_data.protocol0);
             if (result != MI_RESULT_OK)
             {
                 err(ZT("Failed to initialize binary protocol for socket file"));

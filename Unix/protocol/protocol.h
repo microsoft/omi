@@ -72,7 +72,6 @@ typedef struct _ProtocolBase
     /* Indicates whether instance has to be upacked or stored as byte array */
     MI_Boolean          skipInstanceUnpack;
     MI_Boolean          forwardRequests;       // true if in nonroot mode and msg should be forwarded
-    const char*         expectedSecretString;          
     const char*         socketFile;          
 }
 ProtocolBase;
@@ -103,8 +102,10 @@ typedef struct _ProtocolSocket
 
     /* Client auth state */
     Protocol_AuthState  clientAuthState;
-    /* Engine auth state */
-    Protocol_AuthState  engineAuthState;
+    /* Server auth state 
+       maintained for connection between engine and server
+       PRT_AUTH_OK for engine's endpoint if verified connection with server*/
+    Protocol_AuthState  serverAuthState;
     /* server side - auhtenticated user's ids */
     AuthInfo            authInfo;
     Protocol_AuthData*  authData;
@@ -196,8 +197,7 @@ MI_Boolean SendSocketFileRequest(
 
 MI_Boolean SendSocketFileResponse(
     ProtocolSocket* h,
-    const char *socketFile,
-    const char *expectedSecretString);
+    const char *socketFile);
 
 MI_Boolean SendExecutePreexecRequest(
     void *contextp, 

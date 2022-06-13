@@ -65,6 +65,8 @@ NitsSetup(TestAuthSetup)
 {
     EnterStrandState strandEnterState;
     
+    const char* omiPassword = std::getenv("OMI_PASSWORD");
+
     /* Enable auth so we can verify pre-conditions */
     IgnoreAuthCalls(0);
 
@@ -76,7 +78,7 @@ NitsSetup(TestAuthSetup)
         return;
     }
 
-    if (0 != AuthenticateUser(USER, PASSWORD))
+    if (0 != AuthenticateUser(USER, omiPassword))
     {
         UT_WARNING("auth tests skipped - user " USER "/" PASSWORD " not found");
         return;
@@ -170,12 +172,13 @@ NitsTestWithSetup(TestAuthExplicitOOPModes, TestAuthSetup)
     Client c;
     ProvInfo info;
 
+    const char* omiPassword = std::getenv("OMI_PASSWORD");
     const Uint64 TIMEOUT = 15 * 1000 * 1000;
 
     TChar sockfile[PAL_MAX_PATH_SIZE];
     TcsStrlcpy(sockfile, OMI_GetPath(ID_SOCKETFILE), sizeof(sockfile));
 
-    UT_ASSERT(c.Connect(sockfile, USER_Z, PASSWORD_Z, TIMEOUT));
+    UT_ASSERT(c.Connect(sockfile, USER_Z, MI_T(omiPassword), TIMEOUT));
 
     _GetProvInfo(c, info);
 
