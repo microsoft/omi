@@ -225,9 +225,10 @@ MySQL Monitoring Agent for OMI Server                        | [MySQL Provider](
 Apache Monitoring Agent for OMI Server                       | [Apache Provider](https://github.com/Microsoft/Apache-Provider)
 Python Script Provider for OMI Server                        | [Python Provider](https://github.com/Microsoft/omi-script-provider)
 
-### Services that utilize OMI
+### Microsoft Products that use OMI
 
-The services/products mentioned in the table below utilize OMI:
+The following table lists the Microsoft products and Azure services that use OMI to orchestrate configuration management and log collection on Linux VMs:
+
 
 Product Name                                                 | Official Site
 ------------------------------------------------------------ | -------------
