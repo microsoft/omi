@@ -225,6 +225,25 @@ MySQL Monitoring Agent for OMI Server                        | [MySQL Provider](
 Apache Monitoring Agent for OMI Server                       | [Apache Provider](https://github.com/Microsoft/Apache-Provider)
 Python Script Provider for OMI Server                        | [Python Provider](https://github.com/Microsoft/omi-script-provider)
 
+### Services that utilize OMI
+
+The services/products mentioned in the table below utilize OMI:
+
+Product Name                                                 | Official Site
+------------------------------------------------------------ | -------------
+Azure Automation Desired State Configuration                 | [Azure Automation Desired State Configuration, DSC Extension](https://docs.microsoft.com/en-us/azure/virtual-machines/extensions/dsc-linux)
+System Center Operations Manager (SCOM)                      | [System Center Operations Manager (SCOM) Management Pack for UNIX and Linux Operating Systems](https://docs.microsoft.com/en-us/system-center/scom/plan-planning-agent-deployment?view=sc-om-2022)
+Log Analytics Agent                                          | [Log Analytics Agent](https://docs.microsoft.com/en-us/azure/azure-monitor/agents/agent-linux)
+Azure Security Center                                        | [Azure Security Center](https://docs.microsoft.com/en-us/azure/defender-for-cloud/faq-data-collection-agents)
+Container Monitoring Solution                                | [Container Monitoring Solution](https://docs.microsoft.com/en-us/azure/azure-monitor/containers/containers)
+Azure Sentinel                                               | [Azure Sentinel](https://docs.microsoft.com/en-us/azure/sentinel/overview)
+Azure Stack Hub                                              | [Azure Stack Hub](https://docs.microsoft.com/en-us/azure-stack/operator/azure-stack-overview?view=azs-2102)
+Azure HDInsight                                              | [Azure HDInsight](https://docs.microsoft.com/en-us/azure/hdinsight/hdinsight-overview)
+Azure Automation                                             | [Azure Automation](https://docs.microsoft.com/en-us/azure/automation/automation-runbook-execution)
+Azure Automation Update Management                           | [Azure Automation Update Management](https://docs.microsoft.com/en-us/azure/automation/update-management/overview)
+Azure Diagnostics (LAD)                                      | [Azure Diagnostics (LAD)](https://docs.microsoft.com/en-us/azure/virtual-machines/extensions/diagnostics-linux?context=%2Fazure%2Fvirtual-machines%2Fcontext%2Fcontext&tabs=azcli)
+
+
 ### Code of Conduct
 
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).  For more
