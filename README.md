@@ -19,6 +19,7 @@ demonstrates very high performance.
 
 
 ### Get OMI
+#### Using Github
 
 RPM and DEB packages are provided for the installation of OMI on most
 enterprise Linux distributions. To install OMI, download the correct
@@ -44,6 +45,8 @@ Linux    | RPM     | x86          | 1.0.0 | [omi-MAJOR.MINOR.PATCH-BUILD.
 **Note:** MAJOR, MINOR, PATCH, and BUILD refer to the version number information for the specific version of OMI that you wish to install.
 
 [Releases]: https://github.com/Microsoft/omi/releases
+
+#### Using Package Managers
 
 Alternatively, you can now also download from Microsoft Repo. Instructions
 on setting this up can be found [here](https://technet.microsoft.com/en-us/windows-server-docs/compute/Linux-Package-Repository-for-Microsoft-Software).  Follow the instructions for your platform.  You can then use your platform's package tool to install OMI (i.e. `sudo apt-get install omi` or `sudo yum install omi`).
