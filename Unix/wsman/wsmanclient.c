@@ -96,6 +96,8 @@ static void PostResult(WsmanClient *self, const MI_Char *message, MI_Result resu
 
         PostResultMsg *errorMsg = PostResultMsg_New(0);
 
+        if(!errorMsg) return;
+
         if (message)
         {
             errorMsg->errorMessage = Batch_Tcsdup(errorMsg->base.batch, message);
@@ -298,6 +300,7 @@ static MI_Boolean ProcessNormalResponse(WsmanClient *self, Page **data)
     }
 
     msg = PostInstanceMsg_New(0);
+    if(!msg) goto error;
     msg->instance = NULL;
     
     if ((WS_ParseSoapEnvelope(xml) != 0) ||
@@ -605,7 +608,8 @@ static MI_Boolean ProcessFaultResponse(WsmanClient *self, Page **data)
 
         PostResult(self, errorMessage, fault.mi_result > 0 ? fault.mi_result : MI_RESULT_FAILED, cause);
 
-        PAL_Free(xml);
+        if (xml)
+            PAL_Free(xml);
         return MI_FALSE;
     }
 

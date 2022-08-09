@@ -475,6 +475,7 @@ void Session_CancelAllOperations(_Inout_ MI_Session *session)
                 }
                 else
                 {
+                    memset(outstandingOperations, 0, outstandingOperationCount*sizeof(ChildListOutstandingHandles));
                     outstandingOperationSize = outstandingOperationCount;
                     r = ChildList_GetCurrentList(&sessionObject->operationList, outstandingOperations, outstandingOperationSize, &outstandingOperationCount);
                 }
@@ -601,6 +602,7 @@ MI_Result MI_CALL Session_Close(
                     }
                     else
                     {
+                        memset(outstandingOperations, 0, outstandingOperationCount*sizeof(ChildListOutstandingHandles));
                         outstandingOperationSize = outstandingOperationCount;
                         trace_MISessionLog("Processing operationList again.");
                         r = ChildList_GetCurrentList(&sessionObject->operationList, outstandingOperations, outstandingOperationSize, &outstandingOperationCount);

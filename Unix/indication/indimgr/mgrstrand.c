@@ -884,9 +884,9 @@ FAILED:
                 r = subscrip->lastErrorCode;
         }
         finalmsg = PostResultMsg_NewAndSerialize(&req->base.base, error, errmsg, MI_RESULT_TYPE_MI, r);
-        Strand_FailOpenWithMsg( params, (Message*)finalmsg  );
         if (finalmsg)
         {
+            Strand_FailOpenWithMsg(params, (Message*)finalmsg);
             PostResultMsg_Release(finalmsg);
         }
         else

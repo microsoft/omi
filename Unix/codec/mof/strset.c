@@ -139,6 +139,7 @@ int StrSet_Add(
     if (!bucket)
         return -1;
 
+    memset(bucket, 0, sizeof(StrSetBucket) + numBytes);
     bucket->str = (MI_Char*)(bucket + 1);
     bucket->token = _MakeToken(str, len);
     bucket->committed = MI_FALSE;

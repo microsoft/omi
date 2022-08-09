@@ -541,6 +541,10 @@ MI_Boolean Http_DecryptData(_In_ Http_SR_SocketData * handler, _Out_ HttpHeaders
                             while (';' != *linep && linep < linelimit)
                                 linep++;
                             *linep++ = '\0';
+                            
+                            if((linep - original_content_type) >=1024){
+                                return FALSE;
+                            }
                             memcpy(original_content_type_save, original_content_type, linep - original_content_type);
                             original_content_type = original_content_type_save;
                         }
@@ -551,6 +555,10 @@ MI_Boolean Http_DecryptData(_In_ Http_SR_SocketData * handler, _Out_ HttpHeaders
                             while (';' != *linep && linep < linelimit)
                                 linep++;
                             *linep++ = '\0';
+                            
+                            if((linep - original_encoding) >=64){
+                                return FALSE;
+                            }
                             memcpy(original_encoding_save, original_encoding, linep - original_encoding);
                             original_encoding = original_encoding_save;
                         }
@@ -735,6 +743,7 @@ Http_EncryptData(_In_ Http_SR_SocketData *handler, int contentLen, int contentTy
         return MI_FALSE;
     }
 
+    memset(pNewData, 0, needed_data_size+sizeof(Page));
     char *buffp = (char *)(pNewData + 1);
 
     memcpy(buffp, ENCRYPTED_BOUNDARY, ENCRYPTED_BOUNDARY_LEN);
@@ -936,6 +945,7 @@ static gss_buffer_t _getPrincipalName(gss_ctx_id_t pContext)
     OM_uint32 min_status;
     gss_buffer_t buff = PAL_Malloc(sizeof(gss_buffer_desc));
 
+    if(!buff) goto Done;
     memset(buff, 0, sizeof(gss_buffer_desc));
 
     maj_status = (*_g_gssState.Gss_Inquire_Context)(&min_status, pContext, &srcName,
@@ -1536,10 +1546,12 @@ static char *_BuildAuthResponse(_In_ const char *pProtocol,
             *pResultLen = HEADER_SERVER_ERROR_LEN;
 
             char *pdata = PAL_Malloc(*pResultLen + 1);
+
+            if (!pdata) return NULL;
             memcpy(pdata, HEADER_SERVER_ERROR, *pResultLen);
             pdata[*pResultLen] = '\0';
 
-            header_tail_len  = HEADER_TAIL_LEN;
+            header_tail_len = HEADER_TAIL_LEN;
             return pdata;
         }
         break;

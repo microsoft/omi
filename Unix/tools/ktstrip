@@ -44,18 +44,22 @@ then
    exit 2
 fi
 
-list=$(mktemp)
-delete_list=$(mktemp)
-cmd=$(mktemp)
-tmp_kt="/tmp/tmp.kt"
+tmp_dir=$(mktemp -d)
+if [ $? -ne 0 ]; then
+   echo "Could not create temp directory " 2>&1
+   exit 1
+fi 
+
+list=$(mktemp -p $tmp_dir)
+delete_list=$(mktemp -p $tmp_dir)
+cmd=$(mktemp -p $tmp_dir)
+tmp_kt="$tmp_dir/tmp.kt"
 
 # clean temp files
 CleanTempFiles()
 {
     echo "Cleaning temp files..." 2>&1
-    rm -f $list > /dev/null 2>&1
-    rm -f $delete_list > /dev/null 2>&1
-    rm -f $cmd > /dev/null 2>&1
+    rm -rf $tmp_dir > /dev/null 2>&1
 }
 
 #
@@ -86,22 +90,33 @@ cat $list | awk '/^[ ]*[0-9]/{ print " "$1" " $2" "$3 }' | awk '{ if ( $3 !~ /ho
 
 # Build the final command file adding commands at the front and back
 printf "read_kt $SRC_KT \n" | cat - $delete_list >$cmd
-printf "write_kt $tmp_kt\n"   >>$cmd
+printf "write_kt $tmp_kt\nquit\n"   >>$cmd
 
 # The command file will now ready to delete all unneeded entries.
 printf "Creating $DST_KT\n"
 cat $cmd | ktutil
 
-CleanTempFiles
+# Make sure tmp_kt keytab content is valid.
+klist -k $tmp_kt >/dev/null 2>&1
+if  [ $? -ne 0 ]
+then
+   echo "The keytab $tmp_kt is invalid." 2>&1
+   CleanTempFiles
+   exit 1
+fi
+
 
 if [ ! -f $tmp_kt ]
 then
     echo "File " $tmp_kt " is not generated, so we skip configure Kerberos authentication for omi." 2>&1
+    CleanTempFiles
     exit 0
 fi
 
 printf "Move $tmp_kt to $DST_KT\n"
 mv $tmp_kt $DST_KT
+
+CleanTempFiles
 
 # and we adjust the ownership of the keytab so the omi user can see it.
 chown $user $DST_KT

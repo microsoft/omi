@@ -134,8 +134,9 @@ static int _StartEngine(int argc, char** argv, char ** envp, const char *engineS
     }
 
     int logfd = Log_GetFD();
-    /* ATTN: close first 3 also! Left for debugging only */
-    for (fd = 3; fd < fdLimit; ++fd)
+    
+    /* closing FD for stdin,stdout,stderr also i.e. 0,1,2 respectively*/
+    for (fd = 0; fd < fdLimit; ++fd)
     {
         if ((fd != s[1]) && (fd != logfd))
             close(fd);

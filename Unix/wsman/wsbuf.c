@@ -612,6 +612,10 @@ MI_Result WSBuf_Init(
     // The buffer is to be guaranteed to be a multiple of 32 bytes
     
     buf->page = (Page*)PAL_Malloc(sizeof(Page)+ PAD_TO_32(initialSize));
+    if(buf->page)
+    {
+        memset(buf->page, 0, sizeof(Page)+ PAD_TO_32(initialSize));
+    }
     buf->position = 0;
 
     if (!buf->page)
@@ -1517,6 +1521,8 @@ static MI_Result _PackEPR(
     MI_Uint32 flags)
 {
     Instance* self = Instance_GetSelf( instance );
+    if (!self) return MI_RESULT_FAILED;
+
     const MI_ClassDecl* cd = self->classDecl;
     MI_Uint32 i;
 #ifndef DISABLE_SHELL
@@ -1525,10 +1531,10 @@ static MI_Result _PackEPR(
 #endif
 
     /* Put EPR header */
-    if (MI_RESULT_OK != WSBuf_AddLit(buf,LIT(ZT("<wsa:Address>http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous</wsa:Address>")
-            ZT("<wsa:ReferenceParameters>")
-            ZT("<wsman:ResourceURI>"))))
-            return MI_RESULT_FAILED;
+    if (MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT("<wsa:Address>http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous</wsa:Address>")
+        ZT("<wsa:ReferenceParameters>")
+        ZT("<wsman:ResourceURI>"))))
+        return MI_RESULT_FAILED;
 
 #ifndef DISABLE_SHELL
     if ((flags & WSMAN_IsShellResponse) &&
@@ -1544,15 +1550,15 @@ static MI_Result _PackEPR(
     else
 #endif
     {
-        if (MI_RESULT_OK != WSBuf_AddLit(buf,LIT(ZT("http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/")))||
-                MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf,cd->name))
+        if (MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT("http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/"))) ||
+            MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, cd->name))
         {
             return MI_RESULT_FAILED;
         }
-     }
+    }
 
-    if (MI_RESULT_OK != WSBuf_AddLit(buf,LIT(ZT("</wsman:ResourceURI>")
-            ZT("<wsman:SelectorSet>"))))
+    if (MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT("</wsman:ResourceURI>")
+        ZT("<wsman:SelectorSet>"))))
         return MI_RESULT_FAILED;
 
     /* namespace (if present)*/
@@ -1570,11 +1576,11 @@ static MI_Result _PackEPR(
         const void* value = (char*)self + pd->offset;
         MI_Uint32 tmpLastPrefixIndex = 0;
 
-        if ((pd->flags & MI_FLAG_KEY)== 0)
+        if ((pd->flags & MI_FLAG_KEY) == 0)
             continue;
 
         /* skip null values */
-        if (!_Field_GetExists(value,(MI_Type)pd->type))
+        if (!_Field_GetExists(value, (MI_Type)pd->type))
             continue;
 
         if (_PackValue(
@@ -1592,8 +1598,8 @@ static MI_Result _PackEPR(
     }
 
     /* close EPR */
-    if (MI_RESULT_OK != WSBuf_AddLit(buf,LIT(ZT("</wsman:SelectorSet>")
-            ZT("</wsa:ReferenceParameters>"))))
+    if (MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT("</wsman:SelectorSet>")
+        ZT("</wsa:ReferenceParameters>"))))
         return MI_RESULT_FAILED;
 
     return MI_RESULT_OK;
@@ -1673,12 +1679,19 @@ MI_Result WSBuf_ClassToBuf(_In_ const MI_Class *classObject,
     // directly assigning the position since we already know how much we wrote in serialization
     buf.position = bufferLenForSerialization;
     page = WSBuf_StealPage(&buf);
-    Batch_AttachPage(batch, page);
+    if (page)
+    {
+        Batch_AttachPage(batch, page);
 
-    *ptrOut = page + 1;
+        *ptrOut = page + 1;
 
-    *sizeOut = (MI_Uint32)page->u.s.size;
-    result = MI_RESULT_OK;
+        *sizeOut = (MI_Uint32)page->u.s.size;
+        result = MI_RESULT_OK;
+    }
+    else
+    {
+        result = MI_RESULT_FAILED;
+    }
 
 End:
     XmlSerializer_Close(&mi_serializer);
@@ -1699,6 +1712,7 @@ static MI_Result _PackInstance(
     const ZChar* parentNSPrefix) //optional
 {
     Instance* self = Instance_GetSelf( instance );
+    if(!self) return MI_RESULT_FAILED;
     const MI_ClassDecl* cd = castToClassDecl ? castToClassDecl : self->classDecl;
     MI_Uint32 i;
     const ZChar* name;
@@ -2259,11 +2273,18 @@ MI_Result WSBuf_InstanceToBufWithClassName(
     }
 
     page = WSBuf_StealPage(&buf);
-    Batch_AttachPage(batch, page);
+    if (page)
+    {
+        Batch_AttachPage(batch, page);
 
-    *ptrOut = page + 1;
-    *sizeOut = (MI_Uint32)page->u.s.size;
-    return MI_RESULT_OK;
+        *ptrOut = page + 1;
+        *sizeOut = (MI_Uint32)page->u.s.size;
+        return MI_RESULT_OK;
+    }
+    else
+    {
+        return MI_RESULT_FAILED;
+    }
 }
 
 MI_Result WSBuf_InstanceToBuf(
@@ -2281,7 +2302,7 @@ MI_Result WSBuf_InstanceToBuf(
 }
 
 _Use_decl_annotations_
-void WSBuf_GenerateMessageID(
+MI_Result WSBuf_GenerateMessageID(
     ZChar msgID[WS_MSG_ID_SIZE])
 {
     //WS-Management qualifies the use of wsa:MessageID and wsa:RelatesTo as follows:
@@ -2318,7 +2339,10 @@ void WSBuf_GenerateMessageID(
     static MI_Uint64  s1, s2;
 
     if (!s1)
-        PAL_Time(&s1);
+    {
+       PAL_Boolean timeRet = PAL_Time(&s1);
+       if(timeRet == PAL_FALSE) return MI_RESULT_FAILED;
+    }
 
     s2++;
 
@@ -2334,6 +2358,8 @@ void WSBuf_GenerateMessageID(
         (MI_Uint32)((s2 >> 48)& 0xFFFF),
         (MI_Uint32)(s2 & 0xFFFFFFFF),
         (MI_Uint32)((s2 >> 32)& 0xFFFF));
+
+    return MI_RESULT_OK;
 }
 
 MI_Result WSBuf_CreateSoapResponseHeader(
@@ -2376,7 +2402,8 @@ MI_Result WSBuf_CreateSoapResponseHeader(
         goto failed;
 
     /* Generate new uniqueue msg id */
-    WSBuf_GenerateMessageID(msgID);
+    if(MI_RESULT_OK != WSBuf_GenerateMessageID(msgID))
+        goto failed;
 
     if (MI_RESULT_OK != WSBuf_AddLit(buf, msgID, WS_MSG_ID_SIZE - 1))
         goto failed;

@@ -581,6 +581,7 @@ static Http_CallbackResult _ReadHeader(
     if (!handler->recvPage)
         return PRT_RETURN_FALSE;
 
+    memset(handler->recvPage, 0, allocSize);
     ((char*)(handler->recvPage + 1))[handler->recvHeaders.contentLength] = 0;
 
     handler->recvPage->u.s.size = (unsigned int)handler->recvHeaders.contentLength;
@@ -843,6 +844,7 @@ _BuildHeader( Http_SR_SocketData* handler, int contentLen,
     needed_size += 2;  // \r\n
                       
     Page *pHeaderPage = (Page*)PAL_Malloc(sizeof(Page) + needed_size + 1); // 1 for a final null
+    if (!pHeaderPage) return NULL;
     char *bufp = (char *)(pHeaderPage+1);
 
     memset(pHeaderPage, 0, sizeof(Page)); // Zero page header fields.

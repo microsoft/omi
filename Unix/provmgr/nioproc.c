@@ -55,7 +55,7 @@ static void RequestHandler_Shutdown(RequestHandler* handler)
     // wait for unsubscribe thread to exit
     Thread unsubThread;
     ptrdiff_t joined = THREAD_NOT_JOINED;
-    PAL_Uint32 ret;
+    PAL_Uint32 ret = 0;
     Lock_Acquire( &handler->lock );
     if ( handler->running == THREAD_RUNNING )
     {
@@ -107,6 +107,7 @@ static RequestItem* _CreateUnsubscribeProviderItem(
     UnsubscribeProviderItem* ui = (UnsubscribeProviderItem*)PAL_Malloc(sizeof(UnsubscribeProviderItem));
     if (ui)
     {
+        memset(ui, 0, sizeof(UnsubscribeProviderItem));
         ui->base.type = REQUEST_UNSUBSCRIBE;
         ui->base.next = NULL;
         ui->ctx = ctx;
@@ -128,6 +129,7 @@ static RequestItem* _CreateSubscribeProviderItem(
     SubscribeProviderItem* ui = (SubscribeProviderItem*)PAL_Malloc(sizeof(SubscribeProviderItem));
     if (ui)
     {
+        memset(ui, 0, sizeof(SubscribeProviderItem));
         ui->base.type = REQUEST_SUBSCRIBE;
         ui->base.next = NULL;
         ui->provider = provider;
