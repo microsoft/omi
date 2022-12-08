@@ -1098,19 +1098,18 @@ static void _ParseEndTag(
     *nameEnd = '\0';
 
     ns = _FindNamespace(self, prefix);
-    if (ns)
-    {
-        if (self->status)
-            return;
 
-        /* Return element object */
-        elem->type = XML_END;
-        elem->data.data = name;
-        elem->data.size = nameEnd - name;
-        elem->data.namespaceUri = ns->uri;
-        elem->data.namespaceUriSize = ns->uriSize;
-        elem->data.namespaceId = ns->id;
-    }
+    if (ns == NULL || self->status) 
+        return;
+
+    /* Return element object */
+    elem->type = XML_END;
+    elem->data.data = name;
+    elem->data.size = nameEnd - name;
+    elem->data.namespaceUri = ns->uri;
+    elem->data.namespaceUriSize = ns->uriSize;
+    elem->data.namespaceId = ns->id;
+    
     /* Match opening name */
     {
         /* Check for stack underflow */
@@ -1358,7 +1357,7 @@ static int _ParseCharData(
     self->state = STATE_TAG;
 
     /* Return character data element if non-empty */
-    if (end == start)
+    if (end == NULL || end == start)
         return 0;
 
     /* Prepare element */
