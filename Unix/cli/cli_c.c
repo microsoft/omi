@@ -695,6 +695,7 @@ static MI_Result ConsumeInstanceResults(MI_Operation *miOperation)
                         MI_Uint32 clientBufferLength = c_initBufferLength;
                         MI_Uint32 clientBufferNeeded = 0;
                         clientBuffer = (MI_Uint8*)malloc(clientBufferLength + 1);
+                        if(!clientBuffer) return MI_RESULT_FAILED;
                         MI_Application_Initialize(0,NULL,NULL, &application);
                         miResult = XmlSerializer_Create(&application, 0, MI_T("MI_XML"), &serializer);
                         if (miResult != MI_RESULT_OK)
@@ -788,6 +789,13 @@ static MI_Result ConsumeInstanceResults(MI_Operation *miOperation)
                                             // Try again with a buffer given to us by the clientBufferNeeded field
                                             clientBufferLength = clientBufferNeeded;
                                             clientBuffer = (MI_Uint8*)malloc(clientBufferLength + 1);
+                                            if(!clientBuffer)
+                                            {
+                                                XmlSerializer_Close(&serializer);
+                                                MI_Application_Close(&application);
+                                                return MI_RESULT_FAILED;
+                                            }
+                                            
                                             miResult = XmlSerializer_SerializeInstance(&serializer, 0, miInstanceResult, clientBuffer, clientBufferLength, &clientBufferNeeded);
                                         }
                                         else

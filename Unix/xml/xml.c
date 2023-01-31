@@ -654,7 +654,10 @@ static void _ParseAttr(
         }
 
         /* Null-terminate the value */
-        *valueEnd = '\0';
+        if(valueEnd)
+        {
+            *valueEnd = '\0';
+        }
     }
 
     /* Skip spaces */
@@ -930,9 +933,12 @@ static void _ParseStartTag(
                         return;
                 }
 
-                item->name.namespaceUri = itemNS->uri;
-                item->name.namespaceUriSize = itemNS->uriSize;
-                item->name.namespaceId = itemNS->id;
+                if(itemNS)
+                {
+                    item->name.namespaceUri = itemNS->uri;
+                    item->name.namespaceUriSize = itemNS->uriSize;
+                    item->name.namespaceId = itemNS->id;
+                }
             }
         }
 

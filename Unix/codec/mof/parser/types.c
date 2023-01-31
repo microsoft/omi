@@ -36,8 +36,11 @@
     { \
         PTR = ((TYPE##A*)Batch_Get(state->batch, \
             sizeof(TYPE##A) + sizeof(TYPE) * (SIZE))); \
-        PTR->data = (TYPE*)(PTR + 1); \
-        PTR->size = SIZE; \
+        if(PTR) \
+        { \
+            PTR->data = (TYPE*)(PTR + 1); \
+            PTR->size = SIZE; \
+        } \
         break; \
     }
 
@@ -1596,24 +1599,31 @@ int InitializerToValue(
                     {
                         MI_InstanceA* arr;
                         arr = (MI_InstanceA*)Batch_Get(state->batch, sizeof(MI_InstanceA) + sizeof(MI_Instance*)*self->size);
-                        arr->data = (MI_Instance**)(arr + 1);
-                        arr->size = self->size;
-                        for (i = 0; i < self->size; i++)
+                        if(arr)
                         {
-                            const MI_Char* alias = self->data[i].value.string;
-                            const MI_InstanceAliasDecl *decl = FindInstanceAliasDecl(state, alias);
-                            if (!decl)
+                            arr->data = (MI_Instance**)(arr + 1);
+                            arr->size = self->size;
+                            for (i = 0; i < self->size; i++)
                             {
-                                yyerrorf(state->errhandler, ID_UNDEFINED_INSTANCE_ALIAS,
-                                    "",
-                                    tcs(alias));
-                                return -1;
+                                const MI_Char* alias = self->data[i].value.string;
+                                const MI_InstanceAliasDecl *decl = FindInstanceAliasDecl(state, alias);
+                                if (!decl)
+                                {
+                                    yyerrorf(state->errhandler, ID_UNDEFINED_INSTANCE_ALIAS,
+                                        "",
+                                        tcs(alias));
+                                    return -1;
+                                }
+                                arr->data[i] = decl->decl->instance;
+                                decl->decl->refs++;
                             }
-                            arr->data[i] = decl->decl->instance;
-                            decl->decl->refs++;
+                            *value = arr; 
+                            return 0;
                         }
-                        *value = arr; 
-                        return 0;
+                        else
+			{
+                            return -1;
+			}
                     }
                     default:
                         return -1;

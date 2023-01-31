@@ -2248,8 +2248,11 @@ HttpClient_NextAuthRequest(_In_ struct _HttpClient_SR_SocketData * self, _In_ co
         strcpy(requestp, self->hostHeader);
         requestp += strlen(self->hostHeader);
 
-        memcpy(requestp, auth_header, header_len);
-        requestp += header_len;
+        if(auth_header)
+        {
+            memcpy(requestp, auth_header, header_len);
+            requestp += header_len;
+        }
 
         *requestp++ = '\r';
         *requestp++ = '\n';
