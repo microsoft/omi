@@ -218,6 +218,11 @@ static int _CreateChildProcess(
         }
     }
 
+    /* Re-open fd 0,1,2. */
+    open("/dev/null", O_RDONLY);
+    open("/dev/null", O_RDWR);
+    open("/dev/null", O_RDWR);
+
     /* perform operation in quesiton */
     {
         int r = PamCheckUser(user, password);

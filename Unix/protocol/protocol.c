@@ -1260,6 +1260,11 @@ static MI_Boolean _ProcessCreateAgentMsg(
                     close(fd);
             }
 
+            /* Re-open fd 0,1,2. */
+            open("/dev/null", O_RDONLY);
+            open("/dev/null", O_RDWR);
+            open("/dev/null", O_RDWR);
+
             execl(realAgentProgram,
                   realAgentProgram,
                   param_sock,

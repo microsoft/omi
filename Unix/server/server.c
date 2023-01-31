@@ -7,6 +7,7 @@
 **==============================================================================
 */
 
+#include <fcntl.h>
 #include <stdlib.h>
 #include <sock/sock.h>
 #include <pal/dir.h>
@@ -141,6 +142,11 @@ static int _StartEngine(int argc, char** argv, char ** envp, const char *engineS
         if ((fd != s[1]) && (fd != logfd))
             close(fd);
     }
+
+    /* Re-open fd 0,1,2. */
+    open("/dev/null", O_RDONLY);
+    open("/dev/null", O_RDWR);
+    open("/dev/null", O_RDWR);
 
     argv[argc-1] = int64_to_a(socketString, S_SOCKET_LENGTH, (long long)s[1], &size);
     argv[argc-3] = int64_to_a(logfilefd, S_SOCKET_LENGTH, (long long)logfd, &size);
