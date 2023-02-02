@@ -606,11 +606,6 @@ static MI_Boolean ProcessFaultResponse(WsmanClient *self, Page **data)
 
         cause = GetWsmanCimError(errorType);
 
-        if(!cause)
-        {
-            goto error;
-        }
-        
         PostResult(self, errorMessage, fault.mi_result > 0 ? fault.mi_result : MI_RESULT_FAILED, cause);
 
         if (xml)
