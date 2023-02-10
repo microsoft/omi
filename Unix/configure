@@ -476,11 +476,13 @@ fi
 if [ "$enable_ulinux" = "1" ]; then
     openssl100_dir=/usr/local_ssl_1.0.0
     openssl110_dir=/usr/local_ssl_1.1.0
+    openssl300_dir=/usr/local_ssl_3.0.0
 
     case "`uname -m`" in    
         x86_64 )
             openssl100_libdir=${openssl100_dir}/lib64
             openssl110_libdir=${openssl110_dir}/lib
+            openssl300_libdir=${openssl300_dir}/lib64
             ;;
         
         * )
@@ -494,6 +496,8 @@ if [ "$enable_ulinux" = "1" ]; then
     if [ `uname -m` = "x86_64" ]; then
 	openssl110_cflags=`PKG_CONFIG_PATH=$openssl110_libdir/pkgconfig $pkgconfig --cflags openssl`
 	openssl110_libs=`PKG_CONFIG_PATH=$openssl110_libdir/pkgconfig $pkgconfig --libs openssl`
+        openssl300_cflags=`PKG_CONFIG_PATH=$openssl300_libdir/pkgconfig $pkgconfig --cflags openssl`
+        openssl300_libs=`PKG_CONFIG_PATH=$openssl300_libdir/pkgconfig $pkgconfig --libs openssl`
     fi
 
     echo "checking for local installation of openssl version 1.0.0 on system ..."
@@ -2536,6 +2540,11 @@ ifneq (\$(DISABLE_SSL_1_1_0),1)
 	echo Running: ./configure \$(OMI_CONFIGURE_QUALS) --outputdirname=output_openssl_1.1.0 --opensslcflags="${openssl110_cflags}" --openssllibs="${openssl110_libs}" --openssllibdir="${openssl110_libdir}"; \
 	./configure \$(OMI_CONFIGURE_QUALS) --outputdirname=output_openssl_1.1.0 --opensslcflags="${openssl110_cflags}" --openssllibs="${openssl110_libs}" --openssllibdir="${openssl110_libdir}"; \
 	( cd \$(__ROOT); OUTPUTDIR=${root}/output_openssl_1.1.0; SSL_BUILD=1.1.0; \$(MAKE) -f build.mak )
+	@echo '========================= Performing Building OMI (SSL 3.0.0)'
+
+	echo Running: ./configure \$(OMI_CONFIGURE_QUALS) --outputdirname=output_openssl_3.0.0 --opensslcflags="${openssl300_cflags}" --openssllibs="${openssl300_libs}" --openssllibdir="${openssl300_libdir}"; \
+	./configure \$(OMI_CONFIGURE_QUALS) --outputdirname=output_openssl_3.0.0 --opensslcflags="${openssl300_cflags}" --openssllibs="${openssl300_libs}" --openssllibdir="${openssl300_libdir}"; \
+	( cd \$(__ROOT); OUTPUTDIR=${root}/output_openssl_3.0.0; SSL_BUILD=3.0.0; \$(MAKE) -f build.mak )
 endif
 
 else
