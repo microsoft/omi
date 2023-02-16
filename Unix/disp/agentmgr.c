@@ -860,6 +860,11 @@ static pid_t _SpawnAgentProcess(
             close(fd);
     }
 
+    /* Re-open fd 0,1,2. */
+    open("/dev/null", O_RDONLY);
+    open("/dev/null", O_RDWR);
+    open("/dev/null", O_RDWR);
+
     /* prepare parameter:
         socket fd to attach */
     Snprintf(param_sock, sizeof(param_sock), "%d", (int)s);

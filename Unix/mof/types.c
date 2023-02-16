@@ -41,8 +41,11 @@
     { \
         PTR = ((TYPE##A*)MOF_Malloc(&state.heap, \
             sizeof(TYPE##A) + sizeof(TYPE) * (SIZE))); \
-        PTR->data = (TYPE*)(PTR + 1); \
-        PTR->size = SIZE; \
+        if(PTR) \
+        { \
+            PTR->data = (TYPE*)(PTR + 1); \
+            PTR->size = SIZE; \
+        } \
         break; \
     }
 
@@ -1748,7 +1751,7 @@ int InitializerToValue(
                     case MI_REAL64:
                     {
                         MI_Real64* p = MALLOC_T(MI_Real64, 1);
-                        if (*p)
+                        if (p)
                         {
                             *p = (MI_Real64)self->data->value.real;
                             *value = p;
