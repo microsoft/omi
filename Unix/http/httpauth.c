@@ -1629,8 +1629,8 @@ void Deauthorize(_In_ Http_SR_SocketData * handler)
              // 2do: Not clear what to do here
              // I'm going to procede anyway.
         }
-#endif
         handler->pAuthContext = hdl;
+#endif
     }
     if (handler->pVerifierCred)
     {
