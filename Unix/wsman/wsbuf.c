@@ -1250,6 +1250,10 @@ static MI_Result _PackFieldSint32(
     ZChar s[24];
 
     MI_Sint32 size = Stprintf(s, MI_COUNT(s), ZT("%d"), value);
+    if(size<0)
+    {
+	    return MI_RESULT_FAILED;
+    }
     return _PackFieldStringLit(buf,writer,name,s,size, flags, nsPrefix);
 }
 
@@ -1264,6 +1268,10 @@ static MI_Result _PackFieldSint64(
     ZChar s[24];
 
     MI_Sint32 size = Stprintf(s, MI_COUNT(s), SINT64_FMT_T, value);
+    if(size<0)
+    {
+	    return MI_RESULT_FAILED;
+    }
     return _PackFieldStringLit(buf,writer,name,s,size,flags, nsPrefix);
 }
 
@@ -1279,6 +1287,10 @@ static MI_Result _PackFieldReal64(
 
     /* Use DBL_DIG=15 for precision. Check MSDN DBL_DIG */
     MI_Sint32 size = Stprintf(s, MI_COUNT(s), ZT("%.15g"), value);
+    if(size<0)
+    {
+	    return MI_RESULT_FAILED;
+    }
     return _PackFieldStringLit(buf,writer,name,s,size,flags, nsPrefix);
 }
 
