@@ -111,98 +111,98 @@ static const BUF_FaultItem s_faults[] = {
     /* WSBUF_FAULT_INTERNAL_ERROR */
     {
         LIT(ZT("http://schemas.dmtf.org/wbem/wsman/1/wsman/fault")),
-        "SOAP-ENV:Receiver",
+        "s:Receiver",
         "wsman:InternalError",
         ZT("The service cannot comply with the request due to internal processing errors.")
     },
     /* WSBUF_FAULT_NOT_SUPPORTED */
     {
         LIT(ZT("http://schemas.dmtf.org/wbem/wsman/1/wsman/fault")),
-        "SOAP-ENV:Sender",
+        "s:Sender",
         "wsman:UnsupportedFeature",
         ZT("not supported")
     },
     /* WSBUF_FAULT_NOT_UNDERSTOOD */
     {
         LIT(ZT("http://schemas.xmlsoap.org/ws/2004/08/addressing/fault")),
-        "SOAP-ENV:MustUnderstand",
+        "s:MustUnderstand",
         0,
         ZT("Header not understood")
     },
     /* WSBUF_FAULT_DESTINATION_UNREACHABLE */
     {
         LIT(ZT("http://schemas.xmlsoap.org/ws/2004/08/addressing/fault")),
-        "SOAP-ENV:Sender",
+        "s:Sender",
         "wsa:DestinationUnreachable",
         ZT("No route can be determined to reach the destination role defined by the Addressing To header.")
     },
     /* WSBUF_FAULT_ACCESS_DENIED */
     {
         LIT(ZT("http://schemas.dmtf.org/wbem/wsman/1/wsman/fault")),
-        "SOAP-ENV:Sender",
+        "s:Sender",
         "wsman:AccessDenied",
         ZT("The sender was not authorized to access the resource.")
     },
     /* WSBUF_FAULT_ENCODING_LIMIT */
     {
         LIT(ZT("http://schemas.dmtf.org/wbem/wsman/1/wsman/fault")),
-        "SOAP-ENV:Sender",
+        "s:Sender",
         "wsman:EncodingLimit",
         ZT("An internal encoding limit was exceeded in a request or would be violated if the message were processed.")
     },
     /* WSBUF_FAULT_INVALID_EXPIRATION_TIME */
     {
         LIT(ZT("http://schemas.dmtf.org/wbem/wsman/1/wsman/fault")),
-        "SOAP-ENV:Sender",
+        "s:Sender",
         "wsman:InvalidExpirationTime",
         ZT("The request specified an invalid expiration time that cannot be supported (zero or in the past).")
     },
     /* WSBUF_FAULT_UNSUPPORTED_EXPIRATION_TIME */
     {
         LIT(ZT("http://schemas.dmtf.org/wbem/wsman/1/wsman/fault")),
-        "SOAP-ENV:Sender",
+        "s:Sender",
         "wsman:UnsupportedExpirationTime",
         ZT("Only xs:duration expiration values are supported.")
     },
     /* WSBUF_FAULT_TIMED_OUT */
     {
         LIT(ZT("http://schemas.dmtf.org/wbem/wsman/1/wsman/fault")),
-        "SOAP-ENV:Receiver",
+        "s:Receiver",
         "wsman:TimedOut",
         ZT("The operation has timed out.")
     },
     /* WSBUF_FAULT_INVALID_MESSAGE_INFORMATION_HEADER */
     {
         LIT(ZT("http://schemas.xmlsoap.org/ws/2004/08/addressing/fault")),
-        "SOAP-ENV:Sender",
+        "s:Sender",
         "wsa:InvalidMessageInformationHeader",
         ZT("The request specified an invalid header property.")
     },
     /* WSBUF_FAULT_INVALID_HEARTBEAT */
     {
         LIT(ZT("http://schemas.dmtf.org/wbem/wsman/1/wsman/faultDetail/Heartbeats")),
-        "SOAP-ENV:Sender",
+        "s:Sender",
         "wsman:UnsupportedFeature",
         ZT("The request specified an invalid heartbeat.")
     },
     /* WSBUF_FAULT_ACTION_NOT_SUPPORTED */
     {
         LIT(ZT("http://schemas.xmlsoap.org/ws/2004/08/addressing/fault")),
-        "SOAP-ENV:Sender",
+        "s:Sender",
         "wsa:ActionNotSupported",
         ZT("The request specified an unsupported action.")
     },
     /* WSBUF_FAULT_CONNECTION_RETRY_NOT_SUPPORTED */
     {
         LIT(ZT("http://schemas.dmtf.org/wbem/wsman/1/wsman/faultDetail/DeliveryRetries")),
-        "SOAP-ENV:Sender",
+        "s:Sender",
         "wsman:UnsupportedFeature",
         ZT("Connection retry is not supported.")
     },
     /* WSBUF_FAULT_BOOKMARK_INVALID_FORMAT */
     {
         LIT(ZT("http://schemas.dmtf.org/wbem/wsman/1/wsman/faultDetail/InvalidFormat")),
-        "SOAP-ENV:Sender",
+        "s:Sender",
         "wsman:InvalidBookmark",
         ZT("Bookmark must be non-empty if specified.")
     }
@@ -2385,8 +2385,8 @@ MI_Result WSBuf_CreateSoapResponseHeader(
     /* Response header */
     if (MI_RESULT_OK != WSBuf_AddLit(buf,
         LIT(
-        ZT("<SOAP-ENV:Envelope ")
-        ZT("xmlns:SOAP-ENV=\"http://www.w3.org/2003/05/soap-envelope\" ")
+        ZT("<s:Envelope ")
+        ZT("xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\" ")
         ZT("xmlns:wsa=\"http://schemas.xmlsoap.org/ws/2004/08/addressing\" ")
         ZT("xmlns:wsen=\"http://schemas.xmlsoap.org/ws/2004/09/enumeration\" ")
         ZT("xmlns:e=\"http://schemas.xmlsoap.org/ws/2004/08/eventing\" ")
@@ -2398,9 +2398,9 @@ MI_Result WSBuf_CreateSoapResponseHeader(
         ZT("xmlns:msftwinrm=\"http://schemas.microsoft.com/wbem/wsman/1/wsman.xsd\" ")
         /* ZT("xmlns:xml=\"http://www.w3.org/XML/1998/namespace\" ")*/
         ZT("xmlns:wsmid=\"http://schemas.dmtf.org/wbem/wsman/identity/1/wsmanidentity.xsd\">")
-        ZT("<SOAP-ENV:Header>")
+        ZT("<s:Header>")
         ZT("<wsa:To>http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous</wsa:To>")
-        ZT("<wsa:Action>"))))
+        ZT("<wsa:Action s:mustUnderstand=\"true\">"))))
     {
         goto failed;
     }
@@ -2410,7 +2410,7 @@ MI_Result WSBuf_CreateSoapResponseHeader(
 
     if (MI_RESULT_OK != WSBuf_AddLit(buf,
             LIT(ZT("</wsa:Action>")
-            ZT("<wsa:MessageID>"))))
+            ZT("<wsa:MessageID s:mustUnderstand=\"true\">"))))
         goto failed;
 
     /* Generate new uniqueue msg id */
@@ -2475,7 +2475,7 @@ Page* WSBuf_CreateFaultResponsePage(
     if (notUnderstoodTag)
     {
         if (MI_RESULT_OK != WSBuf_AddLit(&outBuf,
-                LIT(ZT("<SOAP-ENV:NotUnderstood qname=\""))))
+                LIT(ZT("<s:NotUnderstood qname=\""))))
             goto failed;
 
         if (MI_RESULT_OK != WSBuf_AddStringNoEncoding(
@@ -2491,26 +2491,26 @@ Page* WSBuf_CreateFaultResponsePage(
 
     if (MI_RESULT_OK != WSBuf_AddLit(&outBuf,
         LIT(
-        ZT("</SOAP-ENV:Header>")
-        ZT("<SOAP-ENV:Body>")
-        ZT("<SOAP-ENV:Fault>")
-        ZT("<SOAP-ENV:Code>")
-        ZT("<SOAP-ENV:Value>"))))
+        ZT("</s:Header>")
+        ZT("<s:Body>")
+        ZT("<s:Fault>")
+        ZT("<s:Code>")
+        ZT("<s:Value>"))))
         goto failed;
 
     if (MI_RESULT_OK != WSBuf_AddCharStringNoEncoding(&outBuf, fault->code))
         goto failed;
-        //SOAP-ENV:Sender
+        //s:Sender
 
     if (MI_RESULT_OK != WSBuf_AddLit(&outBuf,
-        LIT(ZT("</SOAP-ENV:Value>"))))
+        LIT(ZT("</s:Value>"))))
         goto failed;
 
     if (fault->subCode)
     {
         if (MI_RESULT_OK != WSBuf_AddLit(&outBuf,
-            LIT(ZT("<SOAP-ENV:Subcode>")
-            ZT("<SOAP-ENV:Value>"))))
+            LIT(ZT("<s:Subcode>")
+            ZT("<s:Value>"))))
             goto failed;
 
         if (MI_RESULT_OK != WSBuf_AddCharStringNoEncoding(
@@ -2521,15 +2521,15 @@ Page* WSBuf_CreateFaultResponsePage(
         }
 
         if (MI_RESULT_OK != WSBuf_AddLit(&outBuf,
-            LIT(ZT("</SOAP-ENV:Value>")
-            ZT("</SOAP-ENV:Subcode>"))))
+            LIT(ZT("</s:Value>")
+            ZT("</s:Subcode>"))))
             goto failed;
     }
 
     if (MI_RESULT_OK != WSBuf_AddLit(&outBuf,
-        LIT(ZT("</SOAP-ENV:Code>")
-        ZT("<SOAP-ENV:Reason>")
-        ZT("<SOAP-ENV:Text xml:lang=\"en-US\">"))))
+        LIT(ZT("</s:Code>")
+        ZT("<s:Reason>")
+        ZT("<s:Text xml:lang=\"en-US\">"))))
         goto failed;
 
     textToSend = fault->defaultText;
@@ -2545,8 +2545,8 @@ Page* WSBuf_CreateFaultResponsePage(
     }
 
     if (MI_RESULT_OK != WSBuf_AddLit(&outBuf,
-        LIT(ZT("</SOAP-ENV:Text>")
-        ZT("</SOAP-ENV:Reason>"))))
+        LIT(ZT("</s:Text>")
+        ZT("</s:Reason>"))))
     {
         goto failed;
     }
@@ -2558,7 +2558,7 @@ Page* WSBuf_CreateFaultResponsePage(
          * only have 1 right now so this works!
          */
         if ((MI_RESULT_OK != WSBuf_AddLit(&outBuf,
-                        LIT(ZT("<SOAP-ENV:Detail>")
+                        LIT(ZT("<s:Detail>")
                             ZT("<p:WSManFault xmlns:p=\"http://schemas.microsoft.com/wbem/wsman/1/wsmanfault\" Code=\"")
                            )
                         )))
@@ -2592,14 +2592,14 @@ Page* WSBuf_CreateFaultResponsePage(
         }
         if (MI_RESULT_OK != WSBuf_AddLit(&outBuf,
                     LIT(ZT("</p:WSManFault>")
-                        ZT("</SOAP-ENV:Detail>"))))
+                        ZT("</s:Detail>"))))
         {
             goto failed;
         }
     }
     else if ((message->result != MI_RESULT_OK) || (NULL != message->packedInstancePtr))
     {
-        if ((MI_RESULT_OK != WSBuf_AddLit(&outBuf, LIT(ZT("<SOAP-ENV:Detail>")ZT("<p:")))) ||
+        if ((MI_RESULT_OK != WSBuf_AddLit(&outBuf, LIT(ZT("<s:Detail>")ZT("<p:")))) ||
             (MI_RESULT_OK != WSBuf_AddString(&outBuf, (message->cimErrorClassName?message->cimErrorClassName:ZT("OMI_Error")))) ||
             (MI_RESULT_OK != WSBuf_AddLit(&outBuf,
                                           LIT(ZT(" wsmb:IsCIM_Error=\"true\" ")
@@ -2769,16 +2769,16 @@ Page* WSBuf_CreateFaultResponsePage(
 
         if ((MI_RESULT_OK != WSBuf_AddLit(&outBuf, LIT(ZT("</p:"))) ||
             (MI_RESULT_OK != WSBuf_AddString(&outBuf, (message->cimErrorClassName?message->cimErrorClassName:ZT("OMI_Error")))) ||
-            (MI_RESULT_OK != WSBuf_AddLit(&outBuf, LIT(ZT(">") ZT("</SOAP-ENV:Detail>"))))))
+            (MI_RESULT_OK != WSBuf_AddLit(&outBuf, LIT(ZT(">") ZT("</s:Detail>"))))))
         {
             goto failed;
         }
     }
 
     if (MI_RESULT_OK != WSBuf_AddLit(&outBuf,
-        LIT(ZT("</SOAP-ENV:Fault>")
-        ZT("</SOAP-ENV:Body>")
-        ZT("</SOAP-ENV:Envelope>"))))
+        LIT(ZT("</s:Fault>")
+        ZT("</s:Body>")
+        ZT("</s:Envelope>"))))
     {
         goto failed;
     }
@@ -2808,9 +2808,9 @@ Page* WSBuf_CreateReleaseResponsePage(
 
     if (MI_RESULT_OK != WSBuf_AddLit(&outBuf,
         LIT(
-        ZT("</SOAP-ENV:Header>")
-        ZT("<SOAP-ENV:Body/>")
-        ZT("</SOAP-ENV:Envelope>"))))
+        ZT("</s:Header>")
+        ZT("<s:Body/>")
+        ZT("</s:Envelope>"))))
         goto failed;
 
     return WSBuf_StealPage(&outBuf);

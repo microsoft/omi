@@ -76,8 +76,8 @@ STRAND_DEBUGNAME2( WsmanEnumerationContext, PullAttached, UnsubscribeAttached )
 const MI_Uint64 WSMAN_TIMEOUT_DEFAULT = 60 * 1000 * 1000; // 60 Seconds in microseconds
 
 #define TYPICAL_ENUM_RESPONSE_ENVELOPE \
-    "<SOAP-ENV:Envelope \n" \
-    "xmlns:SOAP-ENV=\n" \
+    "<s:Envelope \n" \
+    "xmlns:s=\n" \
     "\"http://www.w3.org/2003/05/soap-envelope\" \n" \
     "xmlns:wsa=\n" \
     "\"http://schemas.xmlsoap.org/ws/2004/08/addressing\" \n" \
@@ -95,21 +95,21 @@ const MI_Uint64 WSMAN_TIMEOUT_DEFAULT = 60 * 1000 * 1000; // 60 Seconds in micro
     "\"http://schemas.dmtf.org/wbem/wscim/1/common\" \n" \
     "xmlns:wsmid=\n" \
     "\"http://schemas.dmtf.org/wbem/wsman/identity/1/wsmanidentity.xsd\">\n" \
-    "<SOAP-ENV:Header>\n" \
+    "<s:Header>\n" \
     "<wsa:To>\n" \
     "http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous\n" \
     "</wsa:To>\n" \
-    "<wsa:Action>\n" \
+    "<wsa:Action s:mustUnderstand=\"true\">\n" \
     "http://schemas.xmlsoap.org/ws/2004/09/enumeration/EnumerateResponse\n" \
     "</wsa:Action>\n" \
-    "<wsa:MessageID>\n" \
+    "<wsa:MessageID s:mustUnderstand=\"true\">\n" \
     "uuid:00000000-0000-0000-0000-000000000000\n" \
     "</wsa:MessageID>\n" \
     "<wsa:RelatesTo>\n" \
     "uuid:00000000-0000-0000-0000-000000000000\n" \
     "</wsa:RelatesTo>\n" \
-    "</SOAP-ENV:Header>\n" \
-    "<SOAP-ENV:Body>\n" \
+    "</s:Header>\n" \
+    "<s:Body>\n" \
     "<wsen:EnumerateResponse>\n" \
     "<wsen:EnumerationContext>\n" \
     "000000000000\n" \
@@ -117,8 +117,8 @@ const MI_Uint64 WSMAN_TIMEOUT_DEFAULT = 60 * 1000 * 1000; // 60 Seconds in micro
     "<wsman:Items>\n" \
     "</wsman:Items>\n" \
     "</wsen:EnumerateResponse>\n" \
-    "</SOAP-ENV:Body>\n" \
-    "</SOAP-ENV:Envelope>\n"
+    "</s:Body>\n" \
+    "</s:Envelope>\n"
 
 /* aproximate repsonse header size */
 #define APPROX_ENUM_RESP_ENVELOPE_SIZE \
@@ -2694,8 +2694,8 @@ static void _SendEnumPullResponse(
     }
 
     if (MI_RESULT_OK != WSBuf_AddLit(&outBufHeader,
-        LIT(ZT("</SOAP-ENV:Header>")
-        ZT("<SOAP-ENV:Body>"))))
+		LIT(ZT("</s:Header>")
+			ZT("<s:Body>"))))
         GOTO_FAILED;
 
     if (selfCD->wsheader.rqtAction == WSMANTAG_ACTION_ENUMERATE)
@@ -2803,8 +2803,8 @@ static void _SendEnumPullResponse(
             GOTO_FAILED;
     }
     if (MI_RESULT_OK != WSBuf_AddLit(&outBufTrailer,
-        LIT(ZT("</SOAP-ENV:Body>")
-        ZT("</SOAP-ENV:Envelope>"))))
+		LIT(ZT("</s:Body>")
+			ZT("</s:Envelope>"))))
         GOTO_FAILED;
 
     /* all together */
@@ -2981,8 +2981,8 @@ static void _SendInvokeResponse(
         GOTO_FAILED;
 
     if (MI_RESULT_OK != WSBuf_AddLit(&outBuf,
-        LIT(ZT("</SOAP-ENV:Header>")
-        ZT("<SOAP-ENV:Body>"))))
+		LIT(ZT("</s:Header>")
+			ZT("<s:Body>"))))
     {
         GOTO_FAILED;
     }
@@ -2997,8 +2997,8 @@ static void _SendInvokeResponse(
 
     if (MI_RESULT_OK != WSBuf_AddLit(
         &outBuf,
-        LIT(ZT("</SOAP-ENV:Body>")
-        ZT("</SOAP-ENV:Envelope>"))))
+		LIT(ZT("</s:Body>")
+			ZT("</s:Envelope>"))))
     {
         GOTO_FAILED;
     }
@@ -3053,8 +3053,8 @@ static void _SendSingleResponseHelper(
         GOTO_FAILED;
 
     if (MI_RESULT_OK != WSBuf_AddLit(&outBuf,
-        LIT(ZT("</SOAP-ENV:Header>")
-        ZT("<SOAP-ENV:Body>")
+		LIT(ZT("</s:Header>")
+			ZT("<s:Body>")
         )))
         GOTO_FAILED;
 
@@ -3072,8 +3072,8 @@ static void _SendSingleResponseHelper(
     /* trailer */
     if (MI_RESULT_OK != WSBuf_AddLit(&outBuf,
         LIT(
-        ZT("</SOAP-ENV:Body>")
-        ZT("</SOAP-ENV:Envelope>"))))
+			ZT("</s:Body>")
+			ZT("</s:Envelope>"))))
         GOTO_FAILED;
 
     /* all together */
@@ -3132,9 +3132,9 @@ static void _SendEmptyBodyResponse(WSMAN_ConnectionData* selfCD,
         GOTO_FAILED;
 
     if (MI_RESULT_OK != WSBuf_AddLit(&outBuf,
-        LIT(ZT("</SOAP-ENV:Header>")
-        ZT("<SOAP-ENV:Body/>")
-        ZT("</SOAP-ENV:Envelope>")
+		LIT(ZT("</s:Header>")
+			ZT("<s:Body/>")
+			ZT("</s:Envelope>")
         )))
         GOTO_FAILED;
 
@@ -4769,16 +4769,16 @@ static void _SendHeartbeatResponse(
         GOTO_FAILED;
 
     if (MI_RESULT_OK != WSBuf_AddLit(&outBuf,
-        LIT(ZT("</SOAP-ENV:Header>")
-        ZT("<SOAP-ENV:Body>")
+		LIT(ZT("</s:Header>")
+		ZT("<s:Body>")
         )))
         GOTO_FAILED;
 
     / * trailer * /
     if (MI_RESULT_OK != WSBuf_AddLit(&outBuf,
         LIT(
-        ZT("</SOAP-ENV:Body>")
-        ZT("</SOAP-ENV:Envelope>"))))
+		ZT("</s:Body>")
+		ZT("</s:Envelope>"))))
         GOTO_FAILED;
 
     / * all together * /
@@ -4829,7 +4829,7 @@ static void _SendUnsubscribeResponse(
         GOTO_FAILED;
 
     if (MI_RESULT_OK != WSBuf_AddLit(&outBuf,
-        LIT(ZT("</SOAP-ENV:Header>\n<SOAP-ENV:Body/>\n</SOAP-ENV:Envelope>")
+		LIT(ZT("</s:Header>\n<s:Body/>\n</s:Envelope>")
         )))
         GOTO_FAILED;
 
