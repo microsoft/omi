@@ -143,7 +143,7 @@ int _ParseHttpPortSpecification(unsigned short **ports, int *size, const char *s
     *size = 0;
 
     // Skip leading spaces
-    char *saveptr;
+	char *saveptr = NULL;
     char *ptr = (char *) spec;
     while (*ptr == ' ')
     {

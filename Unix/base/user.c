@@ -379,7 +379,7 @@ int LookupUser(const char* user, uid_t* uid, gid_t* gid)
 int GetUserGidByUid(uid_t uid, gid_t* gid)
 {
     /* user name */
-    char name[USERNAME_SIZE];
+	char name[USERNAME_SIZE] = {0};
 
     if (0 != GetUserName((LPSTR)uid, (LPDWORD)name))
         return -1;
@@ -834,7 +834,7 @@ int IsUserAuthorized(const char *user, gid_t gid)
 #else
     typedef gid_t group_type;
 #endif
-    group_type groups[MAX_GROUPS];
+	group_type groups[MAX_GROUPS] = { 0 };
     int ngroups = MAX_GROUPS;
     int i;
 

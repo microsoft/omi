@@ -1243,8 +1243,8 @@ static MI_Result _GetHTTPHeaderOpts(
         for (i = 0; i < selfCD->headersSize; i++)
         {
             MI_Value v;
-            ZChar name[128];
-            ZChar value[128];
+			ZChar name[128] = { 0 };
+			ZChar value[128] = { 0 };
 
             Tcslcpy(name, MI_T("HTTP_"), MI_COUNT(name));
             TcsStrlcat(name, selfCD->headers[i].name, MI_COUNT(name));

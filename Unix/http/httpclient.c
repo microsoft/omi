@@ -560,7 +560,7 @@ static void _WriteTraceSessionTimestamp(_In_ PathID pathId, _In_opt_z_ const cha
     // [Session: NNNNN Date: YYYY/MM/DD HH:MM:SS.1234567Z]
     #define SESSION_DATETIME_SIZE 70
     const char FMT[] = "[Session: %s Date: %04d-%02d-%02d %02d:%02d:%02d.%07dZ]";
-    char buf[SESSION_DATETIME_SIZE];
+	char buf[SESSION_DATETIME_SIZE] = { 0 };
 
     struct timeval tv;
     struct tm tm;

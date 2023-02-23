@@ -188,7 +188,7 @@ static void _PutHeader(
     unsigned int line, 
     Log_Level level)
 {
-    char buf[TIMESTAMP_SIZE];
+    char buf[TIMESTAMP_SIZE] = { 0 };
 
     GetTimeStamp(buf);
     Ftprintf(os, ZT("%s "), scs(buf));

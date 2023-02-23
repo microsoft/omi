@@ -821,7 +821,7 @@ _BuildHeader( Http_SR_SocketData* handler, int contentLen,
     const char *perrcode_desc = _HttpErrorCodeDescription(handler->httpErrorCode, &errcode_desc_len);
     
     int  content_len_strlen = 0;
-    char content_len_buff[16] ;
+	char content_len_buff[16] = { 0 };
     char *pcontent_len = int64_to_a(content_len_buff, sizeof(content_len_buff), contentLen, &content_len_strlen);
 
     int needed_size = HTTP_PROTOCOL_HEADER_LEN  + errorcode_strlen + 1 + errcode_desc_len + 2 + // HTTP/1.1 0 200 Success\r\n
@@ -1685,7 +1685,7 @@ static MI_Result _CreateSSLContext(Http* self, const char* sslCipherSuite, SSL_O
     ** certificate.
     */
     {
-        char errorBuf[256];
+		char errorBuf[256] = { 0 };
 
         /* load the specified server certificates */
         trace_SSL_LoadingServerCert(scs(OMI_GetPath(ID_PEMFILE)));
@@ -1705,7 +1705,7 @@ static MI_Result _CreateSSLContext(Http* self, const char* sslCipherSuite, SSL_O
     ** If specified, validate and load the key.
     */
     {
-        char errorBuf[256];
+		char errorBuf[256] = { 0 };
 
         /* load the specified server certificates */
         trace_SSL_LoadingCertPrivateKey(scs(OMI_GetPath(ID_KEYFILE)));
