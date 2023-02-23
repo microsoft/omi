@@ -2024,7 +2024,7 @@ Page* _CreateHttpHeader(
     pageSize += Strlen(hostHeader) + 2;
     if (extraHeaders)
     {
-        int i;
+		size_t i;
         for (i = 0; i < extraHeaders->size; ++i)
         {
             pageSize += Strlen(extraHeaders->data[i]) + 2;
@@ -2163,7 +2163,7 @@ Page* _CreateHttpHeader(
 
     if (extraHeaders)
     {
-        int i;
+		size_t i;
         for (i = 0; i < extraHeaders->size; ++i)
         {
             r = (int)Strlcpy(p, extraHeaders->data[i], pageSize);
@@ -3030,7 +3030,8 @@ MI_Result HttpClient_StartRequest(
     HttpClientRequestHeaders *headers,
     Page** data)
 
-{  char *content_type = NULL;
+{
+   char *content_type = NULL;
    char *auth_header  = NULL;
    HttpClientRequestHeaders extra_headers = { NULL, 0 };
    const char** tmp_headers = NULL;
@@ -3045,8 +3046,8 @@ MI_Result HttpClient_StartRequest(
    {
        tmp_headers = (headers->size != 0) ? (const char **)PAL_Malloc(sizeof(char *) * headers->size) : NULL;
 
-       int i = 0;
-       int j = 0;
+	   size_t i = 0;
+	   size_t j = 0;
        for (i = 0; i < headers->size; i++ ) 
        {
            if (Strncasecmp(headers->data[i], CONTENT_TYPE_HDR, CONTENT_TYPE_HDR_LEN) == 0)

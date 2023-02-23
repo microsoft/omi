@@ -1082,7 +1082,7 @@ MI_Boolean HttpClient_DecryptData(_In_ HttpClient_SR_SocketData * handler, _Out_
         return FALSE;
     }
 
-    int i = 0;
+    MI_Uint32 i = 0;
     for (i = 0; i < pHeaders->sizeHeaders; i++ )
     {
         if (strncasecmp(pHeaders->headers[i].name, CONTENT_TYPE, CONTENT_TYPE_LEN) == 0)
@@ -2782,7 +2782,7 @@ Http_CallbackResult HttpClient_IsAuthorized(_In_ struct _HttpClient_SR_SocketDat
     HttpClientResponseHeader *pheaders = &self->recvHeaders;
     char *auth_header = NULL;
 
-    int i = 0;
+    size_t i = 0;
 
     // For unit test
     if (IsAuthCallsIgnored())
