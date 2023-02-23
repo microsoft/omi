@@ -875,7 +875,7 @@ static MI_Boolean _WriteAuthResponse(Http_SR_SocketData * handler, const char *p
         total_sent += sent;
 
     }
-    while (total_sent < responseLen);
+	while ((int)total_sent < responseLen);
 
     if (FORCE_TRACING || ((total_sent > 0) && handler->enableTracing))
     {

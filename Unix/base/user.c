@@ -381,7 +381,7 @@ int GetUserGidByUid(uid_t uid, gid_t* gid)
     /* user name */
     char name[USERNAME_SIZE];
 
-    if (0 != GetUserName(uid, name))
+    if (0 != GetUserName((LPSTR)uid, (LPDWORD)name))
         return -1;
 
     return LookupUser(name, &uid, gid);

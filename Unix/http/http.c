@@ -992,9 +992,9 @@ static Http_CallbackResult _WriteHeader( Http_SR_SocketData* handler)
                     {
                         GetTimeStamp(startTime);
                         _WriteTraceFile(ID_HTTPSENDTRACEFILE, &startTime, strlen(startTime));
-                        _WriteTraceFile(ID_HTTPSENDTRACEFILE, &before_encrypt, sizeof(before_encrypt));
+						_WriteTraceFile(ID_HTTPSENDTRACEFILE, (void *) &before_encrypt, sizeof(before_encrypt));
                         _WriteTraceFile(ID_HTTPSENDTRACEFILE, (char *)(pOldPage+1), pOldPage->u.s.size);
-                        _WriteTraceFile(ID_HTTPSENDTRACEFILE, &before_encrypt_end, sizeof(before_encrypt_end));
+						_WriteTraceFile(ID_HTTPSENDTRACEFILE, (void *) &before_encrypt_end, sizeof(before_encrypt_end));
                     }
                 }
 
@@ -1094,7 +1094,7 @@ static Http_CallbackResult _WriteData(
     buf_size = handler->sendPage->u.s.size - handler->sentSize;
     sent = 0;
 
-    r = _Sock_Write(handler, buf, buf_size, &sent);
+	r = _Sock_Write(handler, (void*)(buf), buf_size, &sent);
 
     if ( r == MI_RESULT_OK && 0 == sent )
         return PRT_RETURN_FALSE; /* conection closed */

@@ -514,9 +514,9 @@ MI_CONST MI_ClassDecl Identify_rtti =
     MI_FLAG_CLASS, /* flags */
     0x006F790C, /* code */
     MI_T("OMI_Identify"), /* name */
-    NULL, /* qualifiers */
+	(struct _MI_Qualifier**)NULL, /* qualifiers */
     0, /* numQualifiers */
-    Identify_props, /* properties */
+    (struct _MI_PropertyDecl**)Identify_props, /* properties */
     MI_COUNT(Identify_props), /* numProperties */
     sizeof(Identify), /* size */
     NULL, /* superClass */

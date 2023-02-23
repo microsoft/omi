@@ -961,7 +961,7 @@ static void _ReportError(HttpClient_SR_SocketData * self, const char *msg,
     gss_buffer_desc major_err = { 0 };
     gss_buffer_desc minor_err = { 0 };
     int  msglen = 0;
-    char *pmsg = NULL;
+    MI_Char *pmsg = NULL;
 
 
     if (major_status != 0)
@@ -2076,7 +2076,7 @@ static MI_Boolean _WriteAuthRequest(HttpClient_SR_SocketData * handler, const ch
         total_sent += sent;
 
     }
-    while (total_sent < requestLen);
+    while ((int)total_sent < requestLen);
 
     if (FORCE_TRACING || ((total_sent > 0) && handler->enableTracing))
     {
@@ -2840,7 +2840,7 @@ Http_CallbackResult HttpClient_IsAuthorized(_In_ struct _HttpClient_SR_SocketDat
                 #define BASIC_AUTH_FAIL_MSG "Basic Authorization failed for user "
                 int msglen = MI_COUNT(BASIC_AUTH_FAIL_MSG)-1;
                 int username_len = strlen(self->username);
-                char *pmsg = NULL;
+                MI_Char *pmsg = NULL;
     
                 if (username_len > USERNAME_LIMIT)
                 {
@@ -2858,7 +2858,7 @@ Http_CallbackResult HttpClient_IsAuthorized(_In_ struct _HttpClient_SR_SocketDat
                 client->probableCause->probable_cause_id = WSMAN_CIMERROR_PROBABLE_CAUSE_AUTHENTICATION_FAILURE;
                 client->probableCause->description       = (MI_Char *)(client->probableCause+1);
                 
-                self->errMsg = (char*)(client->probableCause+1);
+                self->errMsg = (MI_Char*)(client->probableCause+1);
                 pmsg = self->errMsg;
                 memcpy(pmsg, BASIC_AUTH_FAIL_MSG, msglen);
                 pmsg += msglen;

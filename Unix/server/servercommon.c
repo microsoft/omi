@@ -191,7 +191,7 @@ int _ParseHttpPortSpecification(unsigned short **ports, int *size, const char *s
                     err(ZT("memory allocation failure allocating %d bytes"), bytes);
                 }
 
-                (*ports)[(*size) - 1] = x;
+				(*ports)[(*size) - 1] = (unsigned short)x;
             }
         }
     }

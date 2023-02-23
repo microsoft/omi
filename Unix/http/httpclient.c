@@ -3082,13 +3082,13 @@ MI_Result HttpClient_StartRequest(
        self->connector->authType = AUTH_METHOD_BYPASS;
    }
     
-   rtnval = HttpClient_StartRequestV2(self, verb, uri, content_type, auth_header, headers, data, NULL  );
+	rtnval = HttpClient_StartRequestV2(self, verb, uri, content_type, auth_header, (HttpClientRequestHeaders*)headers, data, (Probable_Cause_Data **)NULL);
    
    if (tmp_headers != NULL)
    {
        // When extra_headers are used properly, please reassess whether this PAL_Free belongs here. 
        // This exists for now to prevent a memory leak.
-       PAL_Free(tmp_headers);
+		PAL_Free((void *)tmp_headers);
    }
 
    return rtnval;

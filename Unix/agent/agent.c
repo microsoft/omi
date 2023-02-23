@@ -330,7 +330,7 @@ static void GetCommandLineOptions(int* argc, const char* argv[])
                     scs(state.arg));
             }
 
-            s_opts.idletimeout = x;
+            s_opts.idletimeout = (MI_Uint32)x;
         }
         else if (strcmp(state.opt, "--loglevel") == 0)
         {
@@ -474,7 +474,7 @@ int agent_main(int argc, const char* argv[])
     if (s_opts.idletimeout)
     {
         /* convert it to usec */
-        s_data.provmgr.idleTimeoutUsec = s_opts.idletimeout * 1000000;
+        s_data.provmgr.idleTimeoutUsec = (MI_Uint64)s_opts.idletimeout * 1000000;
         trace_Agent_ChangingIdleTimeout(s_opts.idletimeout);
 
     }

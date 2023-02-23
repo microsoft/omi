@@ -1044,9 +1044,8 @@ static int _ValidateEnumerateRequest(
             selfCD,
             NULL,
             WSBUF_FAULT_INTERNAL_ERROR,
-            ZT("mandatory parameters (className, namespace) "
-                "are missing for enumerate request"));
-
+			ZT("mandatory parameters (className, namespace) ")
+			ZT("are missing for enumerate request"));
         return -1;
     }
 
@@ -1254,7 +1253,7 @@ static MI_Result _GetHTTPHeaderOpts(
 
             Tcslcpy(value, selfCD->headers[i].value, MI_COUNT(value));
 
-            v.string = value;
+			v.string = (MI_Char*)value;
 
             r = __MI_Instance_AddElement(
                 options,

@@ -290,7 +290,7 @@ MI_Result MI_CALL Class_GetElementAt(
     }
     if (referenceClass)
     {
-        *referenceClass = propertyDecl->className;
+        *referenceClass = (MI_Char*) propertyDecl->className;
     }
     if (qualifierSet)
     {
@@ -366,12 +366,12 @@ MI_Result MI_CALL Class_GetElementAtExt(
 
     if(originClass)
     {
-        *originClass = propertyDecl->origin;
+        *originClass = (MI_Char*) propertyDecl->origin;
     }
 
     if(propagatorClass)
     {
-        *propagatorClass = propertyDecl->propagator;
+        *propagatorClass = (MI_Char*) propertyDecl->propagator;
     }
 
     return MI_RESULT_OK;
@@ -489,12 +489,12 @@ MI_Result MI_CALL Class_GetMethodAtExt(
 
     if(originClass)
     {
-        *originClass = methodDecl->origin;
+        *originClass = (MI_Char*) methodDecl->origin;
     }
 
     if(propagatorClass)
     {
-        *propagatorClass = methodDecl->propagator;
+        *propagatorClass = (MI_Char*) methodDecl->propagator;
     }
 
     if(flags)
@@ -680,7 +680,7 @@ MI_Result _ParameterSet_GetParameterAt(
     (*qualifierSet).reserved2 = (ptrdiff_t) parameterDecl[index]->qualifiers;
     if (referenceClass)
     {
-        *referenceClass = parameterDecl[index]->className;
+        *referenceClass = (MI_Char*) parameterDecl[index]->className;
     }
     return MI_RESULT_OK;
 }
@@ -1649,7 +1649,7 @@ MI_PropertyDecl * Class_Clone_Property(
     MI_PropertyDecl *newProperty = Batch_Get(batch, sizeof(MI_PropertyDecl));
     if (newProperty == NULL)
     {
-        return NULL;  /* Returning NULL causes whole batch to destruct */
+        return (MI_PropertyDecl*)NULL;  /* Returning NULL causes whole batch to destruct */
     }
     memset(newProperty, 0, sizeof(*newProperty));
     newProperty->flags = property->flags;
@@ -1657,14 +1657,14 @@ MI_PropertyDecl * Class_Clone_Property(
     newProperty->name = Batch_Tcsdup(batch, property->name);
     if (newProperty->name == NULL)
     {
-        return NULL;  /* Returning NULL causes whole batch to destruct */
+        return (MI_PropertyDecl*)NULL;  /* Returning NULL causes whole batch to destruct */
     }
     if (property->qualifiers && property->numQualifiers)
     {
-        newProperty->qualifiers = Class_Clone_Qualifiers(batch, property->qualifiers, property->numQualifiers);
+        newProperty->qualifiers = (MI_Qualifier**)Class_Clone_Qualifiers(batch, property->qualifiers, property->numQualifiers);
         if (newProperty->qualifiers == NULL)
         {
-            return NULL;  /* Returning NULL causes whole batch to destruct */
+            return (MI_PropertyDecl*)NULL;  /* Returning NULL causes whole batch to destruct */
         }
         newProperty->numQualifiers = property->numQualifiers;
     }
@@ -1674,7 +1674,7 @@ MI_PropertyDecl * Class_Clone_Property(
         newProperty->className = Batch_Tcsdup(batch, property->className); /* embedded/reference stringly typed class name */
         if (newProperty->className == NULL)
         {
-            return NULL;  /* Returning NULL causes whole batch to destruct */
+            return (MI_PropertyDecl*)NULL;  /* Returning NULL causes whole batch to destruct */
         }
     }
     newProperty->subscript = property->subscript;
@@ -1684,7 +1684,7 @@ MI_PropertyDecl * Class_Clone_Property(
         newProperty->origin = Batch_Tcsdup(batch, property->origin);
         if (newProperty->origin == NULL)
         {
-            return NULL;  /* Returning NULL causes whole batch to destruct */
+            return (MI_PropertyDecl*)NULL;  /* Returning NULL causes whole batch to destruct */
         }
     }
     if (property->propagator)
@@ -1692,7 +1692,7 @@ MI_PropertyDecl * Class_Clone_Property(
         newProperty->propagator = Batch_Tcsdup(batch, property->propagator);
         if (newProperty->propagator == NULL)
         {
-            return NULL;  /* Returning NULL causes whole batch to destruct */
+            return (MI_PropertyDecl*)NULL;  /* Returning NULL causes whole batch to destruct */
         }
     }
     if (((property->flags & MI_FLAG_NULL) != MI_FLAG_NULL) && property->value)
@@ -1700,7 +1700,7 @@ MI_PropertyDecl * Class_Clone_Property(
         newProperty->value = Class_Clone_Value(batch, property->type, property->value);
         if (newProperty->value == NULL)
         {
-            return NULL;  /* Returning NULL causes whole batch to destruct */
+            return (MI_PropertyDecl*)NULL;  /* Returning NULL causes whole batch to destruct */
         }
     }
     else
@@ -1761,7 +1761,7 @@ MI_ParameterDecl * Class_Clone_Parameter(
     }
     if (parameter->qualifiers && parameter->numQualifiers)
     {
-        newParameter->qualifiers = Class_Clone_Qualifiers(batch, parameter->qualifiers, parameter->numQualifiers);
+        newParameter->qualifiers = (MI_Qualifier**)Class_Clone_Qualifiers(batch, parameter->qualifiers, parameter->numQualifiers);
         if (newParameter->qualifiers == NULL)
         {
             return NULL;  /* Returning NULL causes whole batch to destruct */
@@ -1823,7 +1823,7 @@ MI_MethodDecl * Class_Clone_Method(
     MI_MethodDecl *newMethod = Batch_Get(batch, sizeof(MI_MethodDecl));
     if (newMethod == NULL)
     {
-        return NULL;  /* Returning NULL causes whole batch to destruct */
+        return (MI_MethodDecl *)NULL;  /* Returning NULL causes whole batch to destruct */
     }
     memset(newMethod, 0, sizeof(*newMethod));
     newMethod->flags = method->flags;
@@ -1831,23 +1831,23 @@ MI_MethodDecl * Class_Clone_Method(
     newMethod->name = Batch_Tcsdup(batch, method->name);
     if (newMethod->name == NULL)
     {
-        return NULL;  /* Returning NULL causes whole batch to destruct */
+        return (MI_MethodDecl *)NULL;  /* Returning NULL causes whole batch to destruct */
     }
     if (method->qualifiers && method->numQualifiers)
     {
-        newMethod->qualifiers = Class_Clone_Qualifiers(batch, method->qualifiers, method->numQualifiers);
+        newMethod->qualifiers = (struct _MI_Qualifier**)Class_Clone_Qualifiers(batch, method->qualifiers, method->numQualifiers);
         if (newMethod->qualifiers == NULL)
         {
-            return NULL;  /* Returning NULL causes whole batch to destruct */
+            return (MI_MethodDecl *)NULL;  /* Returning NULL causes whole batch to destruct */
         }
         newMethod->numQualifiers = method->numQualifiers;
     }
     if (method->parameters && method->numParameters)
     {
-        newMethod->parameters = Class_Clone_Parameters(batch, method->parameters, method->numParameters, className);
+        newMethod->parameters = (struct _MI_ParameterDecl**)Class_Clone_Parameters(batch, method->parameters, method->numParameters, className);
         if (newMethod->parameters == NULL)
         {
-            return NULL;  /* Returning NULL causes whole batch to destruct */
+            return (MI_MethodDecl *)NULL;  /* Returning NULL causes whole batch to destruct */
         }
         newMethod->numParameters = method->numParameters;
     }
@@ -1858,7 +1858,7 @@ MI_MethodDecl * Class_Clone_Method(
         newMethod->origin = Batch_Tcsdup(batch, method->origin);
         if (newMethod->origin == NULL)
         {
-            return NULL;  /* Returning NULL causes whole batch to destruct */
+            return (MI_MethodDecl *)NULL;  /* Returning NULL causes whole batch to destruct */
         }
     }
     if (method->propagator)
@@ -1866,7 +1866,7 @@ MI_MethodDecl * Class_Clone_Method(
         newMethod->propagator = Batch_Tcsdup(batch, method->propagator);
         if (newMethod->propagator == NULL)
         {
-            return NULL;  /* Returning NULL causes whole batch to destruct */
+            return (MI_MethodDecl *)NULL;  /* Returning NULL causes whole batch to destruct */
         }
     }
     /* Leave owning schema NULL otherwise we would need to potentially clone that and every other class in there */
@@ -1925,7 +1925,7 @@ MI_ClassDecl* Class_Clone_ClassDecl(
     }
     if (classDecl->qualifiers && classDecl->numQualifiers)
     {
-        newClassDecl->qualifiers = Class_Clone_Qualifiers(batch, classDecl->qualifiers, classDecl->numQualifiers);
+        newClassDecl->qualifiers = (struct _MI_Qualifier**)Class_Clone_Qualifiers(batch, classDecl->qualifiers, classDecl->numQualifiers);
         if (newClassDecl->qualifiers == NULL)
         {
             return NULL;  /* Returning NULL causes whole batch to destruct */
@@ -1934,7 +1934,7 @@ MI_ClassDecl* Class_Clone_ClassDecl(
     }
     if (classDecl->properties && classDecl->numProperties)
     {
-        newClassDecl->properties = Class_Clone_Properties(batch, classDecl->properties, classDecl->numProperties);
+        newClassDecl->properties = (struct _MI_PropertyDecl**)Class_Clone_Properties(batch, classDecl->properties, classDecl->numProperties);
         if (newClassDecl->properties == NULL)
         {
             return NULL;  /* Returning NULL causes whole batch to destruct */
@@ -1962,7 +1962,7 @@ MI_ClassDecl* Class_Clone_ClassDecl(
     }
     if (classDecl->methods && classDecl->numMethods)
     {
-        newClassDecl->methods = Class_Clone_Methods(batch, classDecl->methods, classDecl->numMethods, classDecl->name);
+        newClassDecl->methods = (struct _MI_MethodDecl**)Class_Clone_Methods(batch, classDecl->methods, classDecl->numMethods, classDecl->name);
         if (newClassDecl->methods == NULL)
         {
             return NULL;  /* Returning NULL causes whole batch to destruct */

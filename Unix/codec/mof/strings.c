@@ -180,7 +180,7 @@ MI_Char* GetString(MI_Uint32 id)
 {
     if (id < cSTRSLength)
     {
-        return cSTRS[id];
+        return (MI_Char*)cSTRS[id];
     }
     return NULL;
 }
