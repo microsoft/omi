@@ -1013,7 +1013,7 @@ void trace_SigTERM_received_OBSOLETE(const char* user);
 OI_EVENT("Starting %s: version: (%s), platform: (%s)")
 void trace_Product_Version(const char* product, const char* version, const char* platform);
 OI_EVENT("New request received: command=(%T), namespace=(%T), class=(%T)")
-void trace_New_Request(const TChar* cmd, const TChar* namespace, const TChar* class);
+void trace_New_Request(const TChar* cmd, const TChar* namespace_, const TChar* class_);
 OI_EVENT("WARNING: one or more blocks still allocated!")
 void trace_DumpAllocList_Warning();
 OI_EVENT("BLOCK: %s(%u): ptr=%p: magic=%08X id=%u size=%u")
