@@ -1020,6 +1020,7 @@ static void _ProcessNoopRequest(_Inout_ InteractionOpenParams*  params)
         trace_OutOfMemory();
         Strand_FailOpen(params);
         err(ZT("out of memory"));
+		return;
     }
 
     /* Send NoOp response back */
@@ -1030,6 +1031,7 @@ static void _ProcessNoopRequest(_Inout_ InteractionOpenParams*  params)
         trace_OutOfMemory();
         Strand_FailOpen(params);
         err(ZT("out of memory"));
+		return;
     }
 
 #if !defined(CONFIG_FAVORSIZE)

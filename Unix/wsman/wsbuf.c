@@ -778,6 +778,8 @@ MI_Result WSBuf_AddString(
         ZChar* pos = start;
         ZChar* end = (ZChar*)(((char*)(buf->page +1))+ buf->page->u.s.size);
         /* Add reamingin characters (next character is special)*/
+		if (str == NULL)
+			return MI_RESULT_OK;
         while (*str)
         {
             const ZChar* item;
@@ -1576,9 +1578,10 @@ static MI_Result _PackEPR(
     /* namespace (if present)*/
     if (self->nameSpace)
     {
-        WSBuf_AddLit(buf, LIT(ZT("<wsman:Selector Name=\"__cimnamespace\">")));
-        WSBuf_AddStringNoEncoding(buf, self->nameSpace);
-        WSBuf_AddLit(buf, LIT(ZT("</wsman:Selector>")));
+        if(MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT("<wsman:Selector Name=\"__cimnamespace\">"))) ||
+		MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, self->nameSpace) ||
+		MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT("</wsman:Selector>"))))
+        return MI_RESULT_FAILED;
     }
 
     /* Put properties */
