@@ -560,7 +560,7 @@ Err:
 
 
 static void
-_GssUnloadLibrary()
+_GssUnloadLibrary(void)
 
 {
     dlclose(_g_gssClientState.libHandle);
