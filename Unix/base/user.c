@@ -707,6 +707,7 @@ MI_Boolean ValidateGssCredentials(const char *credFilePath, const char *krb5KeyT
         *p = '\0';
     }
 
+    if (credFilePath)
     {
         struct stat buf = {0};
         int rtn = stat(credFilePath, &buf);
@@ -862,6 +863,9 @@ int IsUserAuthorized(const char *user, gid_t gid)
     return 0;
 #else
     // non-supported platforms
+	MI_UNUSED(groups);
+	MI_UNUSED(ngroups);
+	MI_UNUSED(i);
     return 1;
 #endif
 }
