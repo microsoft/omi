@@ -2303,11 +2303,11 @@ static void _ParseValidateProcessCreateRequest(
     /* Set the user agent */
     msg->base.userAgent = selfCD->userAgent;
 
+#ifndef DISABLE_SHELL
     /* Parse create request/body */
     if (WS_ParseCreateBody(xml, msg->base.base.batch, &msg->instance, &selfCD->wsheader.isShellOperation) != 0)
         GOTO_FAILED;
 
-#ifndef DISABLE_SHELL
     if (selfCD->wsheader.isCompressed)
     {
         MI_Value value;
