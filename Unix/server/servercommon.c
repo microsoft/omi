@@ -446,7 +446,7 @@ void ResetLog()
     conf = Conf_Open(path);
     if (!conf)
     {
-        trace_CriticalError("Failed to open configuration file");
+        trace_CriticalError(MI_T("Failed to open configuration file"));
         return;
     }
 
@@ -459,7 +459,7 @@ void ResetLog()
 
         if (r == -1)
         {
-            trace_CriticalError("Incorrect entry in configuration file");
+            trace_CriticalError(MI_T("Incorrect entry in configuration file"));
             break;
         }
 
@@ -470,7 +470,7 @@ void ResetLog()
         {
             if (Log_SetLevelFromString(value) != 0)
             {
-                trace_CriticalError("Incorrect loglevel set in configuration file");
+                trace_CriticalError(MI_T("Incorrect loglevel set in configuration file"));
             }
             break;
         }

@@ -763,12 +763,12 @@ static void _GetConfigFileOptions(
 
     /* Form the configuration file path */
     if (FindConfigFile(path) != 0)
-        err("failed to find configuration file");
+		err(MI_T("failed to find configuration file"));
 
     /* Open the configuration file */
     conf = Conf_Open(path);
     if (!conf)
-        err("failed to open configuration file: %s", path);
+		err(MI_T("failed to open configuration file: %s"), path);
 
     /* For each key=value pair in configuration file */
     for (;;)
@@ -778,7 +778,7 @@ static void _GetConfigFileOptions(
         int r = Conf_Read(conf, &key, &value);
 
         if (r == -1)
-            err("%s: %s\n", path, Conf_Error(conf));
+			err(MI_T("%s: %s\n"), path, Conf_Error(conf));
 
         if (r == 1)
             break;
@@ -801,13 +801,13 @@ static void _GetConfigFileOptions(
                 }
                 else
                 {
-                    err("%s(%u): duplicate key: %s",
+					err(MI_T("%s(%u): duplicate key: %s"),
                         path, Conf_Line(conf), opt.c_str ());
                 }
             }
         }
         else
-            err("%s(%u): unknown key: %s", path, Conf_Line(conf), key);
+			err(MI_T("%s(%u): unknown key: %s"), path, Conf_Line(conf), key);
     }
 
     /* Close configuration file */
