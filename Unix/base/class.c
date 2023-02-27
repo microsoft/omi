@@ -1517,7 +1517,7 @@ void* Class_Clone_Value(
             MI_Char *string = NULL;
             MI_Char **pointerToString = NULL;
 
-            pointerToString =  (MI_Char**)Batch_Get(batch, sizeof(MI_Char**));
+            pointerToString =  (MI_Char**)Batch_Get(batch, sizeof(MI_Char*));
             if (pointerToString == NULL)
             {
                 return NULL; /* Returning NULL causes whole batch to destruct */
@@ -1538,7 +1538,7 @@ void* Class_Clone_Value(
             MI_Instance *instance = NULL;
             MI_Instance **pointerToInstance= NULL;
 
-            pointerToInstance =  (MI_Instance**)Batch_Get(batch, sizeof(MI_Instance**));
+            pointerToInstance =  (MI_Instance**)Batch_Get(batch, sizeof(MI_Instance*));
             if (pointerToInstance == NULL)
             {
                 return NULL; /* Returning NULL causes whole batch to destruct */

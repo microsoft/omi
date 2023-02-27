@@ -1252,7 +1252,7 @@ MI_Result MI_CALL Instance_NewDynamic(
             MI_PropertyDecl** data;
 
             data = (MI_PropertyDecl**)BAlloc(batch,
-                _CAPACITY * sizeof(MI_PropertyDecl), CALLSITE);
+				_CAPACITY * sizeof(MI_PropertyDecl*), CALLSITE);
 
             if (!data)
             {

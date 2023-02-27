@@ -151,7 +151,7 @@ int StrSet_Add(
         free(bucket);
         return 1;
     }
-
+    free(bucket);
     return 0;
 }
 
