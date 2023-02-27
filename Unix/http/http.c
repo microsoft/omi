@@ -222,7 +222,7 @@ static MI_Boolean _getHeaderField(
             }
             break;
         }
-        case (_HashCode('u','t',10)):
+		case (_HashCode('u', 't', 10)): /*User-Agent*/
         {
             /* Remember the User-Agent for later use */
             if (Strcasecmp(name, "User-Agent") == 0)
@@ -231,7 +231,7 @@ static MI_Boolean _getHeaderField(
             }
             break;
         }
-        case (_HashCode('p', 't', 4)):
+		case (_HashCode('p', 't', 4)): /*POST*/
         {
             /* Remember the User-Agent for later use */
             if (Strcasecmp(name, "POST") == 0)
