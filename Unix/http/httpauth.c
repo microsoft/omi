@@ -8,11 +8,13 @@
 */
 
 #include <config.h>
+#if defined SUPPORT_KRB5
 #if ( AUTHORIZATION == 1 )
 #if defined(macos)
 #include <GSS/GSS.h>
 #else
 #include <gssapi/gssapi.h>
+#endif
 #endif
 #endif
 #include <sys/types.h>
@@ -40,13 +42,16 @@
 // #define ENCRYPT_DECRYPT 1
 // #define AUTHORIZATION 1
 
+#if defined SUPPORT_KRB5
 #if !defined(KRB5_CALLCOV)
 #define KRB5_CALLCONV
+#endif
 #endif
 
 #define MAX_ERROR_STRING_SIZE  256
 #define TIMESTAMP_SIZE 128
 int GetTimeStamp(_Pre_writable_size_(TIMESTAMP_SIZE) char buf[TIMESTAMP_SIZE]);
+#if defined SUPPORT_KRB5
 static void _report_error(OM_uint32 major_status, OM_uint32 minor_status, const char *msg);
     
 // dlsyms from the dlopen
@@ -169,7 +174,7 @@ static Gss_Extensions _g_gssState = { 0 };
 
 static struct _Once g_once_state = ONCE_INITIALIZER;
 static const char GSS_LIBRARY_NAME[] = CONFIG_GSSLIB;
-
+#endif
 static const char RESPONSE_HEADER_UNAUTH_FMT[] =
     "HTTP/1.1 401 Unauthorized\r\n" "Content-Length: 0\r\n"
     "WWW-Authenticate: Basic realm=\"WSMAN\"\r\n"       \
@@ -177,6 +182,7 @@ static const char RESPONSE_HEADER_UNAUTH_FMT[] =
     "WWW-Authenticate: Kerberos\r\n" "\r\n";
 static const int RESPONSE_HEADER_UNAUTH_FMT_LEN = MI_COUNT(RESPONSE_HEADER_UNAUTH_FMT)-1;
 
+#if defined SUPPORT_KRB5
 void _GssUnloadLibrary()
 {
     dlclose(_g_gssState.libHandle);
@@ -333,7 +339,7 @@ int _GssInitLibrary(_In_ void *data, _Outptr_result_maybenull_ void **value)
         return FALSE;
 
 }
-
+#endif
 #define HTTP_LONGEST_ERROR_DESCRIPTION 50
 void _WriteTraceFile(PathID id, const void *data, size_t size);
 
@@ -932,6 +938,7 @@ static void _SendAuthResponse(Http_SR_SocketData * sendSock, const char *pRespon
 
 }
 
+#if defined SUPPORT_KRB5
 #if AUTHORIZATION
 static gss_buffer_t _getPrincipalName(gss_ctx_id_t pContext)
 {
@@ -1606,13 +1613,14 @@ static char *_BuildAuthResponse(_In_ const char *pProtocol,
 }
 
 #endif
-
+#endif
 void Deauthorize(_In_ Http_SR_SocketData * handler)
 {
+#if defined SUPPORT_KRB5
 #if defined(AUTHORIZATION)
     OM_uint32 maj_stat, min_stat;
 #endif
-
+#endif
     // Reinit all of the handler authorisation state.
 
     handler->authFailed = FALSE;
@@ -1621,6 +1629,7 @@ void Deauthorize(_In_ Http_SR_SocketData * handler)
     {
         // Tear down the context. The function will set to null
 
+#if defined SUPPORT_KRB5
 #if defined(AUTHORIZATION)
         gss_ctx_id_t hdl = handler->pAuthContext;
         maj_stat = (* _g_gssState.Gss_Delete_Sec_Context)(&min_stat, &hdl, NULL);
@@ -1631,10 +1640,13 @@ void Deauthorize(_In_ Http_SR_SocketData * handler)
         }
         handler->pAuthContext = hdl;
 #endif
+#endif
     }
     if (handler->pVerifierCred)
     {
+#if defined SUPPORT_KRB5
         (* _g_gssState.Gss_Release_Cred)(&min_stat, handler->pVerifierCred);
+#endif
         handler->pVerifierCred = NULL;
     }    
 
@@ -1731,7 +1743,9 @@ Http_CallbackResult IsClientAuthorized(_In_ Http_SR_SocketData * handler)
 #if AUTHORIZATION
     static const char RESPONSE_HEADER_BAD_REQUEST[] = "HTTP/1.1 400 Bad Request\r\n" "Content-Length: 0\r\n" "\r\n";
     static const int  RESPONSE_HEADER_BAD_REQUEST_LEN = MI_COUNT(RESPONSE_HEADER_BAD_REQUEST)-1;
+#if defined SUPPORT_KRB5
     OM_uint32 flags = 0;
+#endif
     const char *protocol_p = NULL;
 #endif
 
@@ -1843,6 +1857,7 @@ Http_CallbackResult IsClientAuthorized(_In_ Http_SR_SocketData * handler)
         handler->isAuthorised = TRUE;
         return PRT_RETURN_TRUE;
     }
+#if defined SUPPORT_KRB5
 #ifdef AUTHORIZATION
     else
     {
@@ -2253,7 +2268,7 @@ Http_CallbackResult IsClientAuthorized(_In_ Http_SR_SocketData * handler)
         }
     }
 #endif
-
+#endif
   Done:
     return authorised;
 }
@@ -2261,6 +2276,7 @@ Http_CallbackResult IsClientAuthorized(_In_ Http_SR_SocketData * handler)
 
 void HttpAuth_Close(_In_ Handler *handlerIn)
 {
+#if defined SUPPORT_KRB5
    Http_SR_SocketData* handler = FromOffset( Http_SR_SocketData, handler, handlerIn );
    gss_ctx_id_t context_hdl = handler->pAuthContext;
    OM_uint32 min_stat = 0;
@@ -2279,6 +2295,7 @@ void HttpAuth_Close(_In_ Handler *handlerIn)
            (*_g_gssState.Gss_Delete_Sec_Context)(&min_stat, &context_hdl, NULL);
        }
    }
+#endif
 }
 
 MI_Result Process_Authorized_Message(
