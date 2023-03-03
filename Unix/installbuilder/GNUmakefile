@@ -15,7 +15,7 @@ include $(TOP)/config.mak
 #
 # This makes it easier for Jenkins to have a reasonable directory layout
 PACKAGE_DIR_SUFFIX = $(shell echo $(OUTPUTDIRNAME) | sed 's/output//' | sed 's~^_open~/open~')
-PACKAGE_SSL_DECORATION = $(shell echo $(OUTPUTDIRNAME) | sed 's/output_openssl_1.0.0/ssl_100/' | sed 's/output_openssl_1.1.0/ssl_110/')
+PACKAGE_SSL_DECORATION = $(shell echo $(OUTPUTDIRNAME) | sed 's/output_openssl_1.0.0/ssl_100/' | sed 's/output_openssl_1.1.0/ssl_110/'| sed 's/output_openssl_3.0.0/ssl_300/')
 PACKAGE_DIR = $(TOP)/../Packages/$(BUILD_CONFIGURATION)$(PACKAGE_DIR_SUFFIX)
 
 # Selinux policy directories.
