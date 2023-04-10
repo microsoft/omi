@@ -20,7 +20,7 @@ extern "C" {
 #endif
 
 #define WQL_MAX_PROPERTIES 128
-#define WQL_MAX_SYMBOLS 128
+#define WQL_MAX_SYMBOLS 256
 
 /* Type of symbol appearing in the WHERE clause */
 typedef enum _WQL_Type
