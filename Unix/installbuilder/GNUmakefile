@@ -15,7 +15,7 @@ include $(TOP)/config.mak
 #
 # This makes it easier for Jenkins to have a reasonable directory layout
 PACKAGE_DIR_SUFFIX = $(shell echo $(OUTPUTDIRNAME) | sed 's/output//' | sed 's~^_open~/open~')
-PACKAGE_SSL_DECORATION = $(shell echo $(OUTPUTDIRNAME) | sed 's/output_openssl_1.0.0/ssl_100/' | sed 's/output_openssl_1.1.0/ssl_110/')
+PACKAGE_SSL_DECORATION = $(shell echo $(OUTPUTDIRNAME) | sed 's/output_openssl_1.0.0/ssl_100/' | sed 's/output_openssl_1.1.0/ssl_110/'| sed 's/output_openssl_3.0.0/ssl_300/')
 PACKAGE_DIR = $(TOP)/../Packages/$(BUILD_CONFIGURATION)$(PACKAGE_DIR_SUFFIX)
 
 # Selinux policy directories.
@@ -70,11 +70,17 @@ else
   WITH_SYMBOLS=withsymbols
 endif
 
+ifeq ($(ENABLE_SECURITY_HARDENING),1)
+  SECURITY_FLAG=.s
+else
+  SECURITY_FLAG=
+endif
+
 # New output format for OMI on Linux (avoids ugly renaming since we always build universal)
 ifeq ($(PF),Linux)
   BUILD_SEMODULE = 1
   ifneq ($(PF_ARCH),ppc)
-    OUTPUTFILE_LINE = --OUTPUTFILE=omi-$(CONFIG_VERSION)-$(CONFIG_PATCH_LEVEL).$(PACKAGE_SSL_DECORATION).ulinux.$(PF_ARCH)
+    OUTPUTFILE_LINE = --OUTPUTFILE=omi-$(CONFIG_VERSION)-$(CONFIG_PATCH_LEVEL).$(PACKAGE_SSL_DECORATION).ulinux$(SECURITY_FLAG).$(PF_ARCH)
     OUTPUTFILE_LINE_WITHSYMBOLS = $(OUTPUTFILE_LINE).$(WITH_SYMBOLS)
   else
     ifeq ($(PF_DISTRO),SUSE)

@@ -692,7 +692,6 @@ void PostSocketFile_Print(
         {"operationId", FT_UINT64, offsetof(Self, base.operationId)},
         {"type", FT_UINT32, offsetof(Self, type)},
         {"sockFilePath", FT_STRING, offsetof(Self, sockFilePath)},
-        {"secretString", FT_STRING, offsetof(Self, secretString)},
         {NULL, 0, 0},
     };
     _Message_Print(msg, os, "PostSocketFile", fields);

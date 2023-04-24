@@ -56,6 +56,7 @@ MI_Result Buf_Init(
     if (!page)
         return MI_RESULT_FAILED;
 
+    memset(page, 0, sizeof(Page) + capacity);
     page->u.s.size = capacity;
     page->u.s.next = 0;
 
@@ -104,6 +105,9 @@ MI_Result Buf_Reserve(
 #ifdef CONFIG_ENABLE_DEBUG
             if (page)
                 memset(((char*)(page+1)) + self->capacity,0xAA,capacity - self->capacity);
+#else
+            if(page)
+                memset(((char*)(page+1)) + self->capacity,0,capacity - self->capacity);
 #endif
         }
         else
@@ -112,6 +116,9 @@ MI_Result Buf_Reserve(
 #ifdef CONFIG_ENABLE_DEBUG
             if(page)
                 memset(page,0xAA,sizeof(Page) + capacity);
+#else
+            if(page)
+                memset(page, 0, sizeof(Page) + capacity);
 #endif
         }
 

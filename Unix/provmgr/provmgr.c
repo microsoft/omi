@@ -1238,7 +1238,9 @@ static MI_Result _HandleGetClassReq(
     // by default serializer will use the function tables to access resultClass as a wrapper to MI_ClassDecl
     // this place will be modified in future to fill in the appropriate extended function tables
     // providing access to schema in form of instance of cimclass
-    Class_Construct(&resultClass, (*prov)->classDecl);
+    r = Class_Construct(&resultClass, (*prov)->classDecl);
+    if( MI_RESULT_OK != r )
+        return r;
 
     _PostClassToCallback(ctx, interactionParams, &resultClass);
     return MI_RESULT_OK;

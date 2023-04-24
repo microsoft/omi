@@ -973,6 +973,10 @@ static void _ReportError(HttpClient_SR_SocketData * self, const char *msg,
     trace_HTTP_ClientAuthFailed(major_err.value, minor_err.value);
     msglen = strlen(msg);
     client->probableCause = (Probable_Cause_Data*)PAL_Malloc(sizeof(Probable_Cause_Data)+msglen+major_err.length+minor_err.length+5);
+    if(client->probableCause)
+    {
+        memset(client->probableCause, 0, sizeof(Probable_Cause_Data)+msglen+major_err.length+minor_err.length+5);
+    }
 
     client->probableCause->alloc_p           = (void*)client->probableCause;
     client->probableCause->type = ERROR_ACCESS_DENIED;
@@ -1565,6 +1569,7 @@ HttpClient_EncryptData(_In_ HttpClient_SR_SocketData * handler, _Out_ Page **pHe
         _ReportError(handler, "alloc failed for pHewHeader", 0, 0);
         goto Error;
     }
+    memset(pNewHeaderPage, 0, MULTIPART_ENCRYPTED_LEN + orig_hdr_len + 100 + sizeof(Page));
     pNewHeaderPage->u.s.size = (MULTIPART_ENCRYPTED_LEN + orig_hdr_len + 100);
 
     pNewHeader = (char *)(pNewHeaderPage+1);
@@ -1664,6 +1669,7 @@ HttpClient_EncryptData(_In_ HttpClient_SR_SocketData * handler, _Out_ Page **pHe
         goto Error;
     }
 
+    memset(pNewData, 0, allocationSize);
     pNewData->u.s.size = needed_data_size;
     pNewData->u.s.next = 0;
     buffp = (char *)(pNewData + 1);
@@ -2233,6 +2239,7 @@ HttpClient_NextAuthRequest(_In_ struct _HttpClient_SR_SocketData * self, _In_ co
         /* create header page */
 
         char *request_header = PAL_Malloc(POST_HEADER_LEN+header_len+5+strlen(self->hostHeader));
+        if (!request_header) return PRT_RETURN_FALSE;
         char *requestp = request_header;
 
         memcpy(requestp, POST_HEADER, POST_HEADER_LEN);
@@ -2241,8 +2248,11 @@ HttpClient_NextAuthRequest(_In_ struct _HttpClient_SR_SocketData * self, _In_ co
         strcpy(requestp, self->hostHeader);
         requestp += strlen(self->hostHeader);
 
-        memcpy(requestp, auth_header, header_len);
-        requestp += header_len;
+        if(auth_header)
+        {
+            memcpy(requestp, auth_header, header_len);
+            requestp += header_len;
+        }
 
         *requestp++ = '\r';
         *requestp++ = '\n';
@@ -2839,6 +2849,10 @@ Http_CallbackResult HttpClient_IsAuthorized(_In_ struct _HttpClient_SR_SocketDat
                 }
 
                 client->probableCause = (Probable_Cause_Data*)PAL_Malloc(sizeof(Probable_Cause_Data)+msglen+strlen(self->username)+3);
+                if(client->probableCause)
+                {
+                    memset(client->probableCause , 0, sizeof(Probable_Cause_Data)+msglen+strlen(self->username)+3);
+                }
                 client->probableCause->alloc_p           = (void*)client->probableCause;
                 client->probableCause->type = ERROR_ACCESS_DENIED;
                 client->probableCause->probable_cause_id = WSMAN_CIMERROR_PROBABLE_CAUSE_AUTHENTICATION_FAILURE;

@@ -192,7 +192,7 @@ MI_Result WSBuf_ClassToBuf(_In_ const MI_Class *classObject,
 /* Utility */
 #define WS_MSG_ID_SIZE      42
 
-void WSBuf_GenerateMessageID(
+MI_Result WSBuf_GenerateMessageID(
     _Pre_writable_size_(WS_MSG_ID_SIZE) ZChar msgID[WS_MSG_ID_SIZE]);
 
 /* Maps CIMM error to the most relevant WS fault;

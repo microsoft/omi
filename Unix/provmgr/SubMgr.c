@@ -681,6 +681,10 @@ static MI_Result _SubscriptionList_EnsureArray(
     if (SizeTMult(sizeof (SubMgrSubscriptionPtr), capacity, &allocSize) == S_OK)
     {
         subarray = (SubMgrSubscriptionPtr*)PAL_Malloc( allocSize );
+        if(subarray)
+        {
+            memset(subarray, 0, allocSize);
+        }
     }
 
     if (subarray == NULL)

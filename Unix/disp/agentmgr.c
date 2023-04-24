@@ -853,12 +853,17 @@ static pid_t _SpawnAgentProcess(
         fdLimit = 2500;
     }
 
-    /* ATTN: close first 3 also! Left for debugging only */
-    for (fd = 3; fd < fdLimit; ++fd)
+    /* closing FD for stdin,stdout,stderr also i.e. 0,1,2 respectively*/
+    for (fd = 0; fd < fdLimit; ++fd)
     {
         if (fd != s && fd != logfd)
             close(fd);
     }
+
+    /* Re-open fd 0,1,2. */
+    open("/dev/null", O_RDONLY);
+    open("/dev/null", O_RDWR);
+    open("/dev/null", O_RDWR);
 
     /* prepare parameter:
         socket fd to attach */

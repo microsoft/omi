@@ -695,6 +695,7 @@ static MI_Result ConsumeInstanceResults(MI_Operation *miOperation)
                         MI_Uint32 clientBufferLength = c_initBufferLength;
                         MI_Uint32 clientBufferNeeded = 0;
                         clientBuffer = (MI_Uint8*)malloc(clientBufferLength + 1);
+                        if(!clientBuffer) return MI_RESULT_FAILED;
                         MI_Application_Initialize(0,NULL,NULL, &application);
                         miResult = XmlSerializer_Create(&application, 0, MI_T("MI_XML"), &serializer);
                         if (miResult != MI_RESULT_OK)
@@ -712,7 +713,17 @@ static MI_Result ConsumeInstanceResults(MI_Operation *miOperation)
                                 // Try again with a buffer given to us by the clientBufferNeeded field
                                 clientBufferLength = clientBufferNeeded;
                                 clientBuffer = (MI_Uint8*)malloc(clientBufferLength + 1);
-                                miResult = XmlSerializer_SerializeInstance( &serializer, 0, miInstanceResult, clientBuffer, clientBufferLength, &clientBufferNeeded);
+
+                                if(clientBuffer)
+                                {
+                                    miResult = XmlSerializer_SerializeInstance( &serializer, 0, miInstanceResult, clientBuffer, clientBufferLength, &clientBufferNeeded);
+                                }
+                                else
+                                {
+                                    XmlSerializer_Close(&serializer);
+                                    MI_Application_Close(&application);
+                                    return MI_RESULT_FAILED;
+                                }
                             }
                             else
                             {
@@ -760,40 +771,54 @@ static MI_Result ConsumeInstanceResults(MI_Operation *miOperation)
                                 MI_Uint32 clientBufferLength = c_initBufferLength;
                                 MI_Uint32 clientBufferNeeded = 0;
                                 clientBuffer = (MI_Uint8*)malloc(clientBufferLength + 1);
-                                MI_Application_Initialize(0,NULL,NULL, &application);
-                                miResult = XmlSerializer_Create(&application, 0, MI_T("MI_XML"), &serializer);
-                                if (miResult != MI_RESULT_OK)
+                                if (clientBuffer)
                                 {
-                                    MI_Application_Close(&application);
-                                    return miResult;
-                                }
-                                miResult = XmlSerializer_SerializeInstance( &serializer, 0, miInstanceResult, clientBuffer, clientBufferLength, &clientBufferNeeded);
-                                if (miResult != MI_RESULT_OK)
-                                {
-                                    free(clientBuffer);
-                                    if (clientBufferNeeded > 0)
+                                    MI_Application_Initialize(0, NULL, NULL, &application);
+                                    miResult = XmlSerializer_Create(&application, 0, MI_T("MI_XML"), &serializer);
+                                    if (miResult != MI_RESULT_OK)
                                     {
-                                        // Try again with a buffer given to us by the clientBufferNeeded field
-                                        clientBufferLength = clientBufferNeeded;
-                                        clientBuffer = (MI_Uint8*)malloc(clientBufferLength + 1);
-                                        miResult = XmlSerializer_SerializeInstance( &serializer, 0, miInstanceResult, clientBuffer, clientBufferLength, &clientBufferNeeded);
-                                    }
-                                    else
-                                    {
-                                        XmlSerializer_Close(&serializer);
                                         MI_Application_Close(&application);
                                         return miResult;
                                     }
-                                }
+                                    miResult = XmlSerializer_SerializeInstance(&serializer, 0, miInstanceResult, clientBuffer, clientBufferLength, &clientBufferNeeded);
+                                    if (miResult != MI_RESULT_OK)
+                                    {
+                                        free(clientBuffer);
+                                        if (clientBufferNeeded > 0)
+                                        {
+                                            // Try again with a buffer given to us by the clientBufferNeeded field
+                                            clientBufferLength = clientBufferNeeded;
+                                            clientBuffer = (MI_Uint8*)malloc(clientBufferLength + 1);
+                                            if(!clientBuffer)
+                                            {
+                                                XmlSerializer_Close(&serializer);
+                                                MI_Application_Close(&application);
+                                                return MI_RESULT_FAILED;
+                                            }
+                                            
+                                            miResult = XmlSerializer_SerializeInstance(&serializer, 0, miInstanceResult, clientBuffer, clientBufferLength, &clientBufferNeeded);
+                                        }
+                                        else
+                                        {
+                                            XmlSerializer_Close(&serializer);
+                                            MI_Application_Close(&application);
+                                            return miResult;
+                                        }
+                                    }
 
-                                XmlSerializer_Close(&serializer);
-                                MI_Application_Close(&application);
-                                if (miResult == MI_RESULT_OK)
-                                {
-                                    clientBuffer[clientBufferNeeded] = '\0';
-                                    printf("%s", (char*)clientBuffer);
+                                    XmlSerializer_Close(&serializer);
+                                    MI_Application_Close(&application);
+                                    if (miResult == MI_RESULT_OK)
+                                    {
+                                        clientBuffer[clientBufferNeeded] = '\0';
+                                        printf("%s", (char*)clientBuffer);
+                                    }
+                                    free(clientBuffer);
                                 }
-                                free(clientBuffer);
+                                else
+                                {
+                                    return MI_RESULT_FAILED;
+                                }
                             }
                             else
                             {
@@ -1665,7 +1690,14 @@ static MI_Result Invoke(MI_Session *miSession, int argc, const MI_Char* argv[])
     if (p != end)
     {
         const MI_Char *className;
-        __MI_Instance_GetClassName(instance, &className);
+        MI_Result getClassNameResult =__MI_Instance_GetClassName(instance, &className);
+        if(getClassNameResult != MI_RESULT_OK)
+        {
+            err(PAL_T("invalid class name specification"));
+            MI_Instance_Delete(instance);
+            return getClassNameResult;
+        }
+
         if (!ArgsToInstance(&p, end, MI_FLAG_METHOD, MI_TRUE, className, &inParams))
         {
             err(PAL_T("invalid instance name specification"));

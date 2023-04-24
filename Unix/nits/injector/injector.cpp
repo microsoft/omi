@@ -300,6 +300,7 @@ BOOL EnumProcessModulesHelper(
         PAL_Char *currentBaseName = NULL;
         lphModule[count].modulePath = NULL;
         lphModule[count].moduleBaseName = NULL;
+        file.width(MAX_PATH);
         file >> buf;
         startOfPath = strchr(buf, '/');
         if(startOfPath)

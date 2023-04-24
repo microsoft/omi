@@ -19,6 +19,7 @@ demonstrates very high performance.
 
 
 ### Get OMI
+#### Using Github
 
 RPM and DEB packages are provided for the installation of OMI on most
 enterprise Linux distributions. To install OMI, download the correct
@@ -44,6 +45,8 @@ Linux    | RPM     | x86          | 1.0.0 | [omi-MAJOR.MINOR.PATCH-BUILD.
 **Note:** MAJOR, MINOR, PATCH, and BUILD refer to the version number information for the specific version of OMI that you wish to install.
 
 [Releases]: https://github.com/Microsoft/omi/releases
+
+#### Using Package Managers
 
 Alternatively, you can now also download from Microsoft Repo. Instructions
 on setting this up can be found [here](https://technet.microsoft.com/en-us/windows-server-docs/compute/Linux-Package-Repository-for-Microsoft-Software).  Follow the instructions for your platform.  You can then use your platform's package tool to install OMI (i.e. `sudo apt-get install omi` or `sudo yum install omi`).
@@ -224,6 +227,26 @@ Docker Monitoring Agent for OMI Server                       | [Docker Provider]
 MySQL Monitoring Agent for OMI Server                        | [MySQL Provider](https://github.com/Microsoft/MySQL-Provider)
 Apache Monitoring Agent for OMI Server                       | [Apache Provider](https://github.com/Microsoft/Apache-Provider)
 Python Script Provider for OMI Server                        | [Python Provider](https://github.com/Microsoft/omi-script-provider)
+
+### Microsoft Products that use OMI
+
+The following table lists the Microsoft products and Azure services that use OMI to orchestrate configuration management and log collection on Linux VMs:
+
+
+Product Name                                                 | Official Site
+------------------------------------------------------------ | -------------
+Azure Automation Desired State Configuration                 | [Azure Automation Desired State Configuration, DSC Extension](https://docs.microsoft.com/en-us/azure/virtual-machines/extensions/dsc-linux)
+System Center Operations Manager (SCOM)                      | [System Center Operations Manager (SCOM) Management Pack for UNIX and Linux Operating Systems](https://docs.microsoft.com/en-us/system-center/scom/plan-planning-agent-deployment?view=sc-om-2022)
+Log Analytics Agent                                          | [Log Analytics Agent](https://docs.microsoft.com/en-us/azure/azure-monitor/agents/agent-linux)
+Azure Security Center                                        | [Azure Security Center](https://docs.microsoft.com/en-us/azure/defender-for-cloud/faq-data-collection-agents)
+Container Monitoring Solution                                | [Container Monitoring Solution](https://docs.microsoft.com/en-us/azure/azure-monitor/containers/containers)
+Azure Sentinel                                               | [Azure Sentinel](https://docs.microsoft.com/en-us/azure/sentinel/overview)
+Azure Stack Hub                                              | [Azure Stack Hub](https://docs.microsoft.com/en-us/azure-stack/operator/azure-stack-overview?view=azs-2102)
+Azure HDInsight                                              | [Azure HDInsight](https://docs.microsoft.com/en-us/azure/hdinsight/hdinsight-overview)
+Azure Automation                                             | [Azure Automation](https://docs.microsoft.com/en-us/azure/automation/automation-runbook-execution)
+Azure Automation Update Management                           | [Azure Automation Update Management](https://docs.microsoft.com/en-us/azure/automation/update-management/overview)
+Azure Diagnostics (LAD)                                      | [Azure Diagnostics (LAD)](https://docs.microsoft.com/en-us/azure/virtual-machines/extensions/diagnostics-linux?context=%2Fazure%2Fvirtual-machines%2Fcontext%2Fcontext&tabs=azcli)
+
 
 ### Code of Conduct
 

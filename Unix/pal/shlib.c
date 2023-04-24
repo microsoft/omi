@@ -35,7 +35,7 @@ PAL_Char* Shlib_Err()
     char* err = dlerror();
     size_t len = strlen(err) + 1;
     PAL_Char* copy = PAL_Malloc(len * sizeof(PAL_Char));
-    TcsStrlcpy(copy, err, len);
+    if(copy)  TcsStrlcpy(copy, err, len);
     return copy;
 }
 

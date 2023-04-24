@@ -1051,6 +1051,7 @@ bool Run::ParseArgument(_In_ char *arg)
 
             memset(buf, 0, sizeof(buf));
 
+            file.width(MAX_PATH);
             file >> buf;
 
             // allow empty lines or commented lines with #

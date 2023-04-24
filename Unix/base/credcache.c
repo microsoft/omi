@@ -208,7 +208,7 @@ void CredCache_PutUser(const char* user, const char* password)
         return;
 
     /* user name */
-    strcpy(s_cache[pos].user, user);
+    strncpy(s_cache[pos].user, user, userLen+1);//add 1 for copying terminating NULL character also
 
     /* hash */
     _Hash(user, userLen, password, strlen(password), s_cache[pos].hash);

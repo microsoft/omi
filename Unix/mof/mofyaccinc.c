@@ -1486,11 +1486,14 @@ case 31:
         
         
         q = CALLOC_T(MI_Qualifier, 1);
-        q->name = qd->name; /* use casing of qualifier declaration name */
-        q->type = qd->type;
-        q->flavor = qd->flavor;
-        q->value = NewTrueValue();
-        yyval.qualifier = q;
+        if (q)
+        {
+            q->name = qd->name; /* use casing of qualifier declaration name */
+            q->type = qd->type;
+            q->flavor = qd->flavor;
+            q->value = NewTrueValue();
+            yyval.qualifier = q;
+        }
     }
 break;
 case 32:
@@ -1516,11 +1519,14 @@ case 32:
         }
         
         q = CALLOC_T(MI_Qualifier, 1);
-        q->name = qd->name; /* use casing of qualifier declaration name */
-        q->type = qd->type;
-        q->flavor = qd->flavor;
-        q->value = value;
-        yyval.qualifier = q;
+        if (q)
+        {
+            q->name = qd->name; /* use casing of qualifier declaration name */
+            q->type = qd->type;
+            q->flavor = qd->flavor;
+            q->value = value;
+            yyval.qualifier = q;
+        }
     }
 break;
 case 33:
@@ -1545,11 +1551,14 @@ case 33:
         }
         
         q = CALLOC_T(MI_Qualifier, 1);
-        q->name = qd->name; /* use casing of qualifier declaration name */
-        q->type = qd->type;
-        q->flavor = PropagateFlavors(yystack.l_mark[0].flags, qd->flavor);
-        q->value = NewTrueValue();
-        yyval.qualifier = q;
+        if (q)
+        {
+            q->name = qd->name; /* use casing of qualifier declaration name */
+            q->type = qd->type;
+            q->flavor = PropagateFlavors(yystack.l_mark[0].flags, qd->flavor);
+            q->value = NewTrueValue();
+            yyval.qualifier = q;
+        }
     }
 break;
 case 34:
@@ -1575,11 +1584,14 @@ case 34:
         }
         
         q = CALLOC_T(MI_Qualifier, 1);
+        if(q)
+        {
         q->name = qd->name; /* use casing of qualifier declaration name */
         q->type = qd->type;
         q->value = value;
         q->flavor = PropagateFlavors(yystack.l_mark[0].flags, qd->flavor);
         yyval.qualifier = q;
+        }
     }
 break;
 case 35:

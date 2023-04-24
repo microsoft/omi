@@ -31,9 +31,7 @@ void SockSendRecvHTTP(
 /* starts server (with or without ignoreAuth option dependin on flag)
     and creates new connector to it */
 #define USER "omi"
-#define PASSWORD "CfgMgr2011"
 #define USER_Z MI_T("omi")
-#define PASSWORD_Z MI_T("CfgMgr2011")
 
 int StartServerAndConnect(
     bool ignoreAuth,

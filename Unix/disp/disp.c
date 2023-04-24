@@ -484,6 +484,11 @@ static MI_Boolean _DispatchAssocReq(
 
     /* Create new request to send to provider */
     msg = AssociationsOfReq_New(req->base.base.operationId, req->base.base.flags, tag);
+    if (!msg)
+    {
+        trace__DispatchAssocReq_OutOfMemory();
+        return MI_FALSE;
+    }
     msg->base.options = req->base.options;
     AuthInfo_Copy( &msg->base.authInfo, &req->base.authInfo );
     /* original request will be kept for the request duration, so perform shallow copy only */
@@ -597,8 +602,7 @@ static MI_Result _HandleGetClassReq(
     _In_ GetClassReq* req)
 {
     MI_Result r;
-    const ProvRegEntry* reg;
-    ProvRegEntry freg;
+    ProvRegEntry* reg;
     ProvRegPosition pos;
 
     /* Validate input parameters */
@@ -610,8 +614,6 @@ static MI_Result _HandleGetClassReq(
     // client must specify classname for GetClass request
     if(Tcscmp(req->className, PAL_T("*")) == 0)
         return MI_RESULT_INVALID_CLASS;
-
-    memset( &freg, 0, sizeof(freg) );
 
     // Find a provider for this class.
     reg = ProvReg_FindProviderForClass(&self->provreg, req->nameSpace,
@@ -642,9 +644,17 @@ static MI_Result _HandleGetClassReq(
             if (MI_RESULT_OK == r)
             {
                 DEBUG_ASSERT(pos.start != NULL);
-                MapRegPositionValuesToRegEntry(&freg, &pos);
-                freg.nameSpace = req->nameSpace;
-                freg.nameSpaceHash = Hash(req->nameSpace);
+                reg = (ProvRegEntry*)Batch_GetClear(req->base.base.batch, sizeof(ProvRegEntry));
+                if(reg)
+                {
+                    MapRegPositionValuesToRegEntry(reg, &pos);
+                    reg->nameSpace =  req->nameSpace;
+                    reg->nameSpaceHash = Hash(req->nameSpace);
+                }
+                else
+                {
+                    r = MI_RESULT_FAILED;
+                }
             }
         }
 
@@ -656,13 +666,9 @@ static MI_Result _HandleGetClassReq(
             goto sendErrorBack;
         }
     }
-    else
-    {
-        freg = *reg;
-    }
 
     // Send the request to provider manager.
-    r = AgentMgr_HandleRequest(&self->agentmgr, interactionParams, &freg);
+    r = AgentMgr_HandleRequest(&self->agentmgr, interactionParams, reg);
 
     if (r != MI_RESULT_OK)
     {
@@ -675,6 +681,7 @@ static MI_Result _HandleGetClassReq(
 
 sendErrorBack:
     // Just abort creating any interaction at all
+
     return r;
 }
 

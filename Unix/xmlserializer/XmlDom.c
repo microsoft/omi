@@ -71,6 +71,7 @@ MI_Result XMLDOM_Parse(_In_z_ MI_Char *xmlString, _Outptr_result_z_ MI_Char **en
         goto cleanup;
     }
 
+    memset(xml, 0, sizeof(*xml));
     XML_Init(xml);
     XML_SetText(xml, xmlString);
 

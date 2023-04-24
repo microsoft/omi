@@ -1133,17 +1133,11 @@ FILE_EVENT1(20153, trace_Password_Error_Impl, LOG_ERR, PAL_T("Password exceeds r
 #endif
 FILE_EVENT0(20154, trace_Listen_Failed_Impl, LOG_ERR, PAL_T("Listen failed on both IPv4 and IPv6"))
 #if defined(CONFIG_ENABLE_DEBUG)
-#define trace_InvalidServerCredentials() trace_InvalidServerCredentials_Impl(__FILE__, __LINE__)
+#define trace_MaliciousAttemptDetected(a0, a1, a2) trace_MaliciousAttemptDetected_Impl(__FILE__, __LINE__, a0, a1, a2)
 #else
-#define trace_InvalidServerCredentials() trace_InvalidServerCredentials_Impl(0, 0)
+#define trace_MaliciousAttemptDetected(a0, a1, a2) trace_MaliciousAttemptDetected_Impl(0, 0, a0, a1, a2)
 #endif
-FILE_EVENT0(20155, trace_InvalidServerCredentials_Impl, LOG_ERR, PAL_T("Invalid Server credentials"))
-#if defined(CONFIG_ENABLE_DEBUG)
-#define trace_AttemptToResetSecretString() trace_AttemptToResetSecretString_Impl(__FILE__, __LINE__)
-#else
-#define trace_AttemptToResetSecretString() trace_AttemptToResetSecretString_Impl(0, 0)
-#endif
-FILE_EVENT0(20156, trace_AttemptToResetSecretString_Impl, LOG_ERR, PAL_T("Attempt to reset Secret String"))
+FILE_EVENT3(20155, trace_MaliciousAttemptDetected_Impl, LOG_ERR, PAL_T("(%c) A malicious attempt is detected. tag:(%d) name:(%T)"), char, MI_Uint32, const TChar *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace__FindSubRequest_CannotFindKey(a0, a1, a2) trace__FindSubRequest_CannotFindKey_Impl(__FILE__, __LINE__, a0, a1, a2)
 #else
@@ -5007,7 +5001,7 @@ FILE_EVENT0(45372, trace_ClientCredentialsVerfied2_Impl, LOG_DEBUG, PAL_T("Clien
 #else
 #define trace_AuthStates(a0, a1, a2, a3) trace_AuthStates_Impl(0, 0, a0, a1, a2, a3)
 #endif
-FILE_EVENT4(45373, trace_AuthStates_Impl, LOG_DEBUG, PAL_T("(%c)Handle:(%p), ClientAuthState = %d, EngineAuthState = %d"), char, void*, int, int)
+FILE_EVENT4(45373, trace_AuthStates_Impl, LOG_DEBUG, PAL_T("(%c)Handle:(%p), ClientAuthState = %d, ServerAuthState = %d"), char, void*, int, int)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_AskServerToAuthenticate() trace_AskServerToAuthenticate_Impl(__FILE__, __LINE__)
 #else
@@ -5086,12 +5080,6 @@ FILE_EVENT2(45385, trace_AgentMgr_PreExec_ResponseStrand_Close_Impl, LOG_DEBUG, 
 #define trace_AgentMgr_PreExec_ResponseStrand_Finish(a0, a1) trace_AgentMgr_PreExec_ResponseStrand_Finish_Impl(0, 0, a0, a1)
 #endif
 FILE_EVENT2(45386, trace_AgentMgr_PreExec_ResponseStrand_Finish_Impl, LOG_DEBUG, PAL_T("AgentMgr_PreExec_ResponseStrand_Finish: preexecContext (%p), strand (%p)"), void*, void*)
-#if defined(CONFIG_ENABLE_DEBUG)
-#define trace_ServerCredentialsVerified(a0) trace_ServerCredentialsVerified_Impl(__FILE__, __LINE__, a0)
-#else
-#define trace_ServerCredentialsVerified(a0) trace_ServerCredentialsVerified_Impl(0, 0, a0)
-#endif
-FILE_EVENT1(45387, trace_ServerCredentialsVerified_Impl, LOG_DEBUG, PAL_T("Server credentials verified (%p)"), void*)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_HTTP_EncryptionFailed() trace_HTTP_EncryptionFailed_Impl(__FILE__, __LINE__)
 #else

@@ -753,6 +753,9 @@ if [ "$arg1" = "cflags" -o "$arg1" = "cxxflags" ]; then
             --gcov)
                 gcov_opt=1
                 ;;
+            --security-hardening)
+                security_hardening_opt=1
+                ;;
             --pic)
                 pic_opt=1
                 ;;
@@ -798,6 +801,10 @@ if [ "$arg1" = "cflags" -o "$arg1" = "cxxflags" ]; then
             r="$r -fvisibility=hidden"
             r="$r -fcommon"
             r="$r -fno-strict-aliasing"
+            test -n "$security_hardening_opt" && r="$r -D_FORTIFY_SOURCE=2"
+            test -n "$security_hardening_opt" && r="$r -z noexecstack"
+            test -n "$security_hardening_opt" && r="$r -Wl,-z,relro -Wl,-z,now"
+            test -n "$security_hardening_opt" && r="$r -Wformat -Wformat-security -Werror=format-security"
             r="$r -fstack-protector-all"
             r="$r -D_GNU_SOURCE"
             r="$r -D_XOPEN_SOURCE=600"

@@ -219,6 +219,7 @@ fi
 sudo rm -rf $prefix
 ./configure --enable-werror --prefix=$prefix --outputdirname=$current_output $options
 
+
 if [ "$?" != "0" ]; then
     echo "$0: configure failed"
     cleanup ./$current_output

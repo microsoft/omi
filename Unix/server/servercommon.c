@@ -1309,8 +1309,7 @@ MI_Result WsmanProtocolListen()
 MI_Result BinaryProtocolListenFile(
     const char *socketFile, 
     MuxIn *mux, 
-    ProtocolBase **protocol,
-    const char *expectedSecretString)
+    ProtocolBase **protocol)
 {
     MI_Result r = MI_RESULT_OK;
 
@@ -1343,12 +1342,10 @@ MI_Result BinaryProtocolListenFile(
         if (serverType == OMI_SERVER && s_optsPtr->nonRoot)
         {
             (*protocol)->socketFile = NULL;
-            (*protocol)->expectedSecretString = expectedSecretString;
         }
         else
         {
             (*protocol)->socketFile = NULL;
-            (*protocol)->expectedSecretString = NULL;
         }
     }
 
@@ -1359,8 +1356,7 @@ MI_Result BinaryProtocolListenSock(
     Sock sock, 
     MuxIn *mux, 
     ProtocolSocketAndBase **protocol, 
-    const char *socketFile, 
-    const char *expectedSecretString)
+    const char *socketFile)
 {
     MI_Result r = MI_RESULT_OK;
 
@@ -1394,14 +1390,10 @@ MI_Result BinaryProtocolListenSock(
         if (serverType == OMI_SERVER && s_optsPtr->nonRoot)
         {
             (*protocol)->internalProtocolBase.socketFile = socketFile;
-            (*protocol)->internalProtocolBase.expectedSecretString = expectedSecretString;
-            (*protocol)->protocolSocket.engineAuthState = PRT_AUTH_OK;
         }
         else
         {
             (*protocol)->internalProtocolBase.socketFile = socketFile;
-            (*protocol)->internalProtocolBase.expectedSecretString = expectedSecretString;
-            (*protocol)->protocolSocket.engineAuthState = PRT_AUTH_OK;
         }
     }
     
@@ -1414,7 +1406,7 @@ MI_Result RunProtocol()
 
     MI_Result r = MI_RESULT_OK;
     const PAL_Uint64 ONE_SECOND_USEC = 1000 * 1000;
-    PAL_Uint64 start;
+    PAL_Uint64 start = 0;
     PAL_Uint64 finish;
 
     PAL_Time(&start);

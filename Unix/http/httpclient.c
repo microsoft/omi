@@ -355,7 +355,7 @@ static MI_Boolean _getRequestLine(
     }
 
     /* skip to end of line */
-    for (index = 1; (*line)[index] && index < handler->receivedSize; index++)
+    for (index = 1; index < handler->receivedSize && (*line)[index]; index++)
     {
         if ((*line)[index-1] == '\r' && (*line)[index] == '\n')
         {
@@ -746,6 +746,10 @@ static Http_CallbackResult _ReadHeader(
     {
         /* Allocate zero-terminated buffer */
         handler->recvPage = (Page*)PAL_Malloc(allocSize);
+        if(handler->recvPage)
+        {
+            memset(handler->recvPage, 0, allocSize);
+        }
     }
     else
     {
@@ -1108,6 +1112,10 @@ static Http_CallbackResult _ReadChunkHeader(
     {
         /* Allocate zero-terminated buffer */
         handler->recvPage = (Page*)PAL_Malloc(allocSize);
+        if(handler->recvPage)
+        {
+            memset(handler->recvPage, 0, allocSize);
+        }
     }
     else
     {
@@ -2100,8 +2108,11 @@ Page* _CreateHttpHeader(
         int  numstr_len = 0;
         char *pnumstr = int64_to_a(numbuff, sizeof(numbuff), size, &numstr_len);
 
-        memcpy(p, pnumstr, numstr_len);
-        p += numstr_len;
+        if (pnumstr)
+        {
+            memcpy(p, pnumstr, numstr_len);
+            p += numstr_len;
+        }
     }
 
     memcpy(p, "\r\n", 2);
@@ -2684,7 +2695,7 @@ MI_Result HttpClient_New_Connector2(
     char *user_domain = NULL;
     char *password    = NULL;
     MI_Uint32 password_len = 0;
-    SSL_Options sslOptions;
+    SSL_Options sslOptions = 0;
 
     static const Probable_Cause_Data CONNECT_ERROR = {
                      ERROR_WSMAN_DESTINATION_UNREACHABLE,

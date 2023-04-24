@@ -16,6 +16,7 @@
 #include <base/log.h>
 #include <base/pidfile.h>
 #include <omiclient/client.h>
+#include <cstdlib>
 #include <iostream>
 #include <unistd.h>
 #include <sys/wait.h>
@@ -197,6 +198,7 @@ int StartServerAndConnect(
     ProtocolSocketAndBase** protocol)
 {
     const char* path = OMI_GetPath(ID_SERVERPROGRAM);
+    const char* omiPassword = std::getenv("OMI_PASSWORD");
     char http[32];
     char https[32];
     string socketFile = OMI_GetPath(ID_SOCKETFILE);
@@ -255,7 +257,7 @@ int StartServerAndConnect(
     {
         mi::Client cl;
         const MI_Uint64 TIMEOUT = 1 * 1000 * 1000;  // 1 second
-        if (cl.Connect(sockfile, USER_Z, PASSWORD_Z, TIMEOUT))
+        if (cl.Connect(sockfile, USER_Z, MI_T(omiPassword), TIMEOUT))
             break;
 
         ut::sleep_ms(100);
@@ -279,7 +281,7 @@ int StartServerAndConnect(
                         socketFile.c_str(),
                         &params,
                         USER,
-                        PASSWORD );
+                        omiPassword );
 
     UT_ASSERT( MI_RESULT_OK == result );
 

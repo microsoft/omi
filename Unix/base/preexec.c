@@ -17,6 +17,7 @@
 #if defined(CONFIG_POSIX)
 # include <pthread.h>
 # include <errno.h>
+# include <fcntl.h>
 # include <unistd.h>
 # include <sys/types.h>
 # include <sys/wait.h>
@@ -293,11 +294,16 @@ int PreExec_ExecuteOnServer(
                 n = 2500;
             }
     
-            /* Leave stdin(0), stdout(1), stderr(2) open (for debugging) */
-            for (fd = 3; fd < n; ++fd)
+            /* closing FD for stdin,stdout,stderr also i.e. 0,1,2 respectively*/
+            for (fd = 0; fd < n; ++fd)
             {
                 close(fd);
             }
+
+            /* Re-open fd 0,1,2. */
+            open("/dev/null", O_RDONLY);
+            open("/dev/null", O_RDWR);
+            open("/dev/null", O_RDWR);
 
             dup2(STDOUT_FILENO, STDOUT_FILENO);
             dup2(STDERR_FILENO, STDERR_FILENO);
