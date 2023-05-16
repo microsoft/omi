@@ -1591,8 +1591,8 @@ if [ "$arg1" = "openssllibdir" ]; then
                 fi
                 ;;
             SUNOS_I86PC_SUNPRO)
-                if [ -f "/usr/sfw/lib/libssl.so" ]; then
-                    libdir=/usr/sfw/lib
+                if [ -f "/usr/lib/libssl.so" ]; then
+                    libdir=/usr/lib
                 fi
                 ;;
             SUNOS_SPARC_SUNPRO)

@@ -366,9 +366,9 @@ SHA1="sha1"
     export LD_LIBRARY_PATH
     OPENSSL_PATH="/usr/local/bin/openssl"
 #elseif PFMINOR == 10
-    LD_LIBRARY_PATH=/usr/sfw/lib
+    LD_LIBRARY_PATH=/usr/lib
     export LD_LIBRARY_PATH
-    OPENSSL_PATH="/usr/sfw/bin/openssl"
+    OPENSSL_PATH="/usr/bin/openssl"
 #endif
 #endif
 
