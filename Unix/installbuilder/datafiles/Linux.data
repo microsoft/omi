@@ -333,7 +333,7 @@ if [ -e /usr/sbin/semodule ]; then
     echo "System appears to have SELinux installed, attempting to install selinux policy module for logrotate"
     echo "  Trying ${{SEPKG_DIR_OMI}}/omi-logrotate.pp ..."
     sestatus=`sestatus|grep status|awk '{print $3}'`
-    if [ -e /usr/bin/dpkg-deb -a "$sestatus" = "disabled" ]; then
+    if [ "$sestatus" = "disabled" ]; then
         echo "INFO: omi-logrotate selinux policy module has not yet installed due to selinux is disabled."
         echo "When enabling selinux, load omi-logrotate module manually with following commands for logrotate feature to work properly for omi logs."
         echo "/usr/sbin/semodule -i $SEPKG_DIR_OMI/omi-logrotate.pp >/dev/null 2>&1"
