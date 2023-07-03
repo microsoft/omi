@@ -2090,8 +2090,8 @@ ifndef DEBUG
   CFLAGS=`$buildtool cflags --debug --pic $securityhardeningopt $buildtoolopts`
   CXXFLAGS=`$buildtool cxxflags --debug --pic $securityhardeningopt $buildtoolopts`
 else
-  CFLAGS=`$buildtool cflags --optim --pic $securityhardeningopt $buildtoolopts`
-  CXXFLAGS=`$buildtool cxxflags --optim --pic $securityhardeningopt $buildtoolopts`
+  CFLAGS=`$buildtool cflags --pic $securityhardeningopt $buildtoolopts`
+  CXXFLAGS=`$buildtool cxxflags --pic $securityhardeningopt $buildtoolopts`
 endif
 
 CSHLIBFLAGS=`$buildtool cshlibflags --libpath=$libdir $buildtoolopts`
