@@ -25,8 +25,8 @@ RPM and DEB packages are provided for the installation of OMI on most
 enterprise Linux distributions. To install OMI, download the correct
 package for your Linux computer. Choose from:
 
-- 32-bit (x86) or 64-bit (x64) architecture
-- OpenSSL version 1.0.x or 1.1.x (to determine your OpenSSL version, run: `openssl version`)
+- 64-bit (x64) architecture
+- OpenSSL version 1.0.x, 1.1.x or 3.0.x (to determine your OpenSSL version, run: `openssl version`)
 - RPM or Debian package format
 
 You can download and install OMI from the [Releases] page. While
@@ -35,12 +35,12 @@ downloads illustrates the package types for OMI:
 
 Platform | Release | Architecture | SSL   | Filename
 -------- |-------- |------------  | ---   | --------
+Linux    | Debian  | x64          | 3.0.0 | [omi-MAJOR.MINOR.PATCH-BUILD.ssl_300.ulinux.x64.deb](https://github.com/Microsoft/omi/releases/latest)
 Linux    | Debian  | x64          | 1.1.0 | [omi-MAJOR.MINOR.PATCH-BUILD.ssl_110.ulinux.x64.deb](https://github.com/Microsoft/omi/releases/latest)
 Linux    | Debian  | x64          | 1.0.0 | [omi-MAJOR.MINOR.PATCH-BUILD.ssl_100.ulinux.x64.deb](https://github.com/Microsoft/omi/releases/latest)
+Linux    | RPM     | x64          | 3.0.0 | [omi-MAJOR.MINOR.PATCH-BUILD.ssl_300.ulinux.x64.rpm](https://github.com/Microsoft/omi/releases/latest)
 Linux    | RPM     | x64          | 1.1.0 | [omi-MAJOR.MINOR.PATCH-BUILD.ssl_110.ulinux.x64.rpm](https://github.com/Microsoft/omi/releases/latest)
 Linux    | RPM     | x64          | 1.0.0 | [omi-MAJOR.MINOR.PATCH-BUILD.ssl_100.ulinux.x64.rpm](https://github.com/Microsoft/omi/releases/latest)
-Linux    | Debian  | x86          | 1.0.0 | [omi-MAJOR.MINOR.PATCH-BUILD.ssl_100.ulinux.x86.deb](https://github.com/Microsoft/omi/releases/latest)
-Linux    | RPM     | x86          | 1.0.0 | [omi-MAJOR.MINOR.PATCH-BUILD.ssl_100.ulinux.x86.rpm](https://github.com/Microsoft/omi/releases/latest)
 
 **Note:** MAJOR, MINOR, PATCH, and BUILD refer to the version number information for the specific version of OMI that you wish to install.
 
@@ -61,15 +61,17 @@ said, our formal tested matrix of Linux platforms includes the following:
 - CentOS 6 and 7 (x86 and x64)
 - CentOS 8 x64 (omi>=1.6.5-0)
 - Debian 8 (x86 and x64) and Debian 9 x64
-- Debian 10 x64 (omi>=1.6.8-0)
-- Oracle Linux 5, 6, and 7 (x86 and x64)
+- Debian 10 x64 and 11 x64 (omi>=1.6.8-0)
+- Oracle Linux 6, and 7 (x86 and x64)
 - Oracle Linux 8 x64 (omi>=1.6.8-0)
-- Red Hat Enterprise Linux Server 5 and 6, and 7 (x86 and x64)
+- Red Hat Enterprise Linux Server 6 and 7 (x86 and x64)
   - Note: Red Hat 7.1 or later also runs on the PPC platform
 - Red Hat Enterprise Linux Server 8 x64 (omi>=1.6.4-0)
-- SUSE Linux Enterprise Server 11, 12 (x86 and x64), 12 ppc and 15.
+- Red Hat Enterprise Linux Server 9 x64 (omi>=1.7.0-0)
+- SUSE Linux Enterprise Server 12 x64, 12 ppc and 15.
 - Ubuntu 14.04 LTS, 16.04 LTS and 18.04 LTS (x86 and x64)
 - Ubuntu 20.04 LTS x64 (omi>=1.6.8-0)
+- Ubuntu 22.04 LTS x64 (omi>=1.7.0-0)
 
 ### Supported Unix Operating Systems
 
