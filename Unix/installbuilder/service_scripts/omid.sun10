@@ -27,7 +27,7 @@ OMI_BINDIR=$OMI_HOME/bin
 OMI_LIBDIR=$OMI_HOME/lib
 
 # Where to find needed libs
-LD_LIBRARY_PATH=/usr/local/lib:/usr/sfw/lib:$OMI_LIBDIR
+LD_LIBRARY_PATH=/usr/local/lib:/usr/lib:/usr/sfw/lib:$OMI_LIBDIR
 export LD_LIBRARY_PATH
 
 #TEMPLATE_CODEVOV_ENV#
