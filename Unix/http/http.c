@@ -405,42 +405,45 @@ static MI_Result _Sock_WriteAux(
     return MI_RESULT_FAILED;
 }
 
-void _WriteTraceFile(PathID id, const void* data, size_t size)
+void _WriteTraceFile(PathID id, const void *data, size_t size)
 {
-#ifdef CONFIG_POSIX
-    static pthread_mutex_t s_mutex = PTHREAD_MUTEX_INITIALIZER;
-#else
-    /* TODO: How to synchronize logging */
-#endif
-    const char* path;
-
-    if (!(path = OMI_GetPath(id)))
-        return;
-
-#ifdef CONFIG_POSIX
-    pthread_mutex_lock(&s_mutex);
-#else
-    /* TODO: How to synchronize logging */
-#endif
+    if (FORCE_TRACING)
     {
-        FILE* out = fopen(path, "a");
-
-        if (out)
-        {
-            fwrite(data, 1, size, out);
-            fwrite("\n", 1, 1, out);
-            fclose(out);
-        }
-        else
-        {
-            trace_CannotOpenHttptraceFile(path, errno);
-        }
-    }
 #ifdef CONFIG_POSIX
-    pthread_mutex_unlock(&s_mutex);
+        static pthread_mutex_t s_mutex = PTHREAD_MUTEX_INITIALIZER;
 #else
-    /* TODO: How to synchronize logging */
+        /* TODO: How to synchronize logging */
 #endif
+        const char *path;
+
+        if (!(path = OMI_GetPath(id)))
+            return;
+
+#ifdef CONFIG_POSIX
+        pthread_mutex_lock(&s_mutex);
+#else
+            /* TODO: How to synchronize logging */
+#endif
+        {
+            FILE *out = fopen(path, "a");
+
+            if (out)
+            {
+                fwrite(data, 1, size, out);
+                fwrite("\n", 1, 1, out);
+                fclose(out);
+            }
+            else
+            {
+                trace_CannotOpenHttptraceFile(path, errno);
+            }
+        }
+#ifdef CONFIG_POSIX
+        pthread_mutex_unlock(&s_mutex);
+#else
+        /* TODO: How to synchronize logging */
+#endif
+    }
 }
 
 INLINE MI_Result _Sock_Read(

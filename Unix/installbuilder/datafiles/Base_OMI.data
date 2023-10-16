@@ -561,7 +561,10 @@ chown omi:omi /etc/opt/omi/.creds >/dev/null 2>&1
 chown omi:omi /etc/opt/omi/.creds/ntlm >/dev/null 2>&1
 chown omi:omi /etc/opt/omi/conf/sockets
 chmod 700 /etc/opt/omi/conf/sockets
-
+rm -f /var/opt/omi/log/omiserver-send.trc >/dev/null 2>&1
+rm -f /var/opt/omi/log/omiserver-recv.trc >/dev/null 2>&1
+rm -f /var/opt/omi/log/omiclient-send.trc >/dev/null 2>&1
+rm -f /var/opt/omi/log/omiclient-recv.trc >/dev/null 2>&1
 
 # Fix potential permissons issue on /etc/opt/omi directory
 chown root:${{ROOT_GROUP_NAME}} /etc/opt/omi

@@ -36,7 +36,7 @@
 //#define GSS_USE_IOV 1
 
 #define ENABLE_TRACING 1
-#define FORCE_TRACING  1
+#define FORCE_TRACING  0
 
 #if GSS_USE_IOV && !defined(macos)
 #include "httpkrb5.h"
