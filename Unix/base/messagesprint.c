@@ -724,7 +724,6 @@ void PamCheckUserReq_Print(
         {"tag", FT_UINT32, offsetof(Self, base.tag)},
         {"operationId", FT_UINT64, offsetof(Self, base.operationId)},
         {"user", FT_STRING, offsetof(Self, user)},
-        {"password", FT_STRING, offsetof(Self, passwd)},
         {"handle", FT_UINT64, offsetof(Self, handle)},
         {NULL, 0, 0},
     };
