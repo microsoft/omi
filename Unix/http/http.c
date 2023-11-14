@@ -422,7 +422,7 @@ void _WriteTraceFile(PathID id, const void *data, size_t size)
 #ifdef CONFIG_POSIX
         pthread_mutex_lock(&s_mutex);
 #else
-            /* TODO: How to synchronize logging */
+        /* TODO: How to synchronize logging */
 #endif
         {
             FILE *out = fopen(path, "a");
