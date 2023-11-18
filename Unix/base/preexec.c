@@ -167,10 +167,10 @@ int PreExec_CheckExec(
     uid_t uid,
     uid_t gid)
 {
-    char key[PAL_MAX_PATH_SIZE];
-    char uidBuf[11];
+    char key[PAL_MAX_PATH_SIZE] = { 0 };
+    char uidBuf[11] = { 0 };
     const char* uidStr;
-    char gidBuf[11];
+    char gidBuf[11] = { 0 };
     const char* gidStr;
 
     /* If no pre-exec program, nothing to do */
@@ -252,9 +252,9 @@ int PreExec_ExecuteOnServer(
             /* Child Process here... */
             const char *uidStr;
             const char *gidStr;
-            char uidBuf[11];
-            char gidBuf[11];
-            char path[PAL_MAX_PATH_SIZE];
+			char uidBuf[11] = { 0 };
+			char gidBuf[11] = { 0 };
+			char path[PAL_MAX_PATH_SIZE] = { 0 };
 
             /* Form the UID string */
             {
@@ -327,7 +327,7 @@ int PreExec_ExecuteOnServer(
         else 
         {
             pid_t r;
-            int status;
+			int status = 0;
 
             /* Parent Process */
             r = waitpid(pid, &status, 0);

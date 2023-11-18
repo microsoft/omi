@@ -1141,7 +1141,7 @@ static int _PromoteValue(
                     if (destpropertydecl->className)
                     {
                         *embeddedpropertyError = MI_TRUE;
-                        return _IsInstanceOfClass(state, inst, destpropertydecl->className);
+                        return _IsInstanceOfClass(state, inst, (MI_Char *)destpropertydecl->className);
                     }
                     return 0;
                 }
@@ -1155,7 +1155,7 @@ static int _PromoteValue(
             case MI_REFERENCEA:
                 {
                     const MI_InstanceA * insta = *(const MI_InstanceA**)value;
-                    MI_Char *destclassname = destpropertydecl->className;
+                    MI_Char *destclassname = (MI_Char *)destpropertydecl->className;
                     if (destclassname)
                     {
                         *embeddedpropertyError = MI_TRUE;
@@ -3003,11 +3003,11 @@ void MOF_PrintInstanceDecl(
 
     /* properties */
     if (self->properties)
-        _PrintProperties(self->properties, self->numProperties, level, file);
+        _PrintProperties(self->properties, (size_t)self->numProperties, level, file);
 
     /* qualifiers */
     if (self->qualifiers)
-        _PrintQualifiers(self->qualifiers, self->numQualifiers, level, file);
+        _PrintQualifiers(self->qualifiers, (size_t)self->numQualifiers, level, file);
 
     /* Footer */
     level--;
@@ -4126,7 +4126,7 @@ int FinalizeInstance(
         /* For each instance property */
         for (i = 0; i < id->numProperties; i++)
         {
-            MI_PropertyDecl* p = id->properties[i];
+            MI_PropertyDecl* p = (MI_PropertyDecl* )id->properties[i];
             MI_PropertyDecl* q = NULL;
 
             /* Find the class property with the same name */
@@ -4276,9 +4276,9 @@ int FinalizeInstance(
     /* For each instance property */
     for (i = 0; i < id->numProperties; i++)
     {
-        MI_PropertyDecl* p = id->properties[i];
+        MI_PropertyDecl* p = (MI_PropertyDecl* )id->properties[i];
         MI_Value *value = (MI_Value*)(p->value);
-        if (ProcessProperty(state->parser->param.schemacheck, p->name, (const MI_Char**) ignorePropertyList, ignorePropertyCount))
+        if (ProcessProperty(state->parser->param.schemacheck, (MI_Char*)p->name, (const MI_Char**) ignorePropertyList, ignorePropertyCount))
         {
             if (validClassDecl)
             {

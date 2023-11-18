@@ -119,12 +119,12 @@ typedef struct _ProvReg
 }
 ProvReg;
 
-/* Initialize ProvReg strucutre from given directory */
+/* Initialize ProvReg structure from given directory */
 MI_Result ProvReg_Init(
     _Inout_ ProvReg* self,
     _In_z_ const char* directory);
 
-/* Initialize ProvReg strucutre from omiregister directory */
+/* Initialize ProvReg structure from omiregister directory */
 MI_Result ProvReg_Init2(
     _Inout_ ProvReg* self);
 

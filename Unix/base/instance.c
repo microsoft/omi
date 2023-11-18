@@ -499,7 +499,7 @@ MI_Result MI_CALL Instance_Construct(
         if (result != MI_RESULT_OK)
             return result;
 
-        self->classDecl = newClass->classDecl;
+		self->classDecl = (MI_ClassDecl*)newClass->classDecl;
     }
     else if (cd->flags & (MI_FLAG_CLASS|MI_FLAG_ASSOCIATION|MI_FLAG_INDICATION))
     {
@@ -1076,7 +1076,7 @@ MI_Result MI_CALL Instance_Clone(
         MI_Result result = MI_Class_Clone(self->classDecl->owningClass, &clonedClass);
         if (result != MI_RESULT_OK)
             MI_RETURN(result);
-        inst->classDecl = clonedClass->classDecl;
+		inst->classDecl = (MI_ClassDecl*)clonedClass->classDecl;
     }
     else//We had better do a hard clone
     {
@@ -1135,7 +1135,7 @@ MI_Result MI_CALL Instance_SetClassName(
         MI_RETURN(MI_RESULT_INVALID_PARAMETER);
 
     /* Save old className */
-    oldClassName = self->classDecl->name;
+	oldClassName = (ZChar*)self->classDecl->name;
 
     /* Set new className */
     {
@@ -1252,7 +1252,7 @@ MI_Result MI_CALL Instance_NewDynamic(
             MI_PropertyDecl** data;
 
             data = (MI_PropertyDecl**)BAlloc(batch,
-                _CAPACITY * sizeof(MI_PropertyDecl), CALLSITE);
+				_CAPACITY * sizeof(MI_PropertyDecl*), CALLSITE);
 
             if (!data)
             {
@@ -1459,13 +1459,13 @@ MI_Result MI_CALL __MI_Instance_Destruct(
         for (i = 0; i < self->classDecl->numProperties; i++)
         {
             MI_PropertyDecl* pd = self->classDecl->properties[i];
-            BFree(batch, pd->name, CALLSITE);
-            BFree(batch, pd, CALLSITE);
+			BFree(batch, (void *)pd->name, CALLSITE);
+			BFree(batch, (void *)pd, CALLSITE);
         }
 
-        BFree(batch, self->classDecl->name, CALLSITE);
-        BFree(batch, self->classDecl->properties, CALLSITE);
-        BFree(batch, self->classDecl, CALLSITE);
+		BFree(batch, (void *)self->classDecl->name, CALLSITE);
+		BFree(batch, (void *)self->classDecl->properties, CALLSITE);
+		BFree(batch, (void *)self->classDecl, CALLSITE);
 
         if ((void*)self != (void*)self_)
             _FreeInstance(batch, self);

@@ -2704,11 +2704,11 @@ void MOF_PrintInstanceDecl(
 
     /* properties */
     if (self->properties)
-        _PrintProperties(self->properties, self->numProperties, level, file);
+        _PrintProperties((MI_PropertyDecl**)self->properties, (size_t)self->numProperties, level, file);
 
     /* qualifiers */
     if (self->qualifiers)
-        _PrintQualifiers(self->qualifiers, self->numQualifiers, level, file);
+        _PrintQualifiers((MI_Qualifier**)self->qualifiers, (size_t)self->numQualifiers, level, file);
 
     /* Footer */
     level--;
@@ -3523,7 +3523,7 @@ int FinalizeInstance(MI_InstanceDecl* id)
     /* For each instance property */
     for (i = 0; i < id->numProperties; i++)
     {
-        MI_PropertyDecl* p = id->properties[i];
+        MI_PropertyDecl* p = (MI_PropertyDecl*)id->properties[i];
         MI_PropertyDecl* q = NULL;
 
         /* Find the class property with the same name */
@@ -3546,7 +3546,7 @@ int FinalizeInstance(MI_InstanceDecl* id)
         }
 
         /* Promote instance property (to the type given by class property) */
-        if (_PromoteValue(p->type, q->type, &p->value) != 0)
+        if (_PromoteValue(p->type, q->type, (void**)&p->value) != 0)
         {
             yyerrorf(ID_INVALID_INITIALIZER, "invalid initializer: \"%s\"",
                 p->name);

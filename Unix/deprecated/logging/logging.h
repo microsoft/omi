@@ -88,7 +88,7 @@ extern unsigned long get_tid();
 extern const char* mistrerror(MI_Result res);
 extern const char* selectorflagstr(MI_Uint32 Flags);
 extern const char* bitnumberstr(unsigned long Bits);
-extern const char* sslstrerror(int SslError);
+extern const char* sslstrerror(unsigned long  SslError);
 extern const char* notifyitemtypestr(int NotifyItemType);
 extern const char* clientstatusstr(int Status);
 extern const char* messagetagnamestr(int Tag);

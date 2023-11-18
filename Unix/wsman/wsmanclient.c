@@ -800,6 +800,7 @@ void _WsmanClient_Post( _In_ Strand* self_, _In_ Message* msg)
         self->wsmanSoapHeaders.action = value.string;
     }
 
+#ifndef DISABLE_SHELL
     if ((MI_Instance_GetElement(requestMessage->options,
         MI_T("__MI_OPERATIONOPTIONS_SESSIONID"),
         &value,
@@ -811,6 +812,7 @@ void _WsmanClient_Post( _In_ Strand* self_, _In_ Message* msg)
     {
         self->wsmanSoapHeaders.sessionId = value.string;
     }
+#endif
     if ((MI_Instance_GetElement(requestMessage->options,
         MI_T("__MI_OPERATIONOPTIONS_ISSHELL"),
         &value,
@@ -841,6 +843,7 @@ void _WsmanClient_Post( _In_ Strand* self_, _In_ Message* msg)
                 break;
             }
 
+#ifndef DISABLE_SHELL
             case CreateInstanceReqTag:
             {
                 CreateInstanceReq *createMessage = (CreateInstanceReq*) msg;
@@ -855,7 +858,7 @@ void _WsmanClient_Post( _In_ Strand* self_, _In_ Message* msg)
                 miresult = CreateMessageRequest(&self->wsbuf, &self->wsmanSoapHeaders, createMessage);
                 break;
             }
-
+#endif
             case ModifyInstanceReqTag:
             {
                 ModifyInstanceReq *putMessage = (ModifyInstanceReq*) msg;

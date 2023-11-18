@@ -222,9 +222,9 @@ MI_CONST MI_ClassDecl CIM_Indication_rtti =
     MI_FLAG_CLASS|MI_FLAG_INDICATION|MI_FLAG_ABSTRACT, /* flags */
     0x00636E0E, /* code */
     MI_T("CIM_Indication"), /* name */
-    CIM_Indication_quals, /* qualifiers */
+    (struct _MI_Qualifier**)CIM_Indication_quals, /* qualifiers */
     MI_COUNT(CIM_Indication_quals), /* numQualifiers */
-    CIM_Indication_props, /* properties */
+    (struct _MI_PropertyDecl**)CIM_Indication_props, /* properties */
     MI_COUNT(CIM_Indication_props), /* numProperties */
     sizeof(CIM_Indication), /* size */
     NULL, /* superClass */
@@ -342,13 +342,13 @@ MI_CONST MI_ClassDecl CIM_InstIndication_rtti =
     MI_FLAG_CLASS|MI_FLAG_INDICATION|MI_FLAG_ABSTRACT, /* flags */
     0x00636E12, /* code */
     MI_T("CIM_InstIndication"), /* name */
-    CIM_InstIndication_quals, /* qualifiers */
+	(struct _MI_Qualifier**)CIM_InstIndication_quals, /* qualifiers */
     MI_COUNT(CIM_InstIndication_quals), /* numQualifiers */
-    CIM_InstIndication_props, /* properties */
+	(struct _MI_PropertyDecl**)CIM_InstIndication_props, /* properties */
     MI_COUNT(CIM_InstIndication_props), /* numProperties */
     sizeof(CIM_InstIndication), /* size */
-    MI_T("CIM_Indication"), /* superClass */
-    &CIM_Indication_rtti, /* superClassDecl */
+    (MI_CONST MI_Char*)MI_T("CIM_Indication"), /* superClass */
+    (MI_ClassDecl*)&CIM_Indication_rtti, /* superClassDecl */
     NULL, /* methods */
     0, /* numMethods */
     &indicationSchemaDecl, /* schema */
@@ -411,13 +411,13 @@ MI_CONST MI_ClassDecl CIM_InstCreation_rtti =
     MI_FLAG_CLASS|MI_FLAG_INDICATION, /* flags */
     0x00636E10, /* code */
     MI_T("CIM_InstCreation"), /* name */
-    CIM_InstCreation_quals, /* qualifiers */
+	(struct _MI_Qualifier**)CIM_InstCreation_quals, /* qualifiers */
     MI_COUNT(CIM_InstCreation_quals), /* numQualifiers */
-    CIM_InstCreation_props, /* properties */
+	(struct _MI_PropertyDecl**)CIM_InstCreation_props, /* properties */
     MI_COUNT(CIM_InstCreation_props), /* numProperties */
     sizeof(CIM_InstCreation), /* size */
-    MI_T("CIM_InstIndication"), /* superClass */
-    &CIM_InstIndication_rtti, /* superClassDecl */
+	(MI_CONST MI_Char*)MI_T("CIM_InstIndication"), /* superClass */
+	(MI_ClassDecl*)&CIM_InstIndication_rtti, /* superClassDecl */
     NULL, /* methods */
     0, /* numMethods */
     &indicationSchemaDecl, /* schema */
@@ -480,13 +480,13 @@ MI_CONST MI_ClassDecl CIM_InstDeletion_rtti =
     MI_FLAG_CLASS|MI_FLAG_INDICATION, /* flags */
     0x00636E10, /* code */
     MI_T("CIM_InstDeletion"), /* name */
-    CIM_InstDeletion_quals, /* qualifiers */
+	(struct _MI_Qualifier**)CIM_InstDeletion_quals, /* qualifiers */
     MI_COUNT(CIM_InstDeletion_quals), /* numQualifiers */
-    CIM_InstDeletion_props, /* properties */
+	(struct _MI_PropertyDecl**)CIM_InstDeletion_props, /* properties */
     MI_COUNT(CIM_InstDeletion_props), /* numProperties */
     sizeof(CIM_InstDeletion), /* size */
-    MI_T("CIM_InstIndication"), /* superClass */
-    &CIM_InstIndication_rtti, /* superClassDecl */
+	(MI_CONST MI_Char*)MI_T("CIM_InstIndication"), /* superClass */
+	(MI_ClassDecl*)&CIM_InstIndication_rtti, /* superClassDecl */
     NULL, /* methods */
     0, /* numMethods */
     &indicationSchemaDecl, /* schema */
@@ -621,13 +621,13 @@ MI_CONST MI_ClassDecl CIM_InstMethodCall_rtti =
     MI_FLAG_CLASS|MI_FLAG_INDICATION, /* flags */
     0x00636C12, /* code */
     MI_T("CIM_InstMethodCall"), /* name */
-    CIM_InstMethodCall_quals, /* qualifiers */
+	(struct _MI_Qualifier**)CIM_InstMethodCall_quals, /* qualifiers */
     MI_COUNT(CIM_InstMethodCall_quals), /* numQualifiers */
-    CIM_InstMethodCall_props, /* properties */
+	(struct _MI_PropertyDecl**)CIM_InstMethodCall_props, /* properties */
     MI_COUNT(CIM_InstMethodCall_props), /* numProperties */
     sizeof(CIM_InstMethodCall), /* size */
-    MI_T("CIM_InstIndication"), /* superClass */
-    &CIM_InstIndication_rtti, /* superClassDecl */
+	(MI_CONST MI_Char*)MI_T("CIM_InstIndication"), /* superClass */
+	(MI_ClassDecl*)&CIM_InstIndication_rtti, /* superClassDecl */
     NULL, /* methods */
     0, /* numMethods */
     &indicationSchemaDecl, /* schema */
@@ -708,13 +708,13 @@ MI_CONST MI_ClassDecl CIM_InstModification_rtti =
     MI_FLAG_CLASS|MI_FLAG_INDICATION, /* flags */
     0x00636E14, /* code */
     MI_T("CIM_InstModification"), /* name */
-    CIM_InstModification_quals, /* qualifiers */
+	(struct _MI_Qualifier**)CIM_InstModification_quals, /* qualifiers */
     MI_COUNT(CIM_InstModification_quals), /* numQualifiers */
-    CIM_InstModification_props, /* properties */
+	(struct _MI_PropertyDecl**)CIM_InstModification_props, /* properties */
     MI_COUNT(CIM_InstModification_props), /* numProperties */
     sizeof(CIM_InstModification), /* size */
-    MI_T("CIM_InstIndication"), /* superClass */
-    &CIM_InstIndication_rtti, /* superClassDecl */
+	(MI_CONST MI_Char*)MI_T("CIM_InstIndication"), /* superClass */
+	(MI_ClassDecl*)&CIM_InstIndication_rtti, /* superClassDecl */
     NULL, /* methods */
     0, /* numMethods */
     &indicationSchemaDecl, /* schema */
@@ -777,13 +777,13 @@ MI_CONST MI_ClassDecl CIM_InstRead_rtti =
     MI_FLAG_CLASS|MI_FLAG_INDICATION, /* flags */
     0x0063640C, /* code */
     MI_T("CIM_InstRead"), /* name */
-    CIM_InstRead_quals, /* qualifiers */
+	(struct _MI_Qualifier**)CIM_InstRead_quals, /* qualifiers */
     MI_COUNT(CIM_InstRead_quals), /* numQualifiers */
-    CIM_InstRead_props, /* properties */
+	(struct _MI_PropertyDecl**)CIM_InstRead_props, /* properties */
     MI_COUNT(CIM_InstRead_props), /* numProperties */
     sizeof(CIM_InstRead), /* size */
-    MI_T("CIM_InstIndication"), /* superClass */
-    &CIM_InstIndication_rtti, /* superClassDecl */
+	(MI_CONST MI_Char*)MI_T("CIM_InstIndication"), /* superClass */
+	(MI_ClassDecl*)&CIM_InstIndication_rtti, /* superClassDecl */
     NULL, /* methods */
     0, /* numMethods */
     &indicationSchemaDecl, /* schema */

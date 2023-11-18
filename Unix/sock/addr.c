@@ -73,7 +73,7 @@ MI_Result Addr_Init(
     memcpy(&self->u.sock_addr, rp->ai_addr, (size_t)rp->ai_addrlen);
 
     /* Set the duplicate copies of family, port and socket type */
-    self->sock_addr_size = rp->ai_addrlen;
+	self->sock_addr_size = (MI_Uint16)rp->ai_addrlen;
     self->port_high_endian = htons(port);
     self->is_ipv6 = (rp->ai_family == AF_INET6);
 

@@ -98,6 +98,7 @@ int enginemain(int argc, const char* argv[])
         // binary connection with client
         const char *path = OMI_GetPath(ID_SOCKETFILE);
         result = BinaryProtocolListenFile(path, &s_data.mux[0], &s_data.protocol0);
+		free((void *)path);
         if (result != MI_RESULT_OK)
         {
             err(ZT("Failed to initialize binary protocol for socket file"));

@@ -461,7 +461,7 @@ MI_Result Instance_Pack(
         /* Pack the flags */
         MI_RETURN_ERR(Buf_PackU32(buf, pd->flags));
 
-        pName = pd->name;
+        pName = (MI_Char*)pd->name;
         if ((pd->flags & MI_FLAG_PARAMETER) && (pd->flags & MI_FLAG_OUT))
         {
             if (pName && pName[0] == ZT('M') && Tcscmp(pName, ZT("MIReturn"))== 0)

@@ -420,7 +420,7 @@ static void _GetConfigFileOptions(GeneratorOptions& opts)
 
     /* Form the configuration file path */
     if (FindConfigFile(path) != 0)
-        err("failed to find configuration file");
+		err("failed to find configuration file: %s", path);
 
     /* Open the configuration file */
     conf = Conf_Open(path);

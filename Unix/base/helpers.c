@@ -969,10 +969,10 @@ static int _Base64DecCallback(
 
     start = *str;
     {
-        unsigned char b1 = (totalSize & 0xFF000000) >> 24;
-        unsigned char b2 = (totalSize & 0x00FF0000) >> 16;
-        unsigned char b3 = (totalSize & 0x0000FF00) >> 8;
-        unsigned char b4 = (totalSize & 0x000000FF);
+        unsigned char b1 = (unsigned char)((totalSize & 0xFF000000) >> 24);
+        unsigned char b2 = (unsigned char)((totalSize & 0x00FF0000) >> 16);
+        unsigned char b3 = (unsigned char)((totalSize & 0x0000FF00) >> 8);
+        unsigned char b4 = (unsigned char)((totalSize & 0x000000FF));
         (*str)[0] = b1;
         (*str)[1] = b2;
         (*str)[2] = b3;
@@ -1061,7 +1061,7 @@ MI_Result MI_CALL Instance_SetElementFromStringA(
             && ((msgFlags & WSMANFlag) == WSMANFlag))
         {
             size_t sizeIncoming = Tcslen(*data);
-            int sizeDec = 0;
+            size_t sizeDec = 0;
             char * src = (char*) *data;
             sizeDec = Base64Dec((const void *)src, sizeIncoming, _Base64DecCallback, &v.array);
 
@@ -1257,7 +1257,7 @@ int UsecToDatetime(
     timeAsUsec /= 60; /* trim down to hours */
     x->u.interval.hours = timeAsUsec % 24;
     timeAsUsec /= 24;/* trim down to days */
-    x->u.interval.days = timeAsUsec;
+    x->u.interval.days = (MI_Uint32)timeAsUsec;
     return 0;
 }
 

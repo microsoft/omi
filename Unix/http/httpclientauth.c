@@ -7,12 +7,14 @@
 **==============================================================================
 */
 #include <config.h>
+#if defined SUPPORT_KRB5
 #if AUTHORIZATION
 #if defined(macos)
 #include <GSS/GSS.h>
 #else
 #include <gssapi/gssapi.h>
 #include <krb5.h>
+#endif
 #endif
 #endif
 #include <dlfcn.h>
@@ -260,6 +262,7 @@ typedef void KRB5_CALLCONV
 
 typedef enum { NOT_LOADED = 0, LOADING, LOADED } LoadState;
 
+#if defined SUPPORT_KRB5
 typedef struct _Gss_Extensions 
 {
     LoadState gssLibLoaded;  /* Default is NOT_LOADED */
@@ -326,6 +329,7 @@ MI_Boolean Gss_Oid_Equal(const gss_OID poid1, const gss_OID poid2)
 
     return MI_TRUE;
 }
+#endif
 
 /*
  * Credentials are expected to live in the file ~/.omi/ntlmcred.
@@ -559,8 +563,9 @@ Err:
 }
 
 
+#if defined SUPPORT_KRB5
 static void
-_GssUnloadLibrary()
+_GssUnloadLibrary(void)
 
 {
     dlclose(_g_gssClientState.libHandle);
@@ -898,7 +903,7 @@ static _Success_(return == 0) int _GssClientInitLibrary( _In_ void* data, _Outpt
        _g_gssClientState.gssLibLoaded = NOT_LOADED;
        return FALSE;
 }
-
+#endif
 
 
 
@@ -936,6 +941,7 @@ static int EncodePlaceCallback(const char *data, size_t size, void *callbackData
     return 0;
 }
 
+#if defined SUPPORT_KRB5
 #if AUTHORIZATION
 
 static void _getStatusMsg(OM_uint32 status_code, int status_type, gss_buffer_t statusString)
@@ -961,7 +967,7 @@ static void _ReportError(HttpClient_SR_SocketData * self, const char *msg,
     gss_buffer_desc major_err = { 0 };
     gss_buffer_desc minor_err = { 0 };
     int  msglen = 0;
-    char *pmsg = NULL;
+    MI_Char *pmsg = NULL;
 
 
     if (major_status != 0)
@@ -1082,7 +1088,7 @@ MI_Boolean HttpClient_DecryptData(_In_ HttpClient_SR_SocketData * handler, _Out_
         return FALSE;
     }
 
-    int i = 0;
+    MI_Uint32 i = 0;
     for (i = 0; i < pHeaders->sizeHeaders; i++ )
     {
         if (strncasecmp(pHeaders->headers[i].name, CONTENT_TYPE, CONTENT_TYPE_LEN) == 0)
@@ -1899,7 +1905,7 @@ static int _getInputToken(_In_ struct _HttpClient_SR_SocketData * self,  const c
 }
 
 #endif
-
+#endif
 /* 
  *  Based on the authorisation type, we create an auth clause for the Http response header. 
  *  The response token is converted to base 64.  
@@ -2076,7 +2082,7 @@ static MI_Boolean _WriteAuthRequest(HttpClient_SR_SocketData * handler, const ch
         total_sent += sent;
 
     }
-    while (total_sent < requestLen);
+    while ((int)total_sent < requestLen);
 
     if (FORCE_TRACING || ((total_sent > 0) && handler->enableTracing))
     {
@@ -2086,6 +2092,7 @@ static MI_Boolean _WriteAuthRequest(HttpClient_SR_SocketData * handler, const ch
     return TRUE;
 }
 
+#if defined SUPPORT_KRB5
 /*
  *  Evaluates the response header returned by the server . 
  *
@@ -2693,7 +2700,7 @@ static char *_BuildInitialGssAuthHeader(_In_ HttpClient_SR_SocketData * self, MI
 }
 
 #endif
-
+#endif
 Http_CallbackResult HttpClient_RequestAuthorization(_In_ struct _HttpClient_SR_SocketData *handler, const char **pAuthHeader)
 {
    MI_Uint32 status = 0;
@@ -2721,6 +2728,7 @@ Http_CallbackResult HttpClient_RequestAuthorization(_In_ struct _HttpClient_SR_S
 
         return PRT_CONTINUE;
 
+#if defined SUPPORT_KRB5
 #if AUTHORIZATION
     case AUTH_METHOD_NEGOTIATE_WITH_CREDS:
     case AUTH_METHOD_NEGOTIATE:
@@ -2744,7 +2752,7 @@ Http_CallbackResult HttpClient_RequestAuthorization(_In_ struct _HttpClient_SR_S
 
         return PRT_CONTINUE;
 #endif
-
+#endif
     default:
          goto AuthFailed;
     }
@@ -2782,7 +2790,7 @@ Http_CallbackResult HttpClient_IsAuthorized(_In_ struct _HttpClient_SR_SocketDat
     HttpClientResponseHeader *pheaders = &self->recvHeaders;
     char *auth_header = NULL;
 
-    int i = 0;
+    size_t i = 0;
 
     // For unit test
     if (IsAuthCallsIgnored())
@@ -2840,7 +2848,7 @@ Http_CallbackResult HttpClient_IsAuthorized(_In_ struct _HttpClient_SR_SocketDat
                 #define BASIC_AUTH_FAIL_MSG "Basic Authorization failed for user "
                 int msglen = MI_COUNT(BASIC_AUTH_FAIL_MSG)-1;
                 int username_len = strlen(self->username);
-                char *pmsg = NULL;
+                MI_Char *pmsg = NULL;
     
                 if (username_len > USERNAME_LIMIT)
                 {
@@ -2858,7 +2866,7 @@ Http_CallbackResult HttpClient_IsAuthorized(_In_ struct _HttpClient_SR_SocketDat
                 client->probableCause->probable_cause_id = WSMAN_CIMERROR_PROBABLE_CAUSE_AUTHENTICATION_FAILURE;
                 client->probableCause->description       = (MI_Char *)(client->probableCause+1);
                 
-                self->errMsg = (char*)(client->probableCause+1);
+                self->errMsg = (MI_Char*)(client->probableCause+1);
                 pmsg = self->errMsg;
                 memcpy(pmsg, BASIC_AUTH_FAIL_MSG, msglen);
                 pmsg += msglen;
@@ -2871,6 +2879,7 @@ Http_CallbackResult HttpClient_IsAuthorized(_In_ struct _HttpClient_SR_SocketDat
         }
 
 
+#if defined SUPPORT_KRB5
     case AUTH_METHOD_NEGOTIATE_WITH_CREDS:
     case AUTH_METHOD_NEGOTIATE:
     case AUTH_METHOD_KERBEROS:
@@ -3000,6 +3009,7 @@ Http_CallbackResult HttpClient_IsAuthorized(_In_ struct _HttpClient_SR_SocketDat
 #endif
         // unreachable return PRT_RETURN_FALSE;
 
+#endif
     default:
         return PRT_RETURN_FALSE;
 

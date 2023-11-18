@@ -479,7 +479,7 @@ int servermain(int argc, const char* argv[], const char *envp[])
     int engine_argc = 0;
     char **engine_argv = NULL;
     char **engine_envp = NULL;
-    char socketFile[PAL_MAX_PATH_SIZE];
+    char socketFile[PAL_MAX_PATH_SIZE] = { 0 };
     const char* arg0 = argv[0];
     MI_Result result;    
     int r;

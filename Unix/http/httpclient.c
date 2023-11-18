@@ -560,7 +560,7 @@ static void _WriteTraceSessionTimestamp(_In_ PathID pathId, _In_opt_z_ const cha
     // [Session: NNNNN Date: YYYY/MM/DD HH:MM:SS.1234567Z]
     #define SESSION_DATETIME_SIZE 70
     const char FMT[] = "[Session: %s Date: %04d-%02d-%02d %02d:%02d:%02d.%07dZ]";
-    char buf[SESSION_DATETIME_SIZE];
+	char buf[SESSION_DATETIME_SIZE] = { 0 };
 
     struct timeval tv;
     struct tm tm;
@@ -2024,7 +2024,7 @@ Page* _CreateHttpHeader(
     pageSize += Strlen(hostHeader) + 2;
     if (extraHeaders)
     {
-        int i;
+		size_t i;
         for (i = 0; i < extraHeaders->size; ++i)
         {
             pageSize += Strlen(extraHeaders->data[i]) + 2;
@@ -2163,7 +2163,7 @@ Page* _CreateHttpHeader(
 
     if (extraHeaders)
     {
-        int i;
+		size_t i;
         for (i = 0; i < extraHeaders->size; ++i)
         {
             r = (int)Strlcpy(p, extraHeaders->data[i], pageSize);
@@ -3030,7 +3030,8 @@ MI_Result HttpClient_StartRequest(
     HttpClientRequestHeaders *headers,
     Page** data)
 
-{  char *content_type = NULL;
+{
+   char *content_type = NULL;
    char *auth_header  = NULL;
    HttpClientRequestHeaders extra_headers = { NULL, 0 };
    const char** tmp_headers = NULL;
@@ -3045,8 +3046,8 @@ MI_Result HttpClient_StartRequest(
    {
        tmp_headers = (headers->size != 0) ? (const char **)PAL_Malloc(sizeof(char *) * headers->size) : NULL;
 
-       int i = 0;
-       int j = 0;
+	   size_t i = 0;
+	   size_t j = 0;
        for (i = 0; i < headers->size; i++ ) 
        {
            if (Strncasecmp(headers->data[i], CONTENT_TYPE_HDR, CONTENT_TYPE_HDR_LEN) == 0)
@@ -3082,13 +3083,13 @@ MI_Result HttpClient_StartRequest(
        self->connector->authType = AUTH_METHOD_BYPASS;
    }
     
-   rtnval = HttpClient_StartRequestV2(self, verb, uri, content_type, auth_header, headers, data, NULL  );
+	rtnval = HttpClient_StartRequestV2(self, verb, uri, content_type, auth_header, (HttpClientRequestHeaders*)headers, data, (Probable_Cause_Data **)NULL);
    
    if (tmp_headers != NULL)
    {
        // When extra_headers are used properly, please reassess whether this PAL_Free belongs here. 
        // This exists for now to prevent a memory leak.
-       PAL_Free(tmp_headers);
+		PAL_Free((void *)tmp_headers);
    }
 
    return rtnval;

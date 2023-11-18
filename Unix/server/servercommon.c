@@ -143,7 +143,7 @@ int _ParseHttpPortSpecification(unsigned short **ports, int *size, const char *s
     *size = 0;
 
     // Skip leading spaces
-    char *saveptr;
+	char *saveptr = NULL;
     char *ptr = (char *) spec;
     while (*ptr == ' ')
     {
@@ -191,7 +191,7 @@ int _ParseHttpPortSpecification(unsigned short **ports, int *size, const char *s
                     err(ZT("memory allocation failure allocating %d bytes"), bytes);
                 }
 
-                (*ports)[(*size) - 1] = x;
+				(*ports)[(*size) - 1] = (unsigned short)x;
             }
         }
     }
@@ -446,7 +446,7 @@ void ResetLog()
     conf = Conf_Open(path);
     if (!conf)
     {
-        trace_CriticalError("Failed to open configuration file");
+        trace_CriticalError(MI_T("Failed to open configuration file"));
         return;
     }
 
@@ -459,7 +459,7 @@ void ResetLog()
 
         if (r == -1)
         {
-            trace_CriticalError("Incorrect entry in configuration file");
+            trace_CriticalError(MI_T("Incorrect entry in configuration file"));
             break;
         }
 
@@ -470,7 +470,7 @@ void ResetLog()
         {
             if (Log_SetLevelFromString(value) != 0)
             {
-                trace_CriticalError("Incorrect loglevel set in configuration file");
+                trace_CriticalError(MI_T("Incorrect loglevel set in configuration file"));
             }
             break;
         }
@@ -1020,6 +1020,7 @@ static void _ProcessNoopRequest(_Inout_ InteractionOpenParams*  params)
         trace_OutOfMemory();
         Strand_FailOpen(params);
         err(ZT("out of memory"));
+		return;
     }
 
     /* Send NoOp response back */
@@ -1030,6 +1031,7 @@ static void _ProcessNoopRequest(_Inout_ InteractionOpenParams*  params)
         trace_OutOfMemory();
         Strand_FailOpen(params);
         err(ZT("out of memory"));
+		return;
     }
 
 #if !defined(CONFIG_FAVORSIZE)

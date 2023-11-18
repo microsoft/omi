@@ -24,7 +24,7 @@ static MI_Boolean Abstract_qual_decl_value = 0;
 
 static MI_QualifierDecl Abstract_qual_decl =
 {
-    (char*)"Abstract", /* name */
+    (MI_Char*)"Abstract", /* name */
     MI_BOOLEAN, /* type */
     0, /* subscript */
     MI_FLAG_ASSOCIATION|MI_FLAG_CLASS|MI_FLAG_INDICATION, /* scope */
@@ -36,7 +36,7 @@ static MI_Boolean Aggregate_qual_decl_value = 0;
 
 static MI_QualifierDecl Aggregate_qual_decl =
 {
-    (char*)"Aggregate", /* name */
+    (MI_Char*)"Aggregate", /* name */
     MI_BOOLEAN, /* type */
     0, /* subscript */
     MI_FLAG_REFERENCE, /* scope */
@@ -48,7 +48,7 @@ static MI_Boolean Aggregation_qual_decl_value = 0;
 
 static MI_QualifierDecl Aggregation_qual_decl =
 {
-    (char*)"Aggregation", /* name */
+    (MI_Char*)"Aggregation", /* name */
     MI_BOOLEAN, /* type */
     0, /* subscript */
     MI_FLAG_ASSOCIATION, /* scope */
@@ -58,7 +58,7 @@ static MI_QualifierDecl Aggregation_qual_decl =
 
 static MI_QualifierDecl Alias_qual_decl =
 {
-    (char*)"Alias", /* name */
+    (MI_Char*)"Alias", /* name */
     MI_STRING, /* type */
     0, /* subscript */
     MI_FLAG_METHOD|MI_FLAG_PROPERTY|MI_FLAG_REFERENCE, /* scope */
@@ -66,11 +66,11 @@ static MI_QualifierDecl Alias_qual_decl =
     NULL, /* value */
 };
 
-static const MI_Char* ArrayType_qual_decl_value = "Bag";
+static const MI_Char* ArrayType_qual_decl_value = (MI_Char *)"Bag";
 
 static MI_QualifierDecl ArrayType_qual_decl =
 {
-    (char*)"ArrayType", /* name */
+    (MI_Char*)"ArrayType", /* name */
     MI_STRING, /* type */
     0, /* subscript */
     MI_FLAG_PARAMETER|MI_FLAG_PROPERTY, /* scope */
@@ -82,7 +82,7 @@ static MI_Boolean Association_qual_decl_value = 0;
 
 static MI_QualifierDecl Association_qual_decl =
 {
-    (char*)"Association", /* name */
+    (MI_Char*)"Association", /* name */
     MI_BOOLEAN, /* type */
     0, /* subscript */
     MI_FLAG_ASSOCIATION, /* scope */
@@ -92,7 +92,7 @@ static MI_QualifierDecl Association_qual_decl =
 
 static MI_QualifierDecl BitMap_qual_decl =
 {
-    (char*)"BitMap", /* name */
+    (MI_Char*)"BitMap", /* name */
     MI_STRINGA, /* type */
     0, /* subscript */
     MI_FLAG_METHOD|MI_FLAG_PARAMETER|MI_FLAG_PROPERTY, /* scope */
@@ -102,7 +102,7 @@ static MI_QualifierDecl BitMap_qual_decl =
 
 static MI_QualifierDecl BitValues_qual_decl =
 {
-    (char*)"BitValues", /* name */
+    (MI_Char*)"BitValues", /* name */
     MI_STRINGA, /* type */
     0, /* subscript */
     MI_FLAG_METHOD|MI_FLAG_PARAMETER|MI_FLAG_PROPERTY, /* scope */
@@ -112,7 +112,7 @@ static MI_QualifierDecl BitValues_qual_decl =
 
 static MI_QualifierDecl ClassConstraint_qual_decl =
 {
-    (char*)"ClassConstraint", /* name */
+    (MI_Char*)"ClassConstraint", /* name */
     MI_STRINGA, /* type */
     0, /* subscript */
     MI_FLAG_ASSOCIATION|MI_FLAG_CLASS|MI_FLAG_INDICATION, /* scope */
@@ -124,7 +124,7 @@ static MI_Boolean Composition_qual_decl_value = 0;
 
 static MI_QualifierDecl Composition_qual_decl =
 {
-    (char*)"Composition", /* name */
+    (MI_Char*)"Composition", /* name */
     MI_BOOLEAN, /* type */
     0, /* subscript */
     MI_FLAG_ASSOCIATION, /* scope */
@@ -134,7 +134,7 @@ static MI_QualifierDecl Composition_qual_decl =
 
 static MI_QualifierDecl Correlatable_qual_decl =
 {
-    (char*)"Correlatable", /* name */
+    (MI_Char*)"Correlatable", /* name */
     MI_STRINGA, /* type */
     0, /* subscript */
     MI_FLAG_PROPERTY, /* scope */
@@ -146,7 +146,7 @@ static MI_Boolean Counter_qual_decl_value = 0;
 
 static MI_QualifierDecl Counter_qual_decl =
 {
-    (char*)"Counter", /* name */
+    (MI_Char*)"Counter", /* name */
     MI_BOOLEAN, /* type */
     0, /* subscript */
     MI_FLAG_METHOD|MI_FLAG_PARAMETER|MI_FLAG_PROPERTY, /* scope */
@@ -158,7 +158,7 @@ static MI_Boolean DN_qual_decl_value = 0;
 
 static MI_QualifierDecl DN_qual_decl =
 {
-    (char*)"DN", /* name */
+    (MI_Char*)"DN", /* name */
     MI_BOOLEAN, /* type */
     0, /* subscript */
     MI_FLAG_METHOD|MI_FLAG_PARAMETER|MI_FLAG_PROPERTY, /* scope */
@@ -170,7 +170,7 @@ static MI_Boolean Delete_qual_decl_value = 0;
 
 static MI_QualifierDecl Delete_qual_decl =
 {
-    (char*)"Delete", /* name */
+    (MI_Char*)"Delete", /* name */
     MI_BOOLEAN, /* type */
     0, /* subscript */
     MI_FLAG_ASSOCIATION|MI_FLAG_REFERENCE, /* scope */
@@ -180,7 +180,7 @@ static MI_QualifierDecl Delete_qual_decl =
 
 static MI_QualifierDecl Deprecated_qual_decl =
 {
-    (char*)"Deprecated", /* name */
+    (MI_Char*)"Deprecated", /* name */
     MI_STRINGA, /* type */
     0, /* subscript */
     MI_FLAG_ANY, /* scope */
@@ -190,7 +190,7 @@ static MI_QualifierDecl Deprecated_qual_decl =
 
 static MI_QualifierDecl Description_qual_decl =
 {
-    (char*)"Description", /* name */
+    (MI_Char*)"Description", /* name */
     MI_STRING, /* type */
     0, /* subscript */
     MI_FLAG_ANY, /* scope */
@@ -200,7 +200,7 @@ static MI_QualifierDecl Description_qual_decl =
 
 static MI_QualifierDecl DisplayDescription_qual_decl =
 {
-    (char*)"DisplayDescription", /* name */
+    (MI_Char*)"DisplayDescription", /* name */
     MI_STRING, /* type */
     0, /* subscript */
     MI_FLAG_ANY, /* scope */
@@ -210,7 +210,7 @@ static MI_QualifierDecl DisplayDescription_qual_decl =
 
 static MI_QualifierDecl DisplayName_qual_decl =
 {
-    (char*)"DisplayName", /* name */
+    (MI_Char*)"DisplayName", /* name */
     MI_STRING, /* type */
     0, /* subscript */
     MI_FLAG_ANY, /* scope */
@@ -220,7 +220,7 @@ static MI_QualifierDecl DisplayName_qual_decl =
 
 static MI_QualifierDecl EmbeddedInstance_qual_decl =
 {
-    (char*)"EmbeddedInstance", /* name */
+    (MI_Char*)"EmbeddedInstance", /* name */
     MI_STRING, /* type */
     0, /* subscript */
     MI_FLAG_METHOD|MI_FLAG_PARAMETER|MI_FLAG_PROPERTY, /* scope */
@@ -232,7 +232,7 @@ static MI_Boolean EmbeddedObject_qual_decl_value = 0;
 
 static MI_QualifierDecl EmbeddedObject_qual_decl =
 {
-    (char*)"EmbeddedObject", /* name */
+    (MI_Char*)"EmbeddedObject", /* name */
     MI_BOOLEAN, /* type */
     0, /* subscript */
     MI_FLAG_METHOD|MI_FLAG_PARAMETER|MI_FLAG_PROPERTY, /* scope */
@@ -244,7 +244,7 @@ static MI_Boolean Exception_qual_decl_value = 0;
 
 static MI_QualifierDecl Exception_qual_decl =
 {
-    (char*)"Exception", /* name */
+    (MI_Char*)"Exception", /* name */
     MI_BOOLEAN, /* type */
     0, /* subscript */
     MI_FLAG_CLASS|MI_FLAG_INDICATION, /* scope */
@@ -256,7 +256,7 @@ static MI_Boolean Expensive_qual_decl_value = 0;
 
 static MI_QualifierDecl Expensive_qual_decl =
 {
-    (char*)"Expensive", /* name */
+    (MI_Char*)"Expensive", /* name */
     MI_BOOLEAN, /* type */
     0, /* subscript */
     MI_FLAG_ANY, /* scope */
@@ -268,7 +268,7 @@ static MI_Boolean Experimental_qual_decl_value = 0;
 
 static MI_QualifierDecl Experimental_qual_decl =
 {
-    (char*)"Experimental", /* name */
+    (MI_Char*)"Experimental", /* name */
     MI_BOOLEAN, /* type */
     0, /* subscript */
     MI_FLAG_ANY, /* scope */
@@ -280,7 +280,7 @@ static MI_Boolean Gauge_qual_decl_value = 0;
 
 static MI_QualifierDecl Gauge_qual_decl =
 {
-    (char*)"Gauge", /* name */
+    (MI_Char*)"Gauge", /* name */
     MI_BOOLEAN, /* type */
     0, /* subscript */
     MI_FLAG_METHOD|MI_FLAG_PARAMETER|MI_FLAG_PROPERTY, /* scope */
@@ -292,7 +292,7 @@ static MI_Boolean Ifdeleted_qual_decl_value = 0;
 
 static MI_QualifierDecl Ifdeleted_qual_decl =
 {
-    (char*)"Ifdeleted", /* name */
+    (MI_Char*)"Ifdeleted", /* name */
     MI_BOOLEAN, /* type */
     0, /* subscript */
     MI_FLAG_ASSOCIATION|MI_FLAG_REFERENCE, /* scope */
@@ -304,7 +304,7 @@ static MI_Boolean In_qual_decl_value = 1;
 
 static MI_QualifierDecl In_qual_decl =
 {
-    (char*)"In", /* name */
+    (MI_Char*)"In", /* name */
     MI_BOOLEAN, /* type */
     0, /* subscript */
     MI_FLAG_PARAMETER, /* scope */
@@ -316,7 +316,7 @@ static MI_Boolean Indication_qual_decl_value = 0;
 
 static MI_QualifierDecl Indication_qual_decl =
 {
-    (char*)"Indication", /* name */
+    (MI_Char*)"Indication", /* name */
     MI_BOOLEAN, /* type */
     0, /* subscript */
     MI_FLAG_CLASS|MI_FLAG_INDICATION, /* scope */
@@ -328,7 +328,7 @@ static MI_Boolean Invisible_qual_decl_value = 0;
 
 static MI_QualifierDecl Invisible_qual_decl =
 {
-    (char*)"Invisible", /* name */
+    (MI_Char*)"Invisible", /* name */
     MI_BOOLEAN, /* type */
     0, /* subscript */
     MI_FLAG_ASSOCIATION|MI_FLAG_CLASS|MI_FLAG_METHOD|MI_FLAG_PROPERTY|MI_FLAG_REFERENCE, /* scope */
@@ -340,7 +340,7 @@ static MI_Boolean IsPUnit_qual_decl_value = 0;
 
 static MI_QualifierDecl IsPUnit_qual_decl =
 {
-    (char*)"IsPUnit", /* name */
+    (MI_Char*)"IsPUnit", /* name */
     MI_BOOLEAN, /* type */
     0, /* subscript */
     MI_FLAG_METHOD|MI_FLAG_PARAMETER|MI_FLAG_PROPERTY, /* scope */
@@ -352,7 +352,7 @@ static MI_Boolean Key_qual_decl_value = 0;
 
 static MI_QualifierDecl Key_qual_decl =
 {
-    (char*)"Key", /* name */
+    (MI_Char*)"Key", /* name */
     MI_BOOLEAN, /* type */
     0, /* subscript */
     MI_FLAG_PROPERTY|MI_FLAG_REFERENCE, /* scope */
@@ -364,7 +364,7 @@ static MI_Boolean Large_qual_decl_value = 0;
 
 static MI_QualifierDecl Large_qual_decl =
 {
-    (char*)"Large", /* name */
+    (MI_Char*)"Large", /* name */
     MI_BOOLEAN, /* type */
     0, /* subscript */
     MI_FLAG_CLASS|MI_FLAG_PROPERTY, /* scope */
@@ -374,7 +374,7 @@ static MI_QualifierDecl Large_qual_decl =
 
 static MI_QualifierDecl MappingStrings_qual_decl =
 {
-    (char*)"MappingStrings", /* name */
+    (MI_Char*)"MappingStrings", /* name */
     MI_STRINGA, /* type */
     0, /* subscript */
     MI_FLAG_ANY, /* scope */
@@ -384,7 +384,7 @@ static MI_QualifierDecl MappingStrings_qual_decl =
 
 static MI_QualifierDecl Max_qual_decl =
 {
-    (char*)"Max", /* name */
+    (MI_Char*)"Max", /* name */
     MI_UINT32, /* type */
     0, /* subscript */
     MI_FLAG_REFERENCE, /* scope */
@@ -394,7 +394,7 @@ static MI_QualifierDecl Max_qual_decl =
 
 static MI_QualifierDecl MaxLen_qual_decl =
 {
-    (char*)"MaxLen", /* name */
+    (MI_Char*)"MaxLen", /* name */
     MI_UINT32, /* type */
     0, /* subscript */
     MI_FLAG_METHOD|MI_FLAG_PARAMETER|MI_FLAG_PROPERTY, /* scope */
@@ -404,7 +404,7 @@ static MI_QualifierDecl MaxLen_qual_decl =
 
 static MI_QualifierDecl MaxValue_qual_decl =
 {
-    (char*)"MaxValue", /* name */
+    (MI_Char*)"MaxValue", /* name */
     MI_SINT64, /* type */
     0, /* subscript */
     MI_FLAG_METHOD|MI_FLAG_PARAMETER|MI_FLAG_PROPERTY, /* scope */
@@ -414,7 +414,7 @@ static MI_QualifierDecl MaxValue_qual_decl =
 
 static MI_QualifierDecl MethodConstraint_qual_decl =
 {
-    (char*)"MethodConstraint", /* name */
+    (MI_Char*)"MethodConstraint", /* name */
     MI_STRINGA, /* type */
     0, /* subscript */
     MI_FLAG_METHOD, /* scope */
@@ -426,7 +426,7 @@ static MI_Uint32 Min_qual_decl_value = 0;
 
 static MI_QualifierDecl Min_qual_decl =
 {
-    (char*)"Min", /* name */
+    (MI_Char*)"Min", /* name */
     MI_UINT32, /* type */
     0, /* subscript */
     MI_FLAG_REFERENCE, /* scope */
@@ -438,7 +438,7 @@ static MI_Uint32 MinLen_qual_decl_value = 0;
 
 static MI_QualifierDecl MinLen_qual_decl =
 {
-    (char*)"MinLen", /* name */
+    (MI_Char*)"MinLen", /* name */
     MI_UINT32, /* type */
     0, /* subscript */
     MI_FLAG_METHOD|MI_FLAG_PARAMETER|MI_FLAG_PROPERTY, /* scope */
@@ -448,7 +448,7 @@ static MI_QualifierDecl MinLen_qual_decl =
 
 static MI_QualifierDecl MinValue_qual_decl =
 {
-    (char*)"MinValue", /* name */
+    (MI_Char*)"MinValue", /* name */
     MI_SINT64, /* type */
     0, /* subscript */
     MI_FLAG_METHOD|MI_FLAG_PARAMETER|MI_FLAG_PROPERTY, /* scope */
@@ -458,7 +458,7 @@ static MI_QualifierDecl MinValue_qual_decl =
 
 static MI_QualifierDecl ModelCorrespondence_qual_decl =
 {
-    (char*)"ModelCorrespondence", /* name */
+    (MI_Char*)"ModelCorrespondence", /* name */
     MI_STRINGA, /* type */
     0, /* subscript */
     MI_FLAG_ANY, /* scope */
@@ -468,7 +468,7 @@ static MI_QualifierDecl ModelCorrespondence_qual_decl =
 
 static MI_QualifierDecl Nonlocal_qual_decl =
 {
-    (char*)"Nonlocal", /* name */
+    (MI_Char*)"Nonlocal", /* name */
     MI_STRING, /* type */
     0, /* subscript */
     MI_FLAG_REFERENCE, /* scope */
@@ -478,7 +478,7 @@ static MI_QualifierDecl Nonlocal_qual_decl =
 
 static MI_QualifierDecl NonlocalType_qual_decl =
 {
-    (char*)"NonlocalType", /* name */
+    (MI_Char*)"NonlocalType", /* name */
     MI_STRING, /* type */
     0, /* subscript */
     MI_FLAG_REFERENCE, /* scope */
@@ -488,7 +488,7 @@ static MI_QualifierDecl NonlocalType_qual_decl =
 
 static MI_QualifierDecl NullValue_qual_decl =
 {
-    (char*)"NullValue", /* name */
+    (MI_Char*)"NullValue", /* name */
     MI_STRING, /* type */
     0, /* subscript */
     MI_FLAG_PROPERTY, /* scope */
@@ -500,7 +500,7 @@ static MI_Boolean Octetstring_qual_decl_value = 0;
 
 static MI_QualifierDecl Octetstring_qual_decl =
 {
-    (char*)"Octetstring", /* name */
+    (MI_Char*)"Octetstring", /* name */
     MI_BOOLEAN, /* type */
     0, /* subscript */
     MI_FLAG_METHOD|MI_FLAG_PARAMETER|MI_FLAG_PROPERTY, /* scope */
@@ -512,7 +512,7 @@ static MI_Boolean Out_qual_decl_value = 0;
 
 static MI_QualifierDecl Out_qual_decl =
 {
-    (char*)"Out", /* name */
+    (MI_Char*)"Out", /* name */
     MI_BOOLEAN, /* type */
     0, /* subscript */
     MI_FLAG_PARAMETER, /* scope */
@@ -522,7 +522,7 @@ static MI_QualifierDecl Out_qual_decl =
 
 static MI_QualifierDecl Override_qual_decl =
 {
-    (char*)"Override", /* name */
+    (MI_Char*)"Override", /* name */
     MI_STRING, /* type */
     0, /* subscript */
     MI_FLAG_METHOD|MI_FLAG_PROPERTY|MI_FLAG_REFERENCE, /* scope */
@@ -532,7 +532,7 @@ static MI_QualifierDecl Override_qual_decl =
 
 static MI_QualifierDecl PUnit_qual_decl =
 {
-    (char*)"PUnit", /* name */
+    (MI_Char*)"PUnit", /* name */
     MI_STRING, /* type */
     0, /* subscript */
     MI_FLAG_METHOD|MI_FLAG_PARAMETER|MI_FLAG_PROPERTY, /* scope */
@@ -542,7 +542,7 @@ static MI_QualifierDecl PUnit_qual_decl =
 
 static MI_QualifierDecl Propagated_qual_decl =
 {
-    (char*)"Propagated", /* name */
+    (MI_Char*)"Propagated", /* name */
     MI_STRING, /* type */
     0, /* subscript */
     MI_FLAG_PROPERTY, /* scope */
@@ -552,7 +552,7 @@ static MI_QualifierDecl Propagated_qual_decl =
 
 static MI_QualifierDecl PropertyConstraint_qual_decl =
 {
-    (char*)"PropertyConstraint", /* name */
+    (MI_Char*)"PropertyConstraint", /* name */
     MI_STRINGA, /* type */
     0, /* subscript */
     MI_FLAG_PROPERTY|MI_FLAG_REFERENCE, /* scope */
@@ -560,11 +560,11 @@ static MI_QualifierDecl PropertyConstraint_qual_decl =
     NULL, /* value */
 };
 
-static const MI_Char* PropertyUsage_qual_decl_value = "CurrentContext";
+static const MI_Char* PropertyUsage_qual_decl_value = (MI_Char*)"CurrentContext";
 
 static MI_QualifierDecl PropertyUsage_qual_decl =
 {
-    (char*)"PropertyUsage", /* name */
+    (MI_Char*)"PropertyUsage", /* name */
     MI_STRING, /* type */
     0, /* subscript */
     MI_FLAG_PROPERTY, /* scope */
@@ -574,7 +574,7 @@ static MI_QualifierDecl PropertyUsage_qual_decl =
 
 static MI_QualifierDecl Provider_qual_decl =
 {
-    (char*)"Provider", /* name */
+    (MI_Char*)"Provider", /* name */
     MI_STRING, /* type */
     0, /* subscript */
     MI_FLAG_ANY, /* scope */
@@ -586,7 +586,7 @@ static MI_Boolean Read_qual_decl_value = 1;
 
 static MI_QualifierDecl Read_qual_decl =
 {
-    (char*)"Read", /* name */
+    (MI_Char*)"Read", /* name */
     MI_BOOLEAN, /* type */
     0, /* subscript */
     MI_FLAG_PROPERTY, /* scope */
@@ -598,7 +598,7 @@ static MI_Boolean Required_qual_decl_value = 0;
 
 static MI_QualifierDecl Required_qual_decl =
 {
-    (char*)"Required", /* name */
+    (MI_Char*)"Required", /* name */
     MI_BOOLEAN, /* type */
     0, /* subscript */
     MI_FLAG_METHOD|MI_FLAG_PARAMETER|MI_FLAG_PROPERTY|MI_FLAG_REFERENCE, /* scope */
@@ -608,7 +608,7 @@ static MI_QualifierDecl Required_qual_decl =
 
 static MI_QualifierDecl Revision_qual_decl =
 {
-    (char*)"Revision", /* name */
+    (MI_Char*)"Revision", /* name */
     MI_STRING, /* type */
     0, /* subscript */
     MI_FLAG_ASSOCIATION|MI_FLAG_CLASS|MI_FLAG_INDICATION, /* scope */
@@ -618,7 +618,7 @@ static MI_QualifierDecl Revision_qual_decl =
 
 static MI_QualifierDecl Schema_qual_decl =
 {
-    (char*)"Schema", /* name */
+    (MI_Char*)"Schema", /* name */
     MI_STRING, /* type */
     0, /* subscript */
     MI_FLAG_METHOD|MI_FLAG_PROPERTY, /* scope */
@@ -628,7 +628,7 @@ static MI_QualifierDecl Schema_qual_decl =
 
 static MI_QualifierDecl Source_qual_decl =
 {
-    (char*)"Source", /* name */
+    (MI_Char*)"Source", /* name */
     MI_STRING, /* type */
     0, /* subscript */
     MI_FLAG_ASSOCIATION|MI_FLAG_CLASS|MI_FLAG_INDICATION, /* scope */
@@ -638,7 +638,7 @@ static MI_QualifierDecl Source_qual_decl =
 
 static MI_QualifierDecl SourceType_qual_decl =
 {
-    (char*)"SourceType", /* name */
+    (MI_Char*)"SourceType", /* name */
     MI_STRING, /* type */
     0, /* subscript */
     MI_FLAG_ASSOCIATION|MI_FLAG_CLASS|MI_FLAG_INDICATION|MI_FLAG_REFERENCE, /* scope */
@@ -650,7 +650,7 @@ static MI_Boolean Static_qual_decl_value = 0;
 
 static MI_QualifierDecl Static_qual_decl =
 {
-    (char*)"Static", /* name */
+    (MI_Char*)"Static", /* name */
     MI_BOOLEAN, /* type */
     0, /* subscript */
     MI_FLAG_METHOD|MI_FLAG_PROPERTY, /* scope */
@@ -660,7 +660,7 @@ static MI_QualifierDecl Static_qual_decl =
 
 static MI_QualifierDecl Syntax_qual_decl =
 {
-    (char*)"Syntax", /* name */
+    (MI_Char*)"Syntax", /* name */
     MI_STRING, /* type */
     0, /* subscript */
     MI_FLAG_METHOD|MI_FLAG_PARAMETER|MI_FLAG_PROPERTY|MI_FLAG_REFERENCE, /* scope */
@@ -670,7 +670,7 @@ static MI_QualifierDecl Syntax_qual_decl =
 
 static MI_QualifierDecl SyntaxType_qual_decl =
 {
-    (char*)"SyntaxType", /* name */
+    (MI_Char*)"SyntaxType", /* name */
     MI_STRING, /* type */
     0, /* subscript */
     MI_FLAG_METHOD|MI_FLAG_PARAMETER|MI_FLAG_PROPERTY|MI_FLAG_REFERENCE, /* scope */
@@ -682,7 +682,7 @@ static MI_Boolean Terminal_qual_decl_value = 0;
 
 static MI_QualifierDecl Terminal_qual_decl =
 {
-    (char*)"Terminal", /* name */
+    (MI_Char*)"Terminal", /* name */
     MI_BOOLEAN, /* type */
     0, /* subscript */
     MI_FLAG_ASSOCIATION|MI_FLAG_CLASS|MI_FLAG_INDICATION, /* scope */
@@ -692,7 +692,7 @@ static MI_QualifierDecl Terminal_qual_decl =
 
 static MI_QualifierDecl TriggerType_qual_decl =
 {
-    (char*)"TriggerType", /* name */
+    (MI_Char*)"TriggerType", /* name */
     MI_STRING, /* type */
     0, /* subscript */
     MI_FLAG_ASSOCIATION|MI_FLAG_CLASS|MI_FLAG_INDICATION|MI_FLAG_METHOD|MI_FLAG_PROPERTY|MI_FLAG_REFERENCE, /* scope */
@@ -702,7 +702,7 @@ static MI_QualifierDecl TriggerType_qual_decl =
 
 static MI_QualifierDecl UMLPackagePath_qual_decl =
 {
-    (char*)"UMLPackagePath", /* name */
+    (MI_Char*)"UMLPackagePath", /* name */
     MI_STRING, /* type */
     0, /* subscript */
     MI_FLAG_ASSOCIATION|MI_FLAG_CLASS|MI_FLAG_INDICATION, /* scope */
@@ -712,7 +712,7 @@ static MI_QualifierDecl UMLPackagePath_qual_decl =
 
 static MI_QualifierDecl Units_qual_decl =
 {
-    (char*)"Units", /* name */
+    (MI_Char*)"Units", /* name */
     MI_STRING, /* type */
     0, /* subscript */
     MI_FLAG_METHOD|MI_FLAG_PARAMETER|MI_FLAG_PROPERTY, /* scope */
@@ -722,7 +722,7 @@ static MI_QualifierDecl Units_qual_decl =
 
 static MI_QualifierDecl UnknownValues_qual_decl =
 {
-    (char*)"UnknownValues", /* name */
+    (MI_Char*)"UnknownValues", /* name */
     MI_STRINGA, /* type */
     0, /* subscript */
     MI_FLAG_PROPERTY, /* scope */
@@ -732,7 +732,7 @@ static MI_QualifierDecl UnknownValues_qual_decl =
 
 static MI_QualifierDecl UnsupportedValues_qual_decl =
 {
-    (char*)"UnsupportedValues", /* name */
+    (MI_Char*)"UnsupportedValues", /* name */
     MI_STRINGA, /* type */
     0, /* subscript */
     MI_FLAG_PROPERTY, /* scope */
@@ -742,7 +742,7 @@ static MI_QualifierDecl UnsupportedValues_qual_decl =
 
 static MI_QualifierDecl ValueMap_qual_decl =
 {
-    (char*)"ValueMap", /* name */
+    (MI_Char*)"ValueMap", /* name */
     MI_STRINGA, /* type */
     0, /* subscript */
     MI_FLAG_METHOD|MI_FLAG_PARAMETER|MI_FLAG_PROPERTY, /* scope */
@@ -752,7 +752,7 @@ static MI_QualifierDecl ValueMap_qual_decl =
 
 static MI_QualifierDecl Values_qual_decl =
 {
-    (char*)"Values", /* name */
+    (MI_Char*)"Values", /* name */
     MI_STRINGA, /* type */
     0, /* subscript */
     MI_FLAG_METHOD|MI_FLAG_PARAMETER|MI_FLAG_PROPERTY, /* scope */
@@ -762,7 +762,7 @@ static MI_QualifierDecl Values_qual_decl =
 
 static MI_QualifierDecl Version_qual_decl =
 {
-    (char*)"Version", /* name */
+    (MI_Char*)"Version", /* name */
     MI_STRING, /* type */
     0, /* subscript */
     MI_FLAG_ASSOCIATION|MI_FLAG_CLASS|MI_FLAG_INDICATION, /* scope */
@@ -774,7 +774,7 @@ static MI_Boolean Weak_qual_decl_value = 0;
 
 static MI_QualifierDecl Weak_qual_decl =
 {
-    (char*)"Weak", /* name */
+    (MI_Char*)"Weak", /* name */
     MI_BOOLEAN, /* type */
     0, /* subscript */
     MI_FLAG_REFERENCE, /* scope */
@@ -786,7 +786,7 @@ static MI_Boolean Write_qual_decl_value = 0;
 
 static MI_QualifierDecl Write_qual_decl =
 {
-    (char*)"Write", /* name */
+    (MI_Char*)"Write", /* name */
     MI_BOOLEAN, /* type */
     0, /* subscript */
     MI_FLAG_PROPERTY, /* scope */

@@ -100,7 +100,7 @@ void ResetLog()
     conf = Conf_Open(path);
     if (!conf)
     {
-        trace_CriticalError("Failed to open configuration file");
+        trace_CriticalError(MI_T("Failed to open configuration file"));
         return;
     }
 
@@ -113,7 +113,7 @@ void ResetLog()
 
         if (r == -1)
         {
-            trace_CriticalError("Incorrect entry in configuration file");
+            trace_CriticalError(MI_T("Incorrect entry in configuration file"));
             break;
         }
 
@@ -124,7 +124,7 @@ void ResetLog()
         {
             if (Log_SetLevelFromString(value) != 0)
             {
-                trace_CriticalError("Incorrect loglevel set in configuration file");
+                trace_CriticalError(MI_T("Incorrect loglevel set in configuration file"));
             }
             break;
         }
@@ -312,7 +312,7 @@ static void GetCommandLineOptions(int* argc, const char* argv[])
         else if (strcmp(state.opt, "--version") == 0)
         {
             Tprintf(ZT("%s: %s\n"), scs(arg0),
-                scs(CONFIG_PRODUCT "-" CONFIG_VERSION " - " CONFIG_DATE));
+                scs((const char *)(CONFIG_PRODUCT MI_T("-") CONFIG_VERSION MI_T(" - ") CONFIG_DATE)));
             exit(0);
         }
         else if (strcmp(state.opt, "--providerdir") == 0)
@@ -330,7 +330,7 @@ static void GetCommandLineOptions(int* argc, const char* argv[])
                     scs(state.arg));
             }
 
-            s_opts.idletimeout = x;
+            s_opts.idletimeout = (MI_Uint32)x;
         }
         else if (strcmp(state.opt, "--loglevel") == 0)
         {
@@ -474,7 +474,7 @@ int agent_main(int argc, const char* argv[])
     if (s_opts.idletimeout)
     {
         /* convert it to usec */
-        s_data.provmgr.idleTimeoutUsec = s_opts.idletimeout * 1000000;
+        s_data.provmgr.idleTimeoutUsec = (MI_Uint64)s_opts.idletimeout * 1000000;
         trace_Agent_ChangingIdleTimeout(s_opts.idletimeout);
 
     }

@@ -344,9 +344,9 @@ MI_CONST MI_ClassDecl CIM_Error_rtti =
     MI_FLAG_CLASS|MI_FLAG_INDICATION, /* flags */
     0x00637209, /* code */
     MI_T("CIM_Error"), /* name */
-    CIM_Error_quals, /* qualifiers */
+    (struct _MI_Qualifier**)CIM_Error_quals, /* qualifiers */
     MI_COUNT(CIM_Error_quals), /* numQualifiers */
-    CIM_Error_props, /* properties */
+    (struct _MI_PropertyDecl**)CIM_Error_props, /* properties */
     MI_COUNT(CIM_Error_props), /* numProperties */
     sizeof(CIM_Error), /* size */
     NULL, /* superClass */
@@ -478,13 +478,13 @@ MI_CONST MI_ClassDecl OMI_Error_rtti =
     MI_FLAG_CLASS|MI_FLAG_INDICATION, /* flags */
     0x006F7209, /* code */
     MI_T("OMI_Error"), /* name */
-    OMI_Error_quals, /* qualifiers */
+    (struct _MI_Qualifier**)OMI_Error_quals, /* qualifiers */
     MI_COUNT(OMI_Error_quals), /* numQualifiers */
-    OMI_Error_props, /* properties */
+    (struct _MI_PropertyDecl**)OMI_Error_props, /* properties */
     MI_COUNT(OMI_Error_props), /* numProperties */
     sizeof(OMI_Error), /* size */
-    MI_T("CIM_Error"), /* superClass */
-    &CIM_Error_rtti, /* superClassDecl */
+    (MI_CONST MI_Char*)(MI_T("CIM_Error")), /* superClass */
+    (MI_ClassDecl*)&CIM_Error_rtti, /* superClassDecl */
     NULL, /* methods */
     0, /* numMethods */
     &errorSchemaDecl, /* schema */

@@ -126,6 +126,10 @@ static void WriteBuffer_Instance(
     *result = MI_RESULT_OK;
 
     *result = MI_Instance_GetClassExt(instance, &classOfInstance);
+    if(classOfInstance.ft == NULL)
+    {
+		return;
+    }
 
     *result = GetClassExtendedFt(&classOfInstance)->GetClassName(&classOfInstance, &classNameOfInstance);
 
@@ -136,6 +140,10 @@ static void WriteBuffer_Instance(
     if(classNameOfInstance)
     {
         WriteBuffer_String(clientBuffer, clientBufferLength, clientBufferNeeded, classNameOfInstance, escapingDepth, result);
+    }
+    else
+    {
+		return;
     }
     WriteBuffer_StringLiteral(clientBuffer, clientBufferLength, clientBufferNeeded, PAL_T("\""), escapingDepth, result);
 
@@ -271,6 +279,10 @@ static void WriteBuffer_InstanceEmbeddedClass(
                     serverName = embeddedInstance[embeddedInstanceLoop]->serverName;
                 }
                 MI_Instance_GetClassExt(embeddedInstance[embeddedInstanceLoop], &classOfInstance);
+				if(classOfInstance.ft == NULL)
+				{
+					return;
+				}
                 WriteBuffer_RecurseInstanceClass(clientBuffer, clientBufferLength, clientBufferNeeded, serializeFlags, &classOfInstance, namespaceName, serverName, writtenClasses, writtenClassCount, result);
 
                 //Recurse in case it has any embedded classes
@@ -303,6 +315,10 @@ static void WriteBuffer_SerializeClass(
     if(miClassName)
     {
         WriteBuffer_CimName(clientBuffer, clientBufferLength, clientBufferNeeded, miClassName, SERIALIZE_NO_ESCAPE, result);
+    }
+    else
+    {
+    	return;
     }
 
     /* %SuperClass; */
@@ -566,7 +582,8 @@ static void WriteBuffer_MiPropertyDecls(
         GetClassExtendedFt(miClass)->GetElementAtExt(miClass, propertyCount, &propertyName, &propertyValue, &propertyValueExistsInDecl,
                     &propertyType, &propertySubscript, &propertyOffset , &propertyReferenceClass, &propertyOriginClass, &propertyPropagatorClass, &propertyQualifierSet, &propertyFlags);
 
-        MI_Instance_GetElementAt((MI_Instance*)instanceStart, propertyCount, &propertyName, &propertyValue, &propertyType, &propertyFlags);
+	    if(MI_RESULT_OK != MI_Instance_GetElementAt((MI_Instance*)instanceStart, propertyCount, &propertyName, &propertyValue, &propertyType, &propertyFlags))
+		    return;
 
         /* If not serializing deep and we are not the propagator of the property then we need to skip this one */
         //MI_SERIALIZER_FLAGS_CLASS_DEEP
@@ -1597,7 +1614,10 @@ static void WriteBuffer_INSTANCENAME(
     MI_Uint32 propertyFlags;
 
     *result = MI_Instance_GetClassExt(refValue, &classOfRefValue);
-
+    if(classOfRefValue.ft == NULL)
+    {
+	    return;
+    }
     *result = GetClassExtendedFt(&classOfRefValue)->GetClassName(&classOfRefValue, &classNameOfRefValue);
 
     WriteBuffer_StringLiteral(clientBuffer, clientBufferLength, clientBufferNeeded, PAL_T("<INSTANCENAME CLASSNAME=\""), escapingDepth, result);
@@ -1817,6 +1837,10 @@ MI_Result MI_CALL XmlSerializer_SerializeInstanceEx(
         //Loop through classes
 
         MI_Instance_GetClassExt(_instanceObject, &classOfInstance);
+        if(classOfInstance.ft == NULL)
+		{
+			return MI_RESULT_INVALID_PARAMETER;
+		}
         WriteBuffer_RecurseInstanceClass(clientBuffer, clientBufferLength, clientBufferNeeded, flags, &classOfInstance, _instanceObject->nameSpace, _instanceObject->serverName, writtenClasses, &writtenClassCount, &result);
 
         //Loop through embedded object classes

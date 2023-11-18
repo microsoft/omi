@@ -222,7 +222,7 @@ static MI_Boolean _getHeaderField(
             }
             break;
         }
-        case (_HashCode('u','t',10)):
+		case (_HashCode('u', 't', 10)): /*User-Agent*/
         {
             /* Remember the User-Agent for later use */
             if (Strcasecmp(name, "User-Agent") == 0)
@@ -231,7 +231,7 @@ static MI_Boolean _getHeaderField(
             }
             break;
         }
-        case (_HashCode('p', 't', 4)):
+		case (_HashCode('p', 't', 4)): /*POST*/
         {
             /* Remember the User-Agent for later use */
             if (Strcasecmp(name, "POST") == 0)
@@ -824,7 +824,7 @@ _BuildHeader( Http_SR_SocketData* handler, int contentLen,
     const char *perrcode_desc = _HttpErrorCodeDescription(handler->httpErrorCode, &errcode_desc_len);
     
     int  content_len_strlen = 0;
-    char content_len_buff[16] ;
+	char content_len_buff[16] = { 0 };
     char *pcontent_len = int64_to_a(content_len_buff, sizeof(content_len_buff), contentLen, &content_len_strlen);
 
     int needed_size = HTTP_PROTOCOL_HEADER_LEN  + errorcode_strlen + 1 + errcode_desc_len + 2 + // HTTP/1.1 0 200 Success\r\n
@@ -995,9 +995,9 @@ static Http_CallbackResult _WriteHeader( Http_SR_SocketData* handler)
                     {
                         GetTimeStamp(startTime);
                         _WriteTraceFile(ID_HTTPSENDTRACEFILE, &startTime, strlen(startTime));
-                        _WriteTraceFile(ID_HTTPSENDTRACEFILE, &before_encrypt, sizeof(before_encrypt));
+						_WriteTraceFile(ID_HTTPSENDTRACEFILE, (void *) &before_encrypt, sizeof(before_encrypt));
                         _WriteTraceFile(ID_HTTPSENDTRACEFILE, (char *)(pOldPage+1), pOldPage->u.s.size);
-                        _WriteTraceFile(ID_HTTPSENDTRACEFILE, &before_encrypt_end, sizeof(before_encrypt_end));
+						_WriteTraceFile(ID_HTTPSENDTRACEFILE, (void *) &before_encrypt_end, sizeof(before_encrypt_end));
                     }
                 }
 
@@ -1097,7 +1097,7 @@ static Http_CallbackResult _WriteData(
     buf_size = handler->sendPage->u.s.size - handler->sentSize;
     sent = 0;
 
-    r = _Sock_Write(handler, buf, buf_size, &sent);
+	r = _Sock_Write(handler, (void*)(buf), buf_size, &sent);
 
     if ( r == MI_RESULT_OK && 0 == sent )
         return PRT_RETURN_FALSE; /* conection closed */
@@ -1688,7 +1688,7 @@ static MI_Result _CreateSSLContext(Http* self, const char* sslCipherSuite, SSL_O
     ** certificate.
     */
     {
-        char errorBuf[256];
+		char errorBuf[256] = { 0 };
 
         /* load the specified server certificates */
         trace_SSL_LoadingServerCert(scs(OMI_GetPath(ID_PEMFILE)));
@@ -1708,7 +1708,7 @@ static MI_Result _CreateSSLContext(Http* self, const char* sslCipherSuite, SSL_O
     ** If specified, validate and load the key.
     */
     {
-        char errorBuf[256];
+		char errorBuf[256] = { 0 };
 
         /* load the specified server certificates */
         trace_SSL_LoadingCertPrivateKey(scs(OMI_GetPath(ID_KEYFILE)));

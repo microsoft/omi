@@ -67,6 +67,10 @@ int WQL_Define(const WQL* self, Buf* out, size_t nindent)
 
         _Indent(nindent, out);
         len = Snprintf(buf, sizeof(buf), "    %u,\n", (int)self->nproperties);
+        if(len<0)
+		{
+			return -1;
+		}
         Buf_App(out, buf, len);
     }
 
@@ -133,6 +137,10 @@ int WQL_Define(const WQL* self, Buf* out, size_t nindent)
                     Buf_App(out, STRLIT("WQL_TYPE_BOOLEAN, "));
                     Buf_App(out, STRLIT("WQL_VALUE_BOOLEAN("));
                     len = Snprintf(buf, sizeof(buf), "%u", sym->value.boolean);
+                    if(len<0)
+				    {
+					    return -1;
+				    }
                     Buf_App(out, buf, len);
                     Buf_App(out, STRLIT(")"));
                     break;
@@ -141,6 +149,10 @@ int WQL_Define(const WQL* self, Buf* out, size_t nindent)
                     Buf_App(out, STRLIT("WQL_VALUE_INTEGER("));
                     len = Snprintf(buf, sizeof(buf), SINT64_FMT, 
                         sym->value.integer);
+                    if(len<0)
+				    {
+					    return -1;
+				    }
                     Buf_App(out, buf, len);
                     Buf_App(out, STRLIT(")"));
                     break;
@@ -148,6 +160,10 @@ int WQL_Define(const WQL* self, Buf* out, size_t nindent)
                     Buf_App(out, STRLIT("WQL_TYPE_REAL, "));
                     Buf_App(out, STRLIT("WQL_VALUE_REAL("));
                     len = Snprintf(buf, sizeof(buf), "%lf", sym->value.real);
+                    if(len<0)
+				    {
+					    return -1;
+				    }
                     Buf_App(out, buf, len);
                     Buf_App(out, STRLIT(")"));
                     break;
@@ -225,6 +241,10 @@ int WQL_Define(const WQL* self, Buf* out, size_t nindent)
 
         len = Snprintf(buf, sizeof(buf), "    %u,\n", (int)self->nsymbols);
         _Indent(nindent, out);
+        if(len<0)
+	    {
+		    return -1;
+	    }
         Buf_App(out, buf, len);
     }
 

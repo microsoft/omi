@@ -1175,7 +1175,7 @@ static MI_Boolean _ProcessCreateAgentMsg(
     {
         /* create/open log file for agent */
         {
-            char path[PAL_MAX_PATH_SIZE];
+            char path[PAL_MAX_PATH_SIZE] = { 0 };
 
             if (0 != FormatLogFileName(agentMsg->uid, agentMsg->gid, agentMsg->libraryName, path))
             {
@@ -1199,11 +1199,11 @@ static MI_Boolean _ProcessCreateAgentMsg(
             char param_sock[32];
             char param_logfd[32];
             const char *agentProgram = OMI_GetPath(ID_AGENTPROGRAM);
-            char realAgentProgram[PATH_MAX];
+			char realAgentProgram[PATH_MAX] = { 0 };
             const char *destDir = OMI_GetPath(ID_DESTDIR);
-            char realDestDir[PATH_MAX];
+            char realDestDir[PATH_MAX] = { 0 };
             const char *provDir = OMI_GetPath(ID_PROVIDERDIR);
-            char realProvDir[PATH_MAX];
+            char realProvDir[PATH_MAX] = { 0 };
             char *ret;
 
             ret = realpath(agentProgram, realAgentProgram);
