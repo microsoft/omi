@@ -10,6 +10,27 @@
 #include <sys/time.h>
 #include "cpu.h"
 
+#if defined(CONFIG_OS_FREEBSD)
+long timezone_calculated = 0;
+
+__attribute__((constructor)) static void InitializeTimeOffset(void)
+{
+    // Unlike SYSV, BSD does not have timezone with time offset. (It returns char* with name)
+    // We need to calculate it once.
+    struct tm gmt;
+    struct tm local;
+
+    time_t now = time(NULL);
+    // Calculate GMT and local time
+    gmtime_r(&now, &gmt);
+    localtime_r(&now, &local);
+
+    // calculate difference between local time and GMT
+    // Since it is only used on one place, pre-calculate to minutes.
+    timezone_calculated = (mktime(&gmt) - mktime(&local)) / -60;
+}
+#endif
+
 _Success_(return == 0)
 int CPU_GetLocalTimestamp(
     _Out_ PAL_Datetime* current)
@@ -28,7 +49,11 @@ int CPU_GetLocalTimestamp(
     current->u.timestamp.minute = tm.tm_min;
     current->u.timestamp.second = tm.tm_sec;
     current->u.timestamp.microseconds = tv.tv_usec;
+#if defined(CONFIG_OS_FREEBSD)
+    current->u.timestamp.utc = timezone_calculated;
+#else
     current->u.timestamp.utc = -timezone / 60;
+#endif
     return 0;
 }
 

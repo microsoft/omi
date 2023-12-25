@@ -1441,6 +1441,14 @@ case $os in
                 krblibpath=/System/Library/Frameworks/Kerberos.framework/Kerberos
             fi
             ;;
+        FREEBSD)
+            if [ disable_auth != 1 ]
+            then
+                gsslib=gssapi_krb5
+                gsslibpath=libgssapi_krb5.so
+                krblibpath=libkrb5.so
+            fi
+            ;;
         *)
             echo "Unknown platform: " $os
             exit 1
@@ -1517,6 +1525,9 @@ if [ "$os" = "DARWIN" ]; then
             exit 1
         fi
     fi
+elif [ "$os" = "FREEBSD" ]; then
+    openssllibdir="/usr/lib"
+    openssllibs="-L$openssllibdir -lssl -lcrypto -lz"
 else
     if [ "$opensslcflags_found" != "1" ]; then
         opensslcflags=`$pkgconfig --cflags openssl`
@@ -2603,7 +2614,7 @@ case $os in
                 cp $root/scripts/installpam-sun9 $fn.tmp
             fi
             ;;
-        Darwin)
+        Darwin|FreeBSD)
             cp $root/scripts/installpam-rhel $fn.tmp
             ;;
         *)

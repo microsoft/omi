@@ -273,14 +273,21 @@ if [ -z "$target" ]; then
             compiler=GNU
             distro=`lsb_release -i | awk -F":" '{ print $2 }'`
             distro_version=`lsb_release -r | awk -F":" '{ print $2 }'`
-	    ;;
+            ;;
         arm*:Linux:*)
             os=LINUX
             arch=ARM
             compiler=GNU
             distro=`lsb_release -i | awk -F":" '{ print $2 }'`
             distro_version=`lsb_release -r | awk -F":" '{ print $2 }'`
-	    ;;
+            ;;
+        amd64:FreeBSD:*:*)
+            os=FREEBSD
+            arch=X86_64
+            compiler=GNU
+            distro=`uname -s`
+            distro_version=`sysctl -n kern.osrelease | cut -f1 -d'-'`
+            ;;
         *)
             echo "$0: error: unsupported platform: $__m:$__s:$__r:$__v"
             exit 1
@@ -329,7 +336,7 @@ case "$platform" in
         compiler_minor_version=`echo $compiler_version | awk -F' ' '{ print $5}' | awk -F"." '{ print $2}'`
         compiler_revision=`echo $compiler_version | awk -F' ' '{ print $5}' | awk -F"." '{ print $3}'`
         ;;
-    DARWIN_IX86_GNU)
+    DARWIN_IX86_GNU|FREEBSD_X86_64_GNU)
         compiler_version=`clang --version | awk -F" " 'match($0, /version [0-9]*\.[0-9]*\.[0-9]*/){ print $4 }'`
         compiler_major_version=`echo $compiler_version | awk -F'.' '{ print $1}'`
         compiler_minor_version=`echo $compiler_version | awk -F'.' '{ print $2}'`
@@ -438,7 +445,7 @@ if [ "$arg1" = "longhostname" ]; then
         MONTAVISTA*)
             hostname
             ;;
-        NETBSD*)
+        NETBSD*|FREEBSD*)
             hostname
             ;;
         DARWIN*)
@@ -594,6 +601,9 @@ if [ "$arg1" = "cc" ]; then
         DARWIN_IX86_GNU)
             echo clang
             ;;
+        FREEBSD_X86_64_GNU)
+            echo clang
+            ;;
     esac
 
     exit
@@ -633,6 +643,9 @@ if [ "$arg1" = "cxx" ]; then
             echo aCC -AA
             ;;
         DARWIN_IX86_GNU)
+            echo clang++
+            ;;
+        FREEBSD_X86_64_GNU)
             echo clang++
             ;;
     esac
@@ -712,6 +725,9 @@ if [ "$arg1" = "size" ]; then
             echo size
             ;;
         DARWIN_IX86_GNU)
+            echo size
+            ;;
+        FREEBSD_X86_64_GNU)
             echo size
             ;;
 	*)
@@ -935,6 +951,20 @@ if [ "$arg1" = "cflags" -o "$arg1" = "cxxflags" ]; then
             r="$r -fstack-protector-all"
             r="$r -DGSS_USE_IOV=1"
             ;;
+        FREEBSD_X86_64_GNU)
+            test -z "$debug_opt" && r="$r -O2"
+            test -n "$pic_opt" && r="$r -fPIC"
+            ## treat warnings as errors.
+            test -n "$errwarn_opt" && r="$r -Werror"
+            r="$r -Wall"
+            r="$r -I/usr/local/include"
+            r="$r -Dfreebsd -D__BSD_VISIBLE=1 -DPAL_NO_ALLOCA=1"
+            r="$r -fstack-protector-all"
+            r="$r -fno-strict-aliasing"
+            r="$r -D_GNU_SOURCE"
+            r="$r -D_XOPEN_SOURCE=700"
+            r="$r -DGSS_USE_IOV=1"
+            ;;
     esac
 
     echo $r
@@ -992,6 +1022,9 @@ if [ "$arg1" = "cshlibflags" -o "$arg1" = "cxxshlibflags" ]; then
             ;;
         NETBSD_IX86_GNU)
             r="$r -shared"
+            ;;
+        FREEBSD_X86_64_GNU)
+            r="$r -shared -fuse-ld=lld"
             test -n "$libpath_opt" && r="$r -Wl,-rpath=$libpath_opt"
             ;;
         SUNOS_I86PC_SUNPRO|SUNOS_SPARC_SUNPRO)
@@ -1112,7 +1145,8 @@ if [ "$arg1" = "cprogflags" -o "$arg1" = "cxxprogflags" ]; then
         MONTAVISTA_IX86_GNU)
             test -n "$libpath_opt" && r="$r -Wl,-rpath=$libpath_opt"
             ;;
-        NETBSD_IX86_GNU)
+        NETBSD_IX86_GNU|FREEBSD_X86_64_GNU)
+            r="$r -fuse-ld=lld"
             test -n "$libpath_opt" && r="$r -Wl,-rpath=$libpath_opt"
             ;;
         SUNOS_I86PC_SUNPRO|SUNOS_SPARC_SUNPRO)
@@ -1239,7 +1273,7 @@ if [ "$arg1" = "syslibs" ]; then
         MONTAVISTA_IX86_GNU)
             r="-lpthread -ldl -lpam"
             ;;
-        NETBSD_IX86_GNU)
+        NETBSD_IX86_GNU|FREEBSD_X86_64_GNU)
             r="-lpthread -ldl -lpam"
             ;;
         SUNOS_I86PC_SUNPRO|SUNOS_SPARC_SUNPRO)
@@ -1293,7 +1327,7 @@ if [ "$arg1" = "libpath" ]; then
                 r="$r -Wl,-rpath=$path"
             done
             ;;
-        NETBSD_IX86_GNU)
+        NETBSD_IX86_GNU|FREEBSD_X86_64_GNU)
             for path in $args
             do
                 r="$r -Wl,-rpath=$path"
@@ -1455,7 +1489,7 @@ if [ "$arg1" = "shlibname" ]; then
         MONTAVISTA_IX86_GNU)
             echo "lib$arg2.so"
             ;;
-        NETBSD_IX86_GNU)
+        NETBSD_IX86_GNU|FREEBSD_X86_64_GNU)
             echo "lib$arg2.so"
             ;;
         SUNOS_I86PC_SUNPRO|SUNOS_SPARC_SUNPRO)
@@ -1499,7 +1533,7 @@ if [ "$arg1" = "shlibext" ]; then
         MONTAVISTA_IX86_GNU)
             echo "so"
             ;;
-        NETBSD_IX86_GNU)
+        NETBSD_IX86_GNU|FREEBSD_X86_64_GNU)
             echo "so"
             ;;
         SUNOS_I86PC_SUNPRO|SUNOS_SPARC_SUNPRO)
@@ -1617,6 +1651,11 @@ if [ "$arg1" = "openssllibdir" ]; then
                 ;;
             DARWIN_IX86_GNU)
                 if [ -f "/usr/lib/libssl.dylib" ]; then
+                    libdir=/usr/lib
+                fi
+                ;;
+            FREEBSD_X86_64_GNU)
+                if [ -f "/usr/lib/libssl.so" ]; then
                     libdir=/usr/lib
                 fi
                 ;;
@@ -1974,6 +2013,9 @@ if [ "$arg1" = "gssapi_ext" ]; then
                     ;;
             DARWIN)
                     echo "0"
+                    ;;
+            FREEBSD)
+                    echo "1"
                     ;;
                 *)
                     # not-supported!
