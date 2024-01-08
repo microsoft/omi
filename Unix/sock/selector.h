@@ -74,6 +74,10 @@ MI_Result Selector_ContainsHandler(
     Selector* self,
     Handler* handler);
 
+MI_Result Selector_ContainsHandlerId(
+    Selector* self,
+    MI_Uint64 handlerId);
+
 /* Runs socket processing loop;
     Parameters:
     self - selector

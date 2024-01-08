@@ -1790,6 +1790,8 @@ static MI_Boolean _VerifyMessage(
     
     return MI_TRUE;
 }
+
+
 /*
     Processes incoming message, including:
         - decoding message from batch
@@ -1863,7 +1865,8 @@ static Protocol_CallbackResult _ProcessReceivedMessage(
         }
         else if (msg->tag == PamCheckUserRespTag)
         {
-            if( _ProcessPamCheckUserResp(handler, msg) )
+            ProtocolBase* protocolBase = (ProtocolBase*)handler->base.data;
+            if(Selector_ContainsHandlerId(protocolBase->selector, ((PamCheckUserResp*)msg)->handle) == MI_RESULT_OK &&  _ProcessPamCheckUserResp(handler, msg) )
                 ret = PRT_CONTINUE;
         }
 #if defined(CONFIG_ENABLE_PREEXEC)
@@ -1882,6 +1885,12 @@ static Protocol_CallbackResult _ProcessReceivedMessage(
                 BinProtocolNotification* binMsg = (BinProtocolNotification*) msg;                    
                 if (binMsg->type == BinNotificationConnectRequest)
                 {
+                    //Check if already forwarded to server 
+                    if(handler->engineHandler != NULL){
+                            trace_FailedNewServerConnection();
+                            return PRT_RETURN_FALSE;
+                    }
+                    
                     // forward to server
 
                     uid_t uid = INVALID_ID;
@@ -2064,6 +2073,12 @@ static Protocol_CallbackResult _ReadHeader(
 
     for ( ; ; )
     {
+        // Check if page count exceeds the PROTOCOL_HEADER_MAX_PAGES , if so this is an invalid request 
+        if (handler->recv_buffer.base.pageCount > PROTOCOL_HEADER_MAX_PAGES)
+        {
+            trace_Socket_ReadingHeader_ErrorPageCount(s_type, handler);
+            return PRT_RETURN_FALSE;
+        }
         buf = (char*)&handler->recv_buffer;
         buf_size = (sizeof(HeaderBase) + sizeof(Header_BatchInfoItem) * handler->recv_buffer.base.pageCount);
         received = 0;
