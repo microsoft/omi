@@ -507,7 +507,7 @@ static MI_Result _RestoreMessage(
                         ptrAdjustmentInfo,
                         ptrAdjustmentInfoCount,
                         ptrPacked,
-                        (size_t)0))
+                        (size_t)packedSize)))
                     {
                         trace_RestoreMsgFailed_PointersForMstInstance();
                         return MI_RESULT_INVALID_PARAMETER;
