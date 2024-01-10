@@ -33,6 +33,7 @@
 #endif
 
 #include <base/log.h>
+#include <base/paths.h>
 #include <pal/strings.h>
 #include <pal/format.h>
 
@@ -642,9 +643,20 @@ MI_Result Sock_CreateLocalListener(
         return MI_RESULT_FAILED;
     }
 
-    /* Change mode to allow non-root to connect to it (they need 'w' to connect) */
+    const char *engineSocketName = OMI_GetPath(ID_SOCKETFILE);
+    if(strcmp(engineSocketName,socketName) == 0)
+    {
+        // socketName is /var/opt/omi/run/omiserver.sock
+        // Waiting root changes socket file to root:omi.
+        struct stat sb;
+        while (stat(socketName, &sb) == 0 && sb.st_uid != 0);
+    }
+    else
+    {
 
-    chmod(socketName, S_IRUSR | S_IWUSR | S_IXUSR | S_IRGRP | S_IWGRP | S_IXGRP | S_IROTH | S_IWOTH | S_IXOTH);
+        // Keep designed socket file.
+        chmod(socketName, S_IRUSR | S_IWUSR | S_IXUSR | S_IRGRP | S_IWGRP | S_IXGRP | S_IROTH | S_IWOTH | S_IXOTH);
+    }
 
     /* Listen on this socket for connections */
     {

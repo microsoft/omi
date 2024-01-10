@@ -14,6 +14,7 @@
 #include <server/server.h>
 #include <libgen.h>
 #include <base/random.h>
+#include <grp.h>
 
 #define S_SOCKET_LENGTH 8
 #define S_SECRET_STRING_LENGTH 32
@@ -635,6 +636,25 @@ int servermain(int argc, const char* argv[], const char *envp[])
             {
                 err(ZT("Failed to initialize binary protocol for socket file"));
             }
+        }
+
+        const char *socketName = OMI_GetPath(ID_SOCKETFILE);
+        while(access(socketName, F_OK)!=0);
+        struct stat sb;
+        if (stat(socketName, &sb) == 0 && sb.st_uid != 0) {
+            // Chown root:omi.
+            struct group *grp = getgrnam("omi");
+            if (grp == NULL) {
+                break;
+            }
+            gid_t gid = grp->gr_gid;
+            uid_t uid = 0;
+            int status = chown(socketName, uid, gid);
+            if (status != 0) {
+                break;
+            }
+            // Chmod to remove others permission.
+            chmod(socketName, S_IRUSR | S_IWUSR | S_IXUSR | S_IRGRP | S_IWGRP | S_IXGRP);
         }
 
         result = RunProtocol();
