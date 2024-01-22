@@ -9,6 +9,7 @@
 #include <base/user.h>
 #include <sock/selector.h>
 #include <server/server.h>
+#include <grp.h>
 
 // We are allowing max 50 cipher suite with each being maximum of 100 length
 #define SSLCIPHERSUITE_LIMIT 5000
@@ -19,6 +20,30 @@ static ServerType serverType = OMI_SERVER;
 static const char* arg0 = 0;
 
 static Lock s_disp_mutex = LOCK_INITIALIZER;
+
+MI_Boolean SetSockPermission(const char *socketName)
+{
+    struct stat sb;
+    if (stat(socketName, &sb) == 0 && sb.st_uid != 0) {
+        // Chown root:omi.
+        struct group *grp = getgrnam("omi");
+        if (grp == NULL) {
+            return MI_FALSE;
+        }
+        gid_t gid = grp->gr_gid;
+        uid_t uid = 0;
+        int status = chown(socketName, uid, gid);
+        if (status != 0) {
+            return MI_FALSE;
+        }
+        // Chmod to remove others permission.
+        if(chmod(socketName, S_IRUSR | S_IWUSR | S_IXUSR | S_IRGRP | S_IWGRP | S_IXGRP) != 0)
+        {
+            return MI_FALSE;
+        }
+    }
+    return MI_TRUE;
+}
 
 void PrintProviderMsg(_In_ Message* msg)
 {
@@ -1433,6 +1458,11 @@ MI_Result RunProtocol()
             {
                 kill(s_dataPtr->enginePid, SIGUSR1);
                 unlink(CONFIG_LOCALSTATEDIR "/omiusers/reload_dispatcher");
+            }
+            const char *socketName = OMI_GetPath(ID_SOCKETFILE);
+            if(access(socketName, F_OK) == 0 && SetSockPermission(socketName) == MI_FALSE)
+            {
+                trace_CriticalError("Unable to set omiserver.sock permission!");
             }
             type = 'S';
         }
