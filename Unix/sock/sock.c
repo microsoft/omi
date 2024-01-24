@@ -646,15 +646,14 @@ MI_Result Sock_CreateLocalListener(
     const char *engineSocketName = OMI_GetPath(ID_SOCKETFILE);
     if(strcmp(engineSocketName,socketName) == 0)
     {
-        // socketName is /var/opt/omi/run/omiserver.sock
-        // Waiting root changes socket file to root:omi.
-        struct stat sb;
-        while (stat(socketName, &sb) == 0 && sb.st_uid != 0);
+        if(chmod(socketName, S_IRUSR | S_IWUSR | S_IXUSR | S_IRGRP | S_IWGRP | S_IXGRP) != 0)
+        {
+            trace_LocalSocketFailed(socketName);
+            return MI_RESULT_FAILED;
+        } 
     }
     else
     {
-
-        // Keep designed socket file.
         chmod(socketName, S_IRUSR | S_IWUSR | S_IXUSR | S_IRGRP | S_IWGRP | S_IXGRP | S_IROTH | S_IWOTH | S_IXOTH);
     }
 
