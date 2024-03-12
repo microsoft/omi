@@ -1652,7 +1652,8 @@ static MI_Result _ServerAuthenticateCallback(PamCheckUserResp *msg)
     char *auth_response = NULL;
     int response_len = 0;
 
-    Http_SR_SocketData *handler = (Http_SR_SocketData*)(uintptr_t)msg->handle;
+    Handler* handlerIn = (Handler*)(uintptr_t)msg->handle;
+    Http_SR_SocketData* handler = FromOffset( Http_SR_SocketData, handler, handlerIn );
     HttpHeaders *headers = &handler->recvHeaders;
 
     if (!msg->result)
@@ -1794,7 +1795,7 @@ Http_CallbackResult IsClientAuthorized(_In_ Http_SR_SocketData * handler)
 
                 if (0 != AskServerToAuthenticate(headers->username, 
                                                  headers->password, 
-                                                 (MI_Uint64)(uintptr_t)handler,
+                                                 (MI_Uint64)(uintptr_t)(&handler->handler),
                                                  _ServerAuthenticateCallback))
                 {
                     handler->httpErrorCode = HTTP_ERROR_CODE_UNAUTHORIZED;

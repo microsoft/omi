@@ -477,7 +477,8 @@ static MI_Result _RestoreMessage(
                     batch,
                     ptrAdjustmentInfo,
                     ptrAdjustmentInfoCount,
-                    ptr))
+                    ptr,
+                    (size_t)0))
                 {
                     trace_RestoreMsgFailed_PointersForMstPointer();
                     return MI_RESULT_INVALID_PARAMETER;
@@ -505,7 +506,8 @@ static MI_Result _RestoreMessage(
                         batch,
                         ptrAdjustmentInfo,
                         ptrAdjustmentInfoCount,
-                        ptrPacked))
+                        ptrPacked,
+                        (size_t)packedSize))
                     {
                         trace_RestoreMsgFailed_PointersForMstInstance();
                         return MI_RESULT_INVALID_PARAMETER;
@@ -680,7 +682,8 @@ MI_Result __MessageFromBatch(
         batch,
         ptrAdjustmentInfo,
         ptrAdjustmentInfoCount,
-        (void*)&msg))
+        (void*)&msg,
+        sizeof(Message)))
     {
         trace_BatchFixPointerFailed();
         return MI_RESULT_INVALID_PARAMETER;

@@ -220,7 +220,8 @@ MI_Boolean Batch_FixPointer(
     Batch* batch,
     const Header_BatchInfoItem* ptrAdjustmentInfo,
     size_t ptrAdjustmentInfoCount,
-    void** ptrInOut);
+    void** ptrInOut,
+    size_t size);
 
 /* Add this block to list of individual blocks */
 MI_INLINE void Batch_AttachPage(
