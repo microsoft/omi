@@ -117,7 +117,7 @@ logging entry in the configuration file, add the following lines to
 
 ```
 ##
-## loglevel -- set the loggiing options for MI server
+## loglevel -- set the logging options for MI server
 ##   Valid options are: ERROR, WARNING, INFO, DEBUG, VERBOSE (debug build)
 ##   If commented out, then default value is: WARNING
 ##
