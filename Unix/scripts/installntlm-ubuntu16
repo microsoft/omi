@@ -2,18 +2,40 @@
 
 # This scripts installs the dependencies and configures SAMBA to enable NTLM authentication
 # and locally cache the credentials.
-# It takes no parameters but requires user interaction for the password prompts.
 # It also requires the omi debian package to be present in the home directory. (See below)
 
-OMI_DEB=$(readlink -f ~/omi-1.1.0-2.rhel.x64.deb)
-POWERSHELL_DEB=$(readlink -f ~/powershell_6.0.0-alpha.12-1ubuntu1.16.04.1_amd64.deb)
-PSRP_DEB=$(readlink -f ~/psrp-1.0.0-0.universal.x64.deb)
+# fetch the latest release, from releases.
 
-# This script automates setting up an ubuntu 16 machine for testing ntlm
-if [ "$EUID" = "0" ]; then
-   echo "This script should NOT be run as root" 1>&2
-   exit 1
-fi
+LATEST_RELEASE="$(curl https://github.com/microsoft/omi/releases 2>/dev/null | grep -Po -m1 '(?<=href\=\"\/microsoft\/omi\/releases\/download\/)(v.+?\.deb)(?=\")')"
+
+[ -z "${LATEST_RELEASE}" ] && { echo "Unable to fetch latest release, exiting" && exit 1 ; }
+
+LATEST_LINK="https://github.com/microsoft/omi/releases/download/${LATEST_RELEASE}"
+
+echo "${LATEST_RELEASE}"
+
+echo "${LATEST_LINK}"
+
+wget -L -O ./omi-latest.deb "${LATEST_LINK}"
+
+FILETYPE_OMI="$(file -b ./omi-latest.deb)"
+
+case "${FILETYPE_OMI}" in
+    'Debian binary package'* ) echo " Downloaded ${LATEST_LINK}"
+        ;;
+    * ) echo "Unable to detemine file type for omi-latest.deb. File must be a .deb archive, exiting" && exit 1
+        ;;
+esac
+
+OMI_DEB=$(readlink -f ./omi-latest.deb)
+POWERSHELL_DEB=$(readlink -f ./powershell_6.0.0-alpha.12-1ubuntu1.16.04.1_amd64.deb)
+PSRP_DEB=$(readlink -f ./psrp-1.0.0-0.universal.x64.deb)
+
+# # This script automates setting up an ubuntu 16 machine for testing ntlm
+# if [ "${EUID}" = "0" ]; then
+#    echo "This script should NOT be run as root" 1>&2
+#    exit 1
+# fi
 
 #set -e
 #set -x
@@ -35,25 +57,25 @@ is_installed()
 # Install the package if it not already installed
 require_package()
 {
-    if [ -z "$1" ]; then
+    if [ -z "${1}" ]; then
         echo "# require_package() requires a package name as parameter"
         exit 1;
     fi
 
-    if is_installed $1; then
-        echo "# $1 already installed"
+    if is_installed ${1}; then
+        echo "# ${1} already installed"
     else
-        echo "# Installing $1"
-        sudo apt install $1 -y
+        echo "# Installing ${1}"
+        sudo apt install ${1} -y
     fi
 }
 
 if ! is_installed omi; then
-    if [ -f $OMI_DEB ]; then
+    if [ -f ${OMI_DEB} ]; then
         echo "# Installing OMI"
-        sudo dpkg -i $OMI_DEB
+        sudo dpkg -i ${OMI_DEB}
     else
-        echo "# Failed to find $OMI_DEB" 1>&2
+        echo "# Failed to find ${OMI_DEB}" 1>&2
         exit 1
     fi
 else
@@ -67,8 +89,8 @@ require_package libcurl3
 
 if ! is_installed powershell; then
     echo "# Installing Powershell"
-    if [ -f $POWERSHELL_DEB ]; then
-        sudo dpkg -i $POWERSHELL_DEB
+    if [ -f ${POWERSHELL_DEB} ]; then
+        sudo dpkg -i ${POWERSHELL_DEB}
     else
         wget https://raw.githubusercontent.com/PowerShell/PowerShell/master/tools/download.sh
         bash download.sh
@@ -79,15 +101,15 @@ fi
 
 if ! is_installed omi-psrp-server; then
     echo "# Installing PSL OMI provider"
-    if [ -f $PSRP_DEB ]; then
-        sudo dpkg -i $PSRP_DEB
+    if [ -f ${PSRP_DEB} ]; then
+        sudo dpkg -i ${PSRP_DEB}
     else
         
-        if ! wget "https://github.com/PowerShell/psl-omi-provider/releases/download/v.1.0/$PSRP_DEB"; then
-            echo "# Failed to download $PSRP_DEB" 1>&2
+        if ! wget "https://github.com/PowerShell/psl-omi-provider/releases/download/v.1.0/${PSRP_DEB}"; then
+            echo "# Failed to download ${PSRP_DEB}" 1>&2
             exit 1
         fi
-        sudo dpkg -i $PSRP_DEB
+        sudo dpkg -i ${PSRP_DEB}
     fi
 else
     echo "# OMI PSRP server already installed"
@@ -117,40 +139,42 @@ fi
 # Configure Samba
 SMB_CONF=/etc/samba/smb.conf
 
-if grep -q "Local NTLM" $SMB_CONF; then
-    echo "# $SMB_CONF already configured"
+if grep -q "Local NTLM" ${SMB_CONF}; then
+    echo "# ${SMB_CONF} already configured"
 else
-    echo "# Configuring $SMB_CONF"
-    cat << EOF > smb.conf
+    echo "# Configuring ${SMB_CONF}"
+    tee smb.conf <<EOF
 # Local NTLM configuration
 [global]
-    workgroup = SAMBA
-    domain logons = Yes
-    security = USER
-    winbind offline logon = Yes
-    winbind use default domain = Yes
-    idmap config * : range = 1000-1000000
-    idmap config * : backend = tdb
-    passdb backend = tdbsam
-    template homedir = /home/%U
-    template shell = /bin/bash
-    # log level = 5
+workgroup = SAMBA
+domain logons = Yes
+security = USER
+winbind offline logon = Yes
+winbind use default domain = Yes
+idmap config * : range = 1000-1000000
+idmap config * : backend = tdb
+passdb backend = tdbsam
+template homedir = /home/%U
+template shell = /bin/bash
+# log level = 5
 
 [homes]
-    comment = Home Directories
-    browseable = No
-    inherit acls = Yes
-    read only = No
-    valid users = %S %D%w%S
+comment = Home Directories
+browseable = No
+inherit acls = Yes
+read only = No
+valid users = %S %D%w%S
 EOF
-    sudo cp $SMB_CONF $SMB_CONF.bak
-    sudo mv smb.conf $SMB_CONF
+    sudo cp "${SMB_CONF}" "${SMB_CONF}.bak"
+    sudo mv smb.conf "${SMB_CONF}"
 fi
 
 # Fix quirk where symlink is missing
+
 GSS_LINK=/usr/lib/x86_64-linux-gnu/libgssapi_krb5.so
+
 if [ ! -h "$GSS_LINK" -a -f "$GSS_LINK".2 ]; then
-    (cd /usr/lib/x86_64-linux-gnu && sudo ln -s libgssapi_krb5.so.2 libgssapi_krb5.so)
+    sudo ln -s /usr/lib/x86_64-linux-gnu/libgssapi_krb5.so.2 /usr/lib/x86_64-linux-gnu/libgssapi_krb5.so
 fi
 
 echo "# Restarting services"
