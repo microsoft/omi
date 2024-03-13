@@ -311,7 +311,7 @@ request* message, we receive the namespace and class:
 
 Using this information, we can retrieve the provider registration
 name. In the above message, the namespace is `root/scx` and the class
-is `SCX_Agent`. To retrive the provider registration name, replace `/`
+is `SCX_Agent`. To retrieve the provider registration name, replace `/`
 with `-` in the namespace and issue the following `grep` command
 (substitute `SCX_Agent` with your class and `root-scx` with your
 namespace):
@@ -329,4 +329,4 @@ information:
 
 1. All of the information described in
    [Required information when reporting problems](#required-information-when-reporting-problems),
-2. Provider registration name, retrived as described above.
+2. Provider registration name, retrieved as described above.

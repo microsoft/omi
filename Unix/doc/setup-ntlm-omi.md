@@ -15,11 +15,11 @@ authenticated via Basic auth. Basic is very simple, but not at all secure,
 inasmuch as the username and password are transmitted in the clear, with only 
 Base64 encoding which is easly decoded by someone able to see the traffic on the 
 connection. For that reason we only recommend Basic never be used on other than a 
-secure (https) conneciton.
+secure (https) connection.
 
 A more secure method of authentication uses Secure Protected Negotitation protocol (SPNEGO), which enables
-negotiation of the security protcol from a selection of options, Currently the only option available with
-omi is the *NT Lan Manager protocol, version 2 (NTLMV2)* which is an improvment over Basic auth in two ways. 
+negotiation of the security protocol from a selection of options, Currently the only option available with
+omi is the *NT Lan Manager protocol, version 2 (NTLMV2)* which is an improvement over Basic auth in two ways. 
 
 - The password is hashed using an irreversable algorithm, so the password is more secure than Basic.
 
@@ -44,7 +44,7 @@ Both the client and host machine must be set up to use provide NTLM to the gener
 To do this, the gss and gss-ntlmssp packages must be installed and up to date.  The packages required are:
 
 <table>
-<tr><th>Linux Verison</th><th>Packages Needed</th></tr>
+<tr><th>Linux Version</th><th>Packages Needed</th></tr>
 <tr><tr><td>RHEL 7.3, CentOS 7.3 </td> <td>krb5-workstation-1.14.1-27.el7.x86_64 or later</td></tr>
     <tr><td/><td>gssntlmssp-0.7.0-1.el7.x86_6</td></tr></tr>
 <tr><tr><td>Ubuntu 16.04 (xenial) </td> <td>libgssapi-krb5-2 version  1.13.2+dfsg-5 or later</td></tr>
@@ -138,7 +138,7 @@ that winbind and samba interact. If you are using samba to mount cifs file share
 modify these instructions. 
 
 
-Winbind is a part of the samba suite. There are a number of good explanations and tutorials avaiable such as
+Winbind is a part of the samba suite. There are a number of good explanations and tutorials available such as
 https://www.samba.org/samba/docs/man/Samba-HOWTO-Collection/idmapper.html discussing winbinds role, but in 
 short it provides credential caching from the machines password provider, and idmapping from the Windows SID
 to and from the UNIX UID. 
@@ -186,7 +186,7 @@ If this method is used, use of the file is specified by setting the option
 ```
 NtlmCredsFile=/etc/opt/omi/.creds/ntlm
 ```
-in the configuration file omiserver.conf.  The file then refered to by the server for credentials. Like certificate directories,
+in the configuration file omiserver.conf.  The file then referred to by the server for credentials. Like certificate directories,
 the server requires permissions of 700 for the directory and 600 for the file. Both the file and directory must be owned by root
 (**for 1.4.0 or later version, both the file and directory must be owned by omi account**).
 If the correct permissions and ownership are not set the file will be ignored with an error in the server log.  
@@ -204,7 +204,7 @@ in the NTLM domain are treated as different from hostname, so a separate entry i
  It does not use the user name and password directly.  The credential is acquired either from winbind or a local credentials 
  file in ~/.omi.
 
-- The client uses the Generic Security Services API (gssapi) to initate a negotiation with the server. Currently this
+- The client uses the Generic Security Services API (gssapi) to initiate a negotiation with the server. Currently this
  negotiation will always end up using NTLM if it succeeds. 
 
 - The server uses gssapi to accept the negotiation using the credential sent by the client.
