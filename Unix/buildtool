@@ -930,7 +930,7 @@ if [ "$arg1" = "cflags" -o "$arg1" = "cxxflags" ]; then
             test -n "$errwarn_opt" && r="$r -Werror"
             r="$r -Wall"
             r="$r -I/usr/local/include"
-            r="$r -Dmacos"
+            r="$r -Dmacos=macos"
             r="$r -fvisibility=hidden"
             r="$r -fstack-protector-all"
             r="$r -DGSS_USE_IOV=1"
