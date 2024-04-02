@@ -303,7 +303,7 @@ if ${{PERFORMING_UPGRADE_NOT}}; then
     egrep -q "^omi:" /etc/passwd
     if [ $? -eq 0 ]; then
        echo "Deleting omi service account ..."
-           userdel omi
+           userdel -f omi
     fi
     egrep -q "^omi:" /etc/group
     if [ $? -eq 0 ]; then

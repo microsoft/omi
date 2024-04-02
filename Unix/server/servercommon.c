@@ -9,6 +9,7 @@
 #include <base/user.h>
 #include <sock/selector.h>
 #include <server/server.h>
+#include <grp.h>
 
 // We are allowing max 50 cipher suite with each being maximum of 100 length
 #define SSLCIPHERSUITE_LIMIT 5000

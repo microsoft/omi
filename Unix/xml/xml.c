@@ -1725,7 +1725,8 @@ int XML_ParseCharFault(const XML *self, const XML_Char *data, XML_Char *buffer, 
 {
 #define PREFIX_SIZE 32
     XML_Char prefix[PREFIX_SIZE];
-    int i, j, k, l;
+    int i, j;
+    size_t k, l;
     MI_Boolean prefixFound = MI_FALSE;
 
     for (i=0; i<PREFIX_SIZE-1; ++i)

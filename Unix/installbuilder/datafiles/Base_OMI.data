@@ -403,7 +403,7 @@ EOF
 }
 
 GenerateKeyCert() {
-    $OPENSSL_PATH req -x509 -sha256 -newkey rsa:2048 -days 3650 -nodes -config $cnffile -keyout $keyfile -out $certfile
+    $OPENSSL_PATH req -x509 -sha256 -newkey rsa:3072 -days 3650 -nodes -config $cnffile -keyout $keyfile -out $certfile
 }
 
 HandleConfigFiles() {
@@ -465,6 +465,13 @@ DeleteUnsupportedCertificate() {
             echo "************************************************************"
             rm -rf $certdir*
         fi
+
+	if [ `$OPENSSL_PATH x509 -in $certfile -text | grep "Public-Key"| sed 's/[^0-9]*//g'` -lt 3072 ]; then
+	    echo "************************************************************"
+	    echo "* Deleting certificates whose public key is less than 3072 *"
+	    echo "************************************************************"
+	    rm -rf $certdir*
+	fi
     fi
 }
 
@@ -561,7 +568,10 @@ chown omi:omi /etc/opt/omi/.creds >/dev/null 2>&1
 chown omi:omi /etc/opt/omi/.creds/ntlm >/dev/null 2>&1
 chown omi:omi /etc/opt/omi/conf/sockets
 chmod 700 /etc/opt/omi/conf/sockets
-
+rm -f /var/opt/omi/log/omiserver-send.trc >/dev/null 2>&1
+rm -f /var/opt/omi/log/omiserver-recv.trc >/dev/null 2>&1
+rm -f /var/opt/omi/log/omiclient-send.trc >/dev/null 2>&1
+rm -f /var/opt/omi/log/omiclient-recv.trc >/dev/null 2>&1
 
 # Fix potential permissons issue on /etc/opt/omi directory
 chown root:${{ROOT_GROUP_NAME}} /etc/opt/omi

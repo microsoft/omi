@@ -4,7 +4,7 @@
 #include <common.h>
 
 #define ENABLE_TRACING 1
-#define FORCE_TRACING 1
+#define FORCE_TRACING 0
 
 #ifdef ENABLE_TRACING
 # define TRACING_LEVEL 4

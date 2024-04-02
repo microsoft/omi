@@ -411,7 +411,8 @@ MI_Boolean Batch_FixPointer(
     Batch* self,
     const Header_BatchInfoItem* ptrAdjustmentInfo,
     size_t ptrAdjustmentInfoCount,
-    void** ptrInOut)
+    void** ptrInOut,
+    size_t size)
 {
     /* see if pointer matches old blocks */
     size_t index;
@@ -432,6 +433,10 @@ MI_Boolean Batch_FixPointer(
         if ( old_ptr >= old_page &&
             old_ptr < (old_page + ptrAdjustmentInfo[index].pageSize) )
         {
+            if( size > 0 && (old_page + ptrAdjustmentInfo[index].pageSize - old_ptr) < size)
+            {
+                return MI_FALSE;
+            }
             *ptrInOut = ((char*)(p + 1)) + (old_ptr - old_page);
             return MI_TRUE;
         }

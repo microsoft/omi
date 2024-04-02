@@ -245,7 +245,11 @@ MI_Result Selector_AddHandler(
 MI_Result Selector_RemoveHandler(
     Selector* self,
     Handler* handler)
-{
+{    
+    if(handler == NULL){
+        return MI_RESULT_NOT_FOUND;
+    }
+    
     SelectorRep* rep = (SelectorRep*)self->rep;
     Handler* p;
 
@@ -457,6 +461,29 @@ MI_Result Selector_ContainsHandler(
     for (p = (Handler*)rep->head; p; p = (Handler*)p->next)
     {
         if (p == handler)
+        {
+            Lock_Release(&rep->listLock);
+            return MI_RESULT_OK;
+        }
+    }
+
+    Lock_Release(&rep->listLock);
+
+    return MI_RESULT_NOT_FOUND;
+}
+
+MI_Result Selector_ContainsHandlerId(
+    Selector* self,
+    MI_Uint64 handlerId)
+{
+    SelectorRep* rep = (SelectorRep*)self->rep;
+    Handler* p;
+
+    Lock_Acquire(&rep->listLock);
+
+    for (p = (Handler*)rep->head; p; p = (Handler*)p->next)
+    {
+        if ((MI_Uint64)(uintptr_t)p == handlerId)
         {
             Lock_Release(&rep->listLock);
             return MI_RESULT_OK;
@@ -699,8 +726,21 @@ MI_Result Selector_Run(
                     /* If callback wants to continue getting events */
                     if (!more)
                     {
+                        Handler* temp = NULL;
+                        if(next != NULL){
+                            temp = next->next;
+                        }
+
                         /* Remove handler */
                         Selector_RemoveHandler(self, p);
+
+                        // the selector_removeHandler also removes the enginehandler from the list
+                        // engine handler could be the next value in the list which can cause use after free access to the memory
+                        // to avoid this advance to next->next
+                        
+                        if(MI_RESULT_OK != Selector_ContainsHandler(self, next)){
+                            next = temp;
+                        } 
 
                         /* Refresh current time stamp */
                         if (PAL_TRUE != PAL_Time(&currentTimeUsec))

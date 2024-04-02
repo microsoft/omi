@@ -28,7 +28,7 @@
 #include "sessionmap.h"
 
 #define ENABLE_TRACING 1
-#define FORCE_TRACING 1
+#define FORCE_TRACING 0
 
 #ifndef CONFIG_POSIX
 /* ssl not supported in this configuration; just make compiler happy */
