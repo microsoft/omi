@@ -145,7 +145,10 @@ ifneq ($(PF),Darwin)
   ifneq ($(PF),Linux)
 	@echo "========================= Make OMI installer $(PF_DISTRO) with symbols"
 	sudo rm -rf $(OUTPUTDIR)/intermediate/staging
-	mkdir -p $(OUTPUTDIR)/release $(OUTPUTDIR)/intermediate
+	mkdir -p $(OUTPUTDIR)/release $(OUTPUTDIR)/intermediate $(OUTPUTDIR)/windbg
+	cp $(OUTPUTDIR)/bin/omiserver $(OUTPUTDIR)/windbg/omiserver
+	cp $(OUTPUTDIR)/bin/omiengine $(OUTPUTDIR)/windbg/omiengine
+	cp $(OUTPUTDIR)/bin/omiagent $(OUTPUTDIR)/windbg/omiagent
 	sudo python $(TOP)/../../pal/installer/InstallBuilder/installbuilder.py \
 		--BASE_DIR=$(OUTPUTDIR) \
 		--TARGET_DIR=$(OUTPUTDIR)/release \
@@ -198,7 +201,18 @@ ifneq ($(PF),Darwin)
     ifeq ($(BUILD_RPM),1)
 	@echo "========================= Make OMI installer RPM with symbols"
 	sudo rm -rf $(OUTPUTDIR)/intermediate/staging
-	mkdir -p $(OUTPUTDIR)/release $(OUTPUTDIR)/intermediate
+	mkdir -p $(OUTPUTDIR)/release $(OUTPUTDIR)/intermediate $(OUTPUTDIR)/windbg
+        ifeq ($(ENABLE_SECURITY_HARDENING),1)
+	cp $(OUTPUTDIR)/bin/omiserver $(OUTPUTDIR)/windbg/omiserver
+	cp $(OUTPUTDIR)/bin/omiengine $(OUTPUTDIR)/windbg/omiengine
+	cp $(OUTPUTDIR)/bin/omiagent $(OUTPUTDIR)/windbg/omiagent
+        else
+          ifneq ($(PF_ARCH),x64)
+	cp $(OUTPUTDIR)/bin/omiserver $(OUTPUTDIR)/windbg/omiserver
+	cp $(OUTPUTDIR)/bin/omiengine $(OUTPUTDIR)/windbg/omiengine
+	cp $(OUTPUTDIR)/bin/omiagent $(OUTPUTDIR)/windbg/omiagent
+          endif
+        endif
 	sudo python $(TOP)/../../pal/installer/InstallBuilder/installbuilder.py \
 		--BASE_DIR=$(OUTPUTDIR) \
 		--TARGET_DIR=$(OUTPUTDIR)/release \
@@ -223,7 +237,18 @@ ifneq ($(PF),Darwin)
 
 	@echo "========================= Make OMI installer DPKG with symbols"
 	sudo rm -rf $(OUTPUTDIR)/intermediate/staging
-	mkdir -p $(OUTPUTDIR)/release $(OUTPUTDIR)/intermediate
+	mkdir -p $(OUTPUTDIR)/release $(OUTPUTDIR)/intermediate $(OUTPUTDIR)/windbg
+        ifeq ($(ENABLE_SECURITY_HARDENING),1)
+	cp $(OUTPUTDIR)/bin/omiserver $(OUTPUTDIR)/windbg/omiserver
+	cp $(OUTPUTDIR)/bin/omiengine $(OUTPUTDIR)/windbg/omiengine
+	cp $(OUTPUTDIR)/bin/omiagent $(OUTPUTDIR)/windbg/omiagent
+        else
+          ifneq ($(PF_ARCH),x64)
+	cp $(OUTPUTDIR)/bin/omiserver $(OUTPUTDIR)/windbg/omiserver
+	cp $(OUTPUTDIR)/bin/omiengine $(OUTPUTDIR)/windbg/omiengine
+	cp $(OUTPUTDIR)/bin/omiagent $(OUTPUTDIR)/windbg/omiagent
+          endif
+        endif
 	ls -l $(TOP)/../../pal/installer/InstallBuilder/tools/bin/dpkg-deb-x64
 	sudo python $(TOP)/../../pal/installer/InstallBuilder/installbuilder.py \
 		--BASE_DIR=$(OUTPUTDIR) \
@@ -313,9 +338,22 @@ else #($(PF),Darwin)
 	# copy the libmi_origin.so to libmi.so 
 	mkdir -p $(PACKAGE_DIR)
 	cp $(OUTPUTDIR)/lib/libmi_origin.so $(PACKAGE_DIR)/libmi.so
+	# copy the symbol binaries to PACKAGE_DIR/windbg for Linux building
+        ifeq ($(ENABLE_SECURITY_HARDENING),1)
+	mkdir -p $(PACKAGE_DIR)/windbg
+	cp $(OUTPUTDIR)/windbg/* $(PACKAGE_DIR)/windbg
+        else
+          ifneq ($(PF_ARCH),x64)
+	mkdir -p $(PACKAGE_DIR)/windbg
+	cp $(OUTPUTDIR)/windbg/* $(PACKAGE_DIR)/windbg
+          endif
+        endif
   else #ifeq ($(PF),Linux)
 	# copy normal libmi.so for other platforms
 	cp $(OUTPUTDIR)/lib/libmi.so $(PACKAGE_DIR)
+	# copy the symbol binaries to PACKAGE_DIR/windbg for native building
+	mkdir -p $(PACKAGE_DIR)/windbg
+	cp $(OUTPUTDIR)/windbg/* $(PACKAGE_DIR)/windbg
   endif #ifeq ($(PF),Linux)
 endif #($(PF),Darwin) 
 

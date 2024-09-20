@@ -36,7 +36,7 @@ case "$SSL_VERSION" in
     1.1.*)
         SSL_FOUND=1.1.0
         ;;
-    3.0.*)
+    3.*)
         SSL_FOUND=3.0.0
         ;;
     *)
