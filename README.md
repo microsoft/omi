@@ -72,6 +72,7 @@ said, our formal tested matrix of Linux platforms includes the following:
 - Ubuntu 14.04 LTS, 16.04 LTS and 18.04 LTS (x86 and x64)
 - Ubuntu 20.04 LTS x64 (omi>=1.6.8-0)
 - Ubuntu 22.04 LTS x64 (omi>=1.7.0-0)
+- Ubuntu 24.04 LTS x64 (omi>=1.9.0-0)
 
 ### Supported Unix Operating Systems
 
