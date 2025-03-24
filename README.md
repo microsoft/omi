@@ -8,8 +8,6 @@ This repository is now **deprecated** and will be **archived soon**.
 - **Bug fixes, security patches, and feature enhancements** are no longer planned.  
 - After archiving, this repository will remain **available in read-only mode** for reference.  
 
-We encourage users to explore alternative solutions, as this project will no longer be actively maintained.  
-
 For any questions, please refer to the existing documentation or community discussions.  
 
 ---
