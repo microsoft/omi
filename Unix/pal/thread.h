@@ -79,6 +79,10 @@ int Thread_Equal(
 
 ThreadID Thread_ID();
 
+#if defined(freebsd)
+int pthread_getthreadid_np(void);
+#endif
+
 PAL_INLINE
 PAL_Uint64 Thread_TID()
 {
@@ -88,6 +92,8 @@ PAL_Uint64 Thread_TID()
     __uint64_t threadid;
     pthread_threadid_np(pthread_self(), &threadid);
     return threadid;
+#elif defined(freebsd)
+    return (PAL_Uint64)pthread_getthreadid_np();
 #else
     // Avoid using a cast here since pthread_self() may return a structure.
     // If so, we need to discover that and provide an alternative for that

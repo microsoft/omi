@@ -332,7 +332,7 @@ MI_INLINE const MI_Char *Errno_ToString(
     _Out_writes_z_(len) MI_Char *buffer,
     MI_Uint32 len)
 {
-#if defined(macos) || ((_POSIX_C_SOURCE >= 200112L || _XOPEN_SOURCE >= 600) && ! _GNU_SOURCE)
+#if defined(macos) || defined(freebsd) || ((_POSIX_C_SOURCE >= 200112L || _XOPEN_SOURCE >= 600) && ! _GNU_SOURCE)
         int ret = strerror_r(OMI_Code, buffer, len);
         if (ret != 0)
             *buffer = '\0';
