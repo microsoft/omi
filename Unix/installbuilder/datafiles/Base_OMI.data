@@ -407,51 +407,35 @@ GenerateKeyCert() {
 }
 
 HandleConfigFiles() {
-    grep -i "sslciphersuite" /etc/opt/omi/conf/omiserver.conf 1> /dev/null 2> /dev/null
-    # if there is no sslCipherSuite defined in omiserver.conf, check the previous omiserver/cimserver OM conf files for an sslCipherSuite defined
-    if [ $? -ne 0 ]; then
-        if [ -f /etc/opt/omi/conf/omiserver.conf.rpmsave ]; then
-            echo `grep sslciphersuite /etc/opt/omi/conf/omiserver.conf.rpmsave` >> /etc/opt/omi/conf/omiserver.conf
-        elif [ -f /etc/opt/omi/conf/omiserver.conf.pkgsave ]; then
-            echo `grep sslciphersuite /etc/opt/omi/conf/omiserver.conf.pkgsave` >> /etc/opt/omi/conf/omiserver.conf
-        elif [ -f /etc/opt/microsoft/scx/conf/omiserver.conf.pkgsave ]; then
-            echo `grep sslciphersuite /etc/opt/microsoft/scx/conf/omiserver.conf.pkgsave` >> /etc/opt/omi/conf/omiserver.conf
-        elif [ -f /etc/opt/microsoft/scx/conf/omiserver.conf ]; then
-            echo `grep sslciphersuite /etc/opt/microsoft/scx/conf/omiserver.conf` >> /etc/opt/omi/conf/omiserver.conf
-        elif [ -f /etc/opt/microsoft/scx/conf/cimserver_current.conf ]; then
-            echo `grep sslCipherSuite /etc/opt/microsoft/scx/conf/cimserver_current.conf` | sed "s@sslCipherSuite@sslciphersuite@" >> /etc/opt/omi/conf/omiserver.conf
-        fi
+    local OMISETTINGS="httpport httpsport NoSSLv2 NoSSLv3 NoTLSv1_0 NoTLSv1_1 NoTLSv1_2 sslciphersuite AuthorizedGroups UnauthorizedGroups"
+
+    # omiconfigeditor requires SSL linkage to be set up properly on Linux
+    # If the file to set these up exists, run it
+    if [ -f /opt/omi/bin/support/installssllinks ]; then
+        /opt/omi/bin/support/installssllinks
     fi
 
-    grep -q '^httpsport=0$' /etc/opt/omi/conf/omiserver.conf 1> /dev/null 2> /dev/null
-    # If there is no httpsport defined in omiserver.conf, check the previous files
-    if [ $? -eq 0 ]; then
-        HTTPSPORT=""
+    for key in ${OMISETTINGS}; do
+        local VALUE=""
+        # If we found an OMISETTINGS from previous configuration, then restore it now
         if [ -f /etc/opt/omi/conf/omiserver.conf.rpmsave ]; then
-            HTTPSPORT=`grep '^httpsport=' /etc/opt/omi/conf/omiserver.conf.rpmsave | cut -d= -f2`
+            VALUE=`grep "^$key=" /etc/opt/omi/conf/omiserver.conf.rpmsave | cut -d= -f2 | head -1`
         elif [ -f /etc/opt/omi/conf/omiserver.conf.pkgsave ]; then
-            HTTPSPORT=`grep '^httpsport=' /etc/opt/omi/conf/omiserver.conf.pkgsave | cut -d= -f2`
+            VALUE=`grep "^$key=" /etc/opt/omi/conf/omiserver.conf.pkgsave | cut -d= -f2 | head -1`
         elif [ -f /etc/opt/microsoft/scx/conf/omiserver.conf.pkgsave ]; then
-            HTTPSPORT=`grep '^httpsport=' /etc/opt/microsoft/scx/conf/omiserver.conf.pkgsave | cut -d= -f2`
+            VALUE=`grep "^$key=" /etc/opt/microsoft/scx/conf/omiserver.conf.pkgsave | cut -d= -f2 | head -1`
         elif [ -f /etc/opt/microsoft/scx/conf/omiserver.conf ]; then
-            HTTPSPORT=`grep '^httpsport=' /etc/opt/microsoft/scx/conf/omiserver.conf | cut -d= -f2`
+            VALUE=`grep "^$key=" /etc/opt/microsoft/scx/conf/omiserver.conf | cut -d= -f2 | head -1`
         elif [ -f /etc/opt/microsoft/scx/conf/cimserver_current.conf ]; then
-            HTTPSPORT=`grep '^httpsport=' /etc/opt/microsoft/scx/conf/cimserver_current.conf | cut -d= -f2`
+            VALUE=`grep "^$key=" /etc/opt/microsoft/scx/conf/cimserver_current.conf | cut -d= -f2 | head -1`
         fi
-
-        # If we found an HTTSPORT from previous configuration, then restore it now
-        if [ -n "$HTTPSPORT" ]; then
-	    # omiconfigeditor requires SSL linkage to be set up properly on Linux
-	    # If the file to set these up exists, run it
-	    if [ -f /opt/omi/bin/support/installssllinks ]; then
-	       /opt/omi/bin/support/installssllinks
-	    fi
-
-            echo "Restoring OMI HTTPSPORT to $HTTPSPORT ..."
-            /opt/omi/bin/omiconfigeditor httpsport -s $HTTPSPORT < /etc/opt/omi/conf/omiserver.conf > /etc/opt/omi/conf/omiserver.conf_temp
-            mv /etc/opt/omi/conf/omiserver.conf_temp /etc/opt/omi/conf/omiserver.conf
+        
+        if [ -n "$VALUE" ]; then
+            echo "Restoring OMI $key to $VALUE ..."
+            /opt/omi/bin/omiconfigeditor $key -u < /etc/opt/omi/conf/omiserver.conf > /etc/opt/omi/conf/omiserver.conf_temp; mv /etc/opt/omi/conf/omiserver.conf_temp /etc/opt/omi/conf/omiserver.conf
+            /opt/omi/bin/omiconfigeditor $key -s $VALUE < /etc/opt/omi/conf/omiserver.conf > /etc/opt/omi/conf/omiserver.conf_temp; mv /etc/opt/omi/conf/omiserver.conf_temp /etc/opt/omi/conf/omiserver.conf
         fi
-    fi
+    done
 }
 
 DeleteUnsupportedCertificate() {
