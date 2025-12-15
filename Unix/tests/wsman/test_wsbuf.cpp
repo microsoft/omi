@@ -1773,5 +1773,25 @@ cleanup:
 }
 NitsEndTest
 
+NitsTestWithSetup(TestBigString, TestWsbufSetup)
+{
+    String result;
+
+    if(!TEST_ASSERT (MI_RESULT_OK == WSBuf_Init(&s_buf, 10)))
+        NitsReturn;
+
+    {
+        result += TEST_STR_ENCODED;
+        std::string str = string(10000 * 1024, '.');
+        char *cstr = new char[str.length() + 1];
+        strcpy(cstr, str.c_str());
+        TEST_ASSERT (MI_RESULT_FAILED == WSBuf_AddString(&s_buf, cstr) );
+        delete [] cstr;
+    }
+
+    TEST_ASSERT (MI_RESULT_OK == WSBuf_Destroy(&s_buf));
+}
+NitsEndTest
+
 #endif
 
