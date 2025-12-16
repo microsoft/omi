@@ -7,7 +7,7 @@
 **==============================================================================
 */
 
-#if !defined(macos)
+#if !defined(macos) && !defined(freebsd)
 #include <malloc.h>
 #endif
 #include <MI.h>
