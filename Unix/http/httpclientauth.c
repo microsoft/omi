@@ -2572,7 +2572,9 @@ static char *_BuildInitialGssAuthHeader(_In_ HttpClient_SR_SocketData * self, MI
         hints.ai_socktype = SOCK_STREAM;
         hints.ai_flags = AI_CANONNAME;
 
-        if ((gai_result = getaddrinfo(self->hostname, "http", &hints, &info)) != 0)
+        // Use a port number rather than a service name (http), which relies on /etc/services, which may not be available.
+        // The port number is irrelevant anyway since we're only using info->ai_canonname below.
+        if ((gai_result = getaddrinfo(self->hostname, "80", &hints, &info)) != 0)
         {
             trace_HTTP_GetAddrInfoError(gai_strerror(gai_result));
             return NULL;
