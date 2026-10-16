@@ -3,13 +3,13 @@
 import xml.etree.ElementTree as ET
 import sys
 import string
+import os
 from optparse import OptionParser
 
 parser = OptionParser()
 parser.add_option("-i","--Input",action="store",type="string",dest="Input",help="Input CDXML file")
 parser.add_option("-d","--Domain",action="store",type="string",dest="Domain",help="Domain name used to connect to the server")
 parser.add_option("-u","--Username",action="store",type="string",dest="Username",help="Username used to connect to the server")
-parser.add_option("-p","--Password",action="store",type="string",dest="Password",help="Password used to connect to the server")
 #parser.add_option("-f","--file",action="store",type="string",dest="filename",help="Write result to FILE",metavar="FILE")
 
 (options,args) = parser.parse_args()
@@ -19,8 +19,6 @@ if options.Domain == None:
 	parser.error("Domain cannot be empty!")
 if options.Username == None:
 	parser.error("Username cannot be empty!")
-if options.Password == None:
-	parser.error("Password cannot be empty!")
 try:
 	tree = ET.parse(options.Input)
 #missing file error
@@ -57,7 +55,10 @@ if getCmd != None:
 	getOperation = True
 	#create script get-noun.py
 	filename = 'Get-'+defaultNoun+'.py'
-	scriptFile = open(filename,'w+')
+	fileFlags = os.O_WRONLY | os.O_CREAT | os.O_TRUNC | getattr(os, 'O_NOFOLLOW', 0)
+	fileDescriptor = os.open(filename, fileFlags, 0600)
+	os.fchmod(fileDescriptor, 0600)
+	scriptFile = os.fdopen(fileDescriptor,'w')
 
 	#Get parameters if overrided: #add to propertyDict
 	propertyDict = {}
@@ -84,6 +85,7 @@ if getCmd != None:
 #imports:
 scriptFile.write('import mi \n')
 scriptFile.write('import ast \n')
+scriptFile.write('import getpass \n')
 scriptFile.write('from optparse import OptionParser \n')
 scriptFile.write('\n')
 
@@ -107,7 +109,10 @@ for item in propertyMand:
 
 #connection, get session:
 scriptFile.write('\n')
-scriptFile.write('session = mi.connect("'+options.Domain+'","'+options.Username+'","'+options.Password+'") \n')
+scriptFile.write('domain = '+repr(options.Domain)+' \n')
+scriptFile.write('username = '+repr(options.Username)+' \n')
+scriptFile.write('password = getpass.getpass("Password: ") \n')
+scriptFile.write('session = mi.connect(domain,username,password) \n')
 scriptFile.write('\n')
 
 #Get-instance:
