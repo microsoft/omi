@@ -963,7 +963,7 @@ void SetDefaults(Options *opts_ptr, ServerData *data_ptr, const char *executable
     s_optsPtr->httpsport[0] = CONFIG_HTTPSPORT;
     s_optsPtr->httpsport_size = 1;
 
-    s_optsPtr->sslOptions = DISABLE_SSL_V2;
+    s_optsPtr->sslOptions = DISABLE_SSL_V2 | DISABLE_SSL_V3 | DISABLE_TLS_V1_0 | DISABLE_TLS_V1_1;
     s_optsPtr->idletimeout = 0;
     s_optsPtr->livetime = 0;
     s_optsPtr->nonRoot = MI_TRUE;
